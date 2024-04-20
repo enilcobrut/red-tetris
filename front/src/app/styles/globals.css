@@ -1,0 +1,193 @@
+@import url("https://fonts.googleapis.com/css2?family=Press+Start+2P:wght@400&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+	background-color: #110023;
+	/* dark-purple */
+	overflow-y: hidden;
+}
+
+.font-2 {
+	display: flex;
+	flex-direction: column;
+	gap: 30px;
+	font-family: "Press Start 2P";
+	color: white;
+	text-shadow: 0px 0px 10px #F0F;
+	font-size: 25px;
+	z-index: 5;
+  	justify-content: center;
+	align-items: center;
+  }
+
+
+.font {
+	display: flex;
+	flex-direction: column;
+	gap: 30px;
+	font-family: "Press Start 2P";
+	color: white;
+	text-shadow: 0px 0px 10px #F0F;
+	font-size: 40px;
+	z-index: 5;
+  	justify-content: center;
+	align-items: center;
+  }
+  
+.font-username {
+	display: flex;
+	flex-direction: column;
+	gap: 10;
+	font-family: "Press Start 2P";
+	color: white;
+	text-shadow: 0px 0px 10px #0FF;
+	font-size: 20px;
+
+}
+
+
+.font-players {
+	display: flex;
+	flex-direction: column;
+	gap: 10;
+	font-family: "Press Start 2P";
+	color: white;
+	text-shadow: 0px 0px 10px #0FF;
+	font-size: 16px;
+
+}
+
+
+.username-container {
+	z-index: 20;
+	display: flex;
+	padding: 30px;
+	flex-direction: column;
+	align-items: center;
+	gap: 10px;
+	flex: 1 0 0;
+	align-self: stretch;
+	border-radius: 16px;
+	border: 1px solid var(--borders-border-primary, #FFF);
+	background: var(--surfaces-surface-secondary, #1D1A40);
+}
+
+.input-username {
+	font-family: "Press Start 2P";
+	color: white;
+	background-color: #110023;
+	border-radius: 16px;
+	font-size: 20px;
+	text-align: center; /* Centre le texte horizontalement */
+	padding: 10px 0; /* Ajustez pour le centrage vertical si nécessaire */
+	margin-top: 15px;
+	width: 100%; 
+  }
+  .button-neon {
+	width: 100%; /* Prend toute la largeur disponible */
+	padding: 14px 20px; /* Padding spécifié */
+	border-radius: 16px; /* Rayon de bordure */
+	border: 2px solid #FFFFFF; /* Bordure blanche */
+	background-color: transparent; /* Couleur de fond transparente */
+	box-shadow: 0 0 10px 0 #00FFFF; /* Ombre portée (effet néon) */
+	font-size: 16px; /* Taille de police (ajustable) */
+	color: white; /* Couleur du texte */
+	font-family: 'Press Start 2P', sans-serif; /* Police */
+	display: flex; /* Utilisation de Flexbox */
+	justify-content: center; /* Centrage horizontal du contenu */
+	align-items: center; /* Centrage vertical du contenu */
+	cursor: pointer; /* Style du curseur */
+	margin-top: 5px;
+  }
+  
+  .button-blue {
+	box-shadow: 0 0 10px 0 #00FFFF; /* Ombre portée pour bleu */
+
+  }
+  
+  .button-magenta {
+	box-shadow: 0 0 10px 0 magenta; /* Ombre portée pour magenta */
+  }
+  
+
+
+/*room user*/
+
+.room-layout {
+	display: grid;
+	justify-content: center;
+	width: 100%;
+	height: 100%;
+	padding: 0 20px;
+	align-items: center;
+	justify-content: center;
+	gap: 1rem;
+	grid-template-areas:
+		'User-Scores Create-Room HallOfFame'
+		'User-Scores Room-List HallOfFame';
+	grid-template-columns: 275px minmax(auto, 750px) 275px;
+	grid-template-rows: 25fr 10fr;
+}
+
+.User-Scores {
+	grid-area: User-Scores;
+}
+
+.Create-Room {
+	grid-area: Create-Room;
+}
+.HallOfFame {
+	grid-area: HallOfFame;
+}
+
+.Room-List {
+	grid-area: Room-List;
+}
+
+
+.halloffame {
+	display: flex;
+	padding: 15px;
+	flex-direction: column;
+	align-items: center;
+	gap: 10px;
+	flex: 1 0 0;
+	align-self: stretch;
+	border-radius: 16px;
+	border: 1px solid var(--borders-border-primary, #FFF);
+	background: var(--surfaces-surface-secondary, #1D1A40);
+}
+
+
+
+.waiting-container {
+    z-index: 20;
+    display: flex;
+    padding: 30px;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    align-self: center;  /* Centre le conteneur sans l'étirer */
+    border-radius: 16px;
+    border: 1px solid var(--borders-border-primary, #FFF);
+    background: var(--surfaces-surface-secondary, #1D1A40);
+    width: auto;  /* Assure que le conteneur s'adapte à son contenu */
+    max-width: 100%;  /* Empêche le conteneur de déborder de son conteneur parent */
+}
+
+
+.game-container {
+	z-index: 20;
+	display: flex;
+	padding: 30px;
+	flex-direction: column;
+	align-items: center;
+	gap: 10px;
+	flex: 1 0 0;
+	align-self: stretch;
+	border-radius: 16px;
+	border: 1px solid var(--borders-border-primary, #FFF);
+	background: var(--surfaces-surface-secondary, #1D1A40);
+}
