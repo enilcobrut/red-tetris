@@ -179,15 +179,38 @@ body {
 
 
 .game-container {
-	z-index: 20;
 	display: flex;
 	padding: 30px;
 	flex-direction: column;
 	align-items: center;
 	gap: 10px;
-	flex: 1 0 0;
+	flex: 1 0 auto;
 	align-self: stretch;
 	border-radius: 16px;
 	border: 1px solid var(--borders-border-primary, #FFF);
 	background: var(--surfaces-surface-secondary, #1D1A40);
+	max-width: 100vw; /* Assure que le conteneur ne dépasse pas la largeur de l'écran */
+	box-sizing: border-box; /* Inclut le padding dans la largeur */
+	max-width: 500px; /* Largeur maximale de la grille pour contrôler la taille des cellules */
+
+
+
+  }
+  .game-grid {
+    display: grid;
+    grid-template-columns: repeat(10, minmax(0, 1fr)); /* 10 colonnes avec une largeur maximale flexible */
+    grid-template-rows: repeat(20, 1fr); /* 20 lignes proportionnelles aux colonnes */
+    max-width: 500px; /* Largeur maximale de la grille pour contrôler la taille des cellules */
+    margin: auto; /* Centre la grille dans le conteneur */
+    width: 100%; /* Utilise toute la largeur disponible jusqu'à la largeur maximale */
+    height: auto; /* Hauteur ajustée automatiquement à la content de la grille */
+    background-color: #110023; /* Fond noir strictement à la grille */
+    border-radius: 0;
+    aspect-ratio: 1 / 2; /* Maintient un rapport hauteur/largeur constant */
+    overflow: hidden;
+}
+.grid-cell {
+    width: 100%; /* Utilise toute la largeur de la colonne de grille */
+    aspect-ratio: 1; /* Maintient chaque cellule comme un carré */
+    border: 1px solid #1D1A40; /* Bordure pour chaque cellule pour la visibilité */
 }

@@ -7,7 +7,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: "*",  // Remplacez '*' par vos URLs de frontend en production
+        origin: "*",
         methods: ["GET", "POST"]
     }
 });
@@ -32,30 +32,45 @@ io.on('connection', socket => {
     socket.on('join_room', ({ username, room }) => {
         socket.join(room);
         if (!rooms[room]) {
-            rooms[room] = { roomName: room, players: [] };
-        }
-        if (!rooms[room].players.includes(username)) {
-            rooms[room].players.push(username);
-        }
-        setTimeout(() => {
-            io.to(room).emit('room_update', rooms[room]);
-        }, 300);
-    });
-
-    socket.on('disconnecting', () => {
-        Object.keys(socket.rooms).forEach(room => {
-            if (room !== socket.id) {
-                socket.leave(room);
-                if (rooms[room]) {
-                    rooms[room].players = rooms[room].players.filter(player => player !== socket.id);
-                    if (rooms[room].players.length === 0) {
-                        delete rooms[room];
-                    } else {
-                        io.to(room).emit('room_update', rooms[room]);
-                    }
-                }
+            rooms[room] = {
+                roomName: room,
+                players: [{ name: username, socketId: socket.id, isOwner: true }],
+                owner: username
+            };
+        } else {
+            if (!rooms[room].players.find(player => player.name === username)) {
+                rooms[room].players.push({ name: username, socketId: socket.id, isOwner: false });
             }
-        });
+        }
+        io.to(room).emit('room_update', rooms[room]);
+    });
+    
+    
+    
+
+    socket.on('start_game', ({ username, room }) => {
+        console.log("start back");
+        const roomData = rooms[room];
+        console.log("Room Data:", roomData);
+    
+        if (!roomData) {
+            console.log(`No room data found for room: ${room}`);
+            return;
+        }
+    
+        const player = roomData.players.find(p => p.name === username);
+        if (player && player.isOwner) {
+            console.log("just before redirect");
+            io.to(room).emit('game_started', { room, url: `/${room}/${username}` });
+        } else {
+            console.log("User is not the owner or player data is missing", { username, isOwner: player ? player.isOwner : "Player not found" });
+        }
+    });
+    
+    
+    
+    socket.on('disconnect', () => {
+        console.log(`User disconnected: ${socket.id}`);
     });
 });
 

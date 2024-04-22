@@ -24,11 +24,11 @@
       "static/css/app/waitingRoom/page.css",
       "static/chunks/app/waitingRoom/page.js"
     ],
-    "/room/[room]/[player_name]/page": [
+    "/[room]/[player_name]/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/app/room/[room]/[player_name]/page.css",
-      "static/chunks/app/room/[room]/[player_name]/page.js"
+      "static/css/app/[room]/[player_name]/page.css",
+      "static/chunks/app/[room]/[player_name]/page.js"
     ]
   }
 }
