@@ -13,7 +13,7 @@ const io = new Server(server, {
 });
 
 const rooms = {};
-
+const { getRandomPiece } = require('./tetris/pieces');
 io.on('connection', socket => {
     console.log('A user connected', socket.id);
 
@@ -47,12 +47,8 @@ io.on('connection', socket => {
     
     
     
-
     socket.on('start_game', ({ username, room }) => {
-        console.log("start back");
         const roomData = rooms[room];
-        console.log("Room Data:", roomData);
-    
         if (!roomData) {
             console.log(`No room data found for room: ${room}`);
             return;
@@ -60,12 +56,22 @@ io.on('connection', socket => {
     
         const player = roomData.players.find(p => p.name === username);
         if (player && player.isOwner) {
-            console.log("just before redirect");
+            console.log("Starting game and redirecting users");
             io.to(room).emit('game_started', { room, url: `/${room}/${username}` });
         } else {
             console.log("User is not the owner or player data is missing", { username, isOwner: player ? player.isOwner : "Player not found" });
         }
     });
+    
+    socket.on('request_pieces', ({ username, room }) => {
+        const roomData = rooms[room];
+        if (roomData && roomData.players.find(p => p.name === username)) {
+            console.log("Generating and sending new pieces");
+            const piece = getRandomPiece();
+            socket.emit('new_piece', { piece });
+        }
+    });
+    
     
     
     

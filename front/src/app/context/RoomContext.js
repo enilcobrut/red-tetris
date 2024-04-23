@@ -3,11 +3,13 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useSocket } from './SocketContext';
 import { useUser } from './UserContext';
 import { useRouter } from 'next/navigation';
+
 const RoomContext = createContext();
 
 export const RoomProvider = ({ children }) => {
-    const router = useRouter();
     const { socket } = useSocket();
+    const { username } = useUser();  // Assurez-vous d'extraire username correctement ici
+    const router = useRouter();
     const [roomInfo, setRoomInfo] = useState({ roomName: '', players: [], owner: '', ownerSocketId: '' });
     const [isOwner, setIsOwner] = useState(false);
 
@@ -17,7 +19,7 @@ export const RoomProvider = ({ children }) => {
                 setRoomInfo(roomData);
                 setIsOwner(roomData.ownerSocketId === socket.id);
             };
-
+            console.log("www");
             socket.on('room_update', handleRoomUpdate);
 
             return () => {
@@ -35,12 +37,12 @@ export const RoomProvider = ({ children }) => {
 
         if (socket) {
             socket.on('game_started', handleGameStart);
-        
+
             return () => {
                 socket.off('game_started', handleGameStart);
             };
         }
-    }, [socket, roomInfo.roomName, router]);
+    }, [socket, roomInfo.roomName, router, username]);  // Inclure username dans les dépendances
 
     return (
         <RoomContext.Provider value={{ roomInfo, setRoomInfo, isOwner }}>
