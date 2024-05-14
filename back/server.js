@@ -117,49 +117,102 @@ io.on('connection', socket => {
         });
         callback({ success: true, username: cleanUsername });
     });
-
     socket.on('join_room', ({ username, room }) => {
         socket.join(room);
         if (!games[room]) {
-            games[room] = new Game(room);
-            games[room].addPlayer(username, socket.id, true); // Premier joueur devient propriétaire
+            games[room] = new Game(room, () => {
+                console.log(`Deleting room ${room}`);
+                delete games[room];
+            });
+            games[room].addPlayer(username, socket.id, true);
         } else {
             games[room].addPlayer(username, socket.id);
         }
         io.to(room).emit('room_update', games[room].getRoomData());
     });
+    
 
-    socket.on('start_game', ({ username, room }) => {
+    socket.on('redirect_game', ({ username, room }) => {
         const game = games[room];
         if (game && game.findPlayer(username).isOwner) {
-            game.startGame(io);
+            game.redirectGame(io);
             console.log(`Game started in room ${room} by ${username}`);
         }
     });
 
-    socket.on('request_pieces', ({ username, room }) => {
+    socket.on('game_started', ({ username, room }) => {
         const game = games[room];
-        if (game && game.findPlayer(username)) {
-            if (!game.getCurrentPiece()) {
-                game.generateNewPiece();  // Générer une pièce si aucune n'est actuellement définie
-            }
-            const piece = game.getCurrentPiece();
-            console.log(piece);
-                socket.emit('new_piece', { piece });
+        if (game) {
+            game.startGame(io);
+        } else {
+            console.error('Tentative de démarrage de jeu dans une salle inexistante');
         }
     });
+    
+    socket.on('rotate', () => { 
+        const game = findGameByPlayer(socket.id);
+        if (game) {
+            game.rotate(io, socket.id);
+        }
+
+    })  
+
+    socket.on('fall', () => { 
+        const game = findGameByPlayer(socket.id);
+        if (game) {
+            game.fall(io, socket.id);
+        }
+
+    })  
+
+
+    socket.on('stopFall', () => { 
+        const game = findGameByPlayer(socket.id);
+        if (game) {
+            game.stopFall(io, socket.id);
+        }
+
+    })  
+    socket.on('move', ({ direction }) => {
+        const game = findGameByPlayer(socket.id); // Trouver le jeu du joueur
+        if (game) {
+            if (direction === 'left') {
+                game.movePlayerPieceLeft(io, socket.id);
+            } else if (direction === 'right') {
+                game.movePlayerPieceRight(io, socket.id);
+            }
+        // io.to(game.roomName).emit('grid_update', game.getGridData());
+        }
+    });
+
+    socket.on('drop', () => {
+        const game = findGameByPlayer(socket.id);
+        if (game) {
+            game.dropPiece(io, socket.id);
+        }
+    });
+
     
 
     socket.on('disconnect', () => {
         console.log(`User ${socket.id} disconnected`);
+    
+        // Itérer sur chaque jeu pour voir si le socket déconnecté a un impact
         Object.keys(games).forEach(room => {
-            if (games[room].handleDisconnect(socket.id)) {
+            if (games[room].handleDisconnect(io, socket.id)) {
                 console.log(`Deleting room ${room}`);
-                delete games[room];
+                delete games[room];  // Supprimer la salle si le jeu indique qu'il doit être terminé
             }
         });
     });
 });
+
+function findGameByPlayer(socketId) {
+    // Recherche dans tous les jeux pour trouver où ce socketId est utilisé
+    return Object.values(games).find(game => 
+        game.players.some(player => player.socketId === socketId));
+}
+
 
 const PORT = process.env.PORT || 3001;
 server.listen(PORT, () => {

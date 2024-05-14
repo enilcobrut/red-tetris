@@ -7,7 +7,7 @@ import { useRoom } from '@/app/context/RoomContext';
 import { useSocket } from '@/app/context/SocketContext';  // Assurez-vous d'avoir accès au socket via un contexte ou un hook similaire
 import { useUser } from '@/app/context/UserContext';
 
-export default function Home() {
+export default function Game() {
   const { socket } = useSocket();
   const { roomInfo } = useRoom();
   const hasRequested = useRef(false);
@@ -19,18 +19,13 @@ export default function Home() {
     console.log("Room Name:", roomInfo.roomName);
     console.log("Has Requested:", hasRequested.current);
 
-    if (socket && username && roomInfo.roomName && !hasRequested.current) {
+    if (socket && username === roomInfo.owner && roomInfo.roomName && !hasRequested.current) {
         console.log("Requesting initial pieces for the game.");
-        socket.emit('request_pieces', { username, room: roomInfo.roomName });
+        socket.emit('game_started', { username, room: roomInfo.roomName });
         hasRequested.current = true;
     }
 }, [socket, username, roomInfo.roomName]);
 
-
-
-    const handleClick = () => {
-        router.push('/');
-    };  
     
   return (
     <div className="flex items-center justify-center p-10 h-full w-full">

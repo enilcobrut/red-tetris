@@ -4,7 +4,7 @@ import TetrisAnimation from './components/TetrisAnimation';
 import BackgroundAnimation from './components/BackgroundAnimation';
 import Username from './components/Username';
 
-export default function Home() {
+export default function () {
   return (
     <main className="flex min-h-screen items-center justify-center">
       <BackgroundAnimation />

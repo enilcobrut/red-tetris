@@ -7,7 +7,8 @@ import Button from '../components/Button';
 import BackgroundAnimation from '../components/BackgroundAnimation';
 import { useSocket } from '../context/SocketContext';
 
-export default function Home() {
+export default function waitingRoom() {
+    
     const router = useRouter();
     const { roomInfo } = useRoom();
     const { username } = useUser();
@@ -20,7 +21,7 @@ export default function Home() {
     const startGame = () => {
         if (roomInfo.roomName && username && username === roomInfo.owner) {
             console.log("start front");
-            socket.emit('start_game', { room: roomInfo.roomName, username });
+            socket.emit('redirect_game', { room: roomInfo.roomName, username });
         } else {
             console.error('Les informations nécessaires pour démarrer le jeu ne sont pas disponibles.');
         }

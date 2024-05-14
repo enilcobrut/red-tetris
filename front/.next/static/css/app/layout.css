@@ -693,8 +693,8 @@ body {
   }
   .game-grid {
     display: grid;
-    grid-template-columns: repeat(10, minmax(0, 1fr)); /* 10 colonnes avec une largeur maximale flexible */
     grid-template-rows: repeat(20, 1fr); /* 20 lignes proportionnelles aux colonnes */
+    grid-template-columns: repeat(10, minmax(0, 1fr)); /* 10 colonnes avec une largeur maximale flexible */
     max-width: 500px; /* Largeur maximale de la grille pour contrôler la taille des cellules */
     margin: auto; /* Centre la grille dans le conteneur */
     width: 100%; /* Utilise toute la largeur disponible jusqu'à la largeur maximale */

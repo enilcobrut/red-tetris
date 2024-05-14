@@ -1,9 +1,11 @@
 'use client'
 import React, { useState, useEffect } from 'react';
 import { useSocket } from '@/app/context/SocketContext';
+import { useRouter } from 'next/navigation';
 
 const GameCanva = () => {
     const { socket } = useSocket();
+    const router = useRouter();
     const rows = 20;
     const cols = 10;
     const [grid, setGrid] = useState(Array.from({ length: rows }, () =>
@@ -11,43 +13,99 @@ const GameCanva = () => {
     ));
 
     useEffect(() => {
-        const handleNewPiece = ({ piece }) => {
-            const newGrid = grid.slice(); // Créez une copie de la grille pour déclencher une mise à jour d'état
-            // Code du GameCanva resterait essentiellement le même, mais assurez-vous que la logique prend en compte `y < 0`
-            piece.shape.forEach((row, dy) => {
-                row.forEach((cell, dx) => {
-                    if (cell) {
-                        const x = dx + piece.position.x;
-                        const y = dy + piece.position.y;
-                        // Assurez-vous que la condition ci-dessous gère correctement y < 0
-                        if (y >= 0 && y < rows && x >= 0 && x < cols) {
-                            newGrid[x][y] = { filled: true, color: piece.color };
-                        }
-                    }
-                });
-            });
+        const handleKeyDown = (event) => {
+            if (event.repeat) return; // Ignore les appuis répétés sur la même touche
+            switch (event.key) {
+                case 'ArrowLeft':
+                    socket.emit('move', { direction: 'left' });
+                    break;
+                case 'ArrowRight':
+                    socket.emit('move', { direction: 'right' });
+                    break;
+                case 'ArrowUp':
+                    socket.emit('rotate');
+                    break;
+                case 'ArrowDown':
+                    socket.emit('fall'); // Envoyé une seule fois à la première pression
+                    break;
+                case ' ':
+                    socket.emit('drop');
+                    break;
+                default:
+                    break;
+            }
+        };
+    
+        const handleKeyUp = (event) => {
+            switch (event.key) {
+                case 'ArrowDown':
+                    socket.emit('stopFall'); // Envoyer cet événement quand la touche est relâchée
+                    break;
+                default:
+                    break;
+            }
+        };
+    
+        document.addEventListener('keydown', handleKeyDown);
+        document.addEventListener('keyup', handleKeyUp);
+    
+        // Assurez-vous de nettoyer les événements après le démontage du composant
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+            document.removeEventListener('keyup', handleKeyUp);
+        };
+    }, [socket]); // Ajoutez d'autres dépendances si nécessaire
+    
 
-            setGrid(newGrid);
+    useEffect(() => {
+        if (!socket) {
+            router.push('/');
+            console.error("Socket is not defined");
+            return;
+        }
+    
+        const handleGridUpdate = ({ grid: receivedGrid }) => {
+            console.log("Grid updated from server:", receivedGrid);
+            if (receivedGrid.length === cols && receivedGrid[0].length === rows) {
+                console.error("Grid dimensions are transposed. Correcting...");
+                const correctedGrid = receivedGrid[0].map((_, colIndex) =>
+                    receivedGrid.map(row => row[colIndex])
+                );
+                setGrid(correctedGrid);
+            } else if (receivedGrid.length === rows && receivedGrid[0].length === cols) {
+                console.log("Grid structure is correct");
+                setGrid(receivedGrid);
+            } else {
+                console.error("Incorrect grid structure", receivedGrid);
+            }
+        };
+        const handleGameOver = () => {
+            console.log("Game over, redirecting to homepage");
+            router.push('/');
         };
 
-        if (socket) {
-            socket.on('new_piece', handleNewPiece);
+    
+        socket.on('grid_update', handleGridUpdate);
+        socket.on('game_over', handleGameOver);
 
-            return () => {
-                socket.off('new_piece', handleNewPiece);
-            };
-        }
-    }, [socket, grid]);
+    
+        return () => {
+            socket.off('grid_update', handleGridUpdate);
+            socket.off('game_over', handleGameOver);
+
+        };
+    }, [socket]);
+    
 
     return (
         <div className="game-grid">
-            {grid.map((row, rowIndex) => (
-                <div key={rowIndex} className="grid-row">
-                    {row.map((cell, cellIndex) => (
+            {Array.from({ length: cols }).map((_, colIndex) => (
+                <div key={colIndex} className="grid-column">
+                    {grid.map((row, rowIndex) => (
                         <div
-                            key={cellIndex}
+                            key={`${colIndex}-${rowIndex}`}
                             className="grid-cell"
-                            style={{ backgroundColor: cell.filled ? cell.color : 'transparent' }}
+                            style={{ backgroundColor: row[colIndex].color }}
                         />
                     ))}
                 </div>

@@ -3,7 +3,12 @@ class Player {
         this.username = username;
         this.socketId = socketId;
         this.isOwner = false;
-        this.hasReceivedPiece = false; // Nouveau drapeau pour suivre si le joueur a reçu la pièce
+        this.currentPieceIndex = 0;
+        this.currentPiece = null;
+        this.score = 0;
+        this.dropped = false;
+        this.fall = false;
+        this.updateInterval = null; // Ajout de la référence d'intervalle ici
     }
 }
 module.exports = Player;

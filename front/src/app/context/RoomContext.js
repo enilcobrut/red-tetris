@@ -36,13 +36,13 @@ export const RoomProvider = ({ children }) => {
         };
 
         if (socket) {
-            socket.on('game_started', handleGameStart);
+            socket.on('redirect_game', handleGameStart);
 
             return () => {
-                socket.off('game_started', handleGameStart);
+                socket.off('redirect_game', handleGameStart);
             };
         }
-    }, [socket, roomInfo.roomName, router, username]);  // Inclure username dans les dépendances
+    }, [socket, roomInfo.roomName, router, username]); 
 
     return (
         <RoomContext.Provider value={{ roomInfo, setRoomInfo, isOwner }}>
