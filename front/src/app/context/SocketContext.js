@@ -9,7 +9,7 @@ export const SocketProvider = ({ children }) => {
   const [isConnected, setConnected] = useState(false);
 
   useEffect(() => {
-    const newSocket = io('http://localhost:3001', { transports: ['websocket'] });
+    const newSocket = io('http://192.168.1.126:3001', { transports: ['websocket'] });
     newSocket.on('connect', () => {
       console.log('Connected to server');
       setConnected(true);
