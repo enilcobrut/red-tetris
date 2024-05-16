@@ -6,7 +6,7 @@
 body {
 	background-color: #110023;
 	/* dark-purple */
-	overflow-y: hidden;
+	overflow: hidden;
 }
 
 .font-2 {

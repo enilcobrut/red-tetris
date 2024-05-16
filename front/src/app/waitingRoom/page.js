@@ -6,6 +6,7 @@ import { useUser } from '../context/UserContext';
 import Button from '../components/Button';
 import BackgroundAnimation from '../components/BackgroundAnimation';
 import { useSocket } from '../context/SocketContext';
+import { useEffect } from 'react';
 
 export default function waitingRoom() {
     
@@ -26,6 +27,28 @@ export default function waitingRoom() {
             console.error('Les informations nécessaires pour démarrer le jeu ne sont pas disponibles.');
         }
     };
+
+
+  useEffect(() => {
+    if (!socket) {
+        router.push('/');
+        console.error("Socket is not defined");
+        return;
+    }
+    const handleDisconnect = () => {
+      console.log("Game over, redirecting to homepage");
+      router.push('/');
+  };
+  socket.on('handle_disconnect', handleDisconnect);
+
+
+    return () => {
+        socket.off('handle_disconnect', handleDisconnect);
+
+    };
+  }, [socket]);
+
+
     
     
 

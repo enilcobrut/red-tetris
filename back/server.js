@@ -195,18 +195,30 @@ io.on('connection', socket => {
     });
 
     
-
     socket.on('disconnect', () => {
         console.log(`User ${socket.id} disconnected`);
     
-        // Itérer sur chaque jeu pour voir si le socket déconnecté a un impact
+        let found = false;
+    
         Object.keys(games).forEach(room => {
-            if (games[room].handleDisconnect(io, socket.id)) {
-                console.log(`Deleting room ${room}`);
-                delete games[room];  // Supprimer la salle si le jeu indique qu'il doit être terminé
+            if (games[room].players.some(player => player.socketId === socket.id)) {
+                found = true;  // Marquer comme trouvé
+                console.log("uwuwuwu");
+                if (games[room].handleDisconnect(io, socket.id)) {
+                    console.log(`Deleting room ${room}`);
+                    delete games[room];
+                }
             }
         });
+        console.log("EEE");
+        if (!found) {
+            console.log("CCC");
+            io.to(socket.id).emit('handle_disconnect', {
+                message: "You were not in any game room, but the disconnect was handled."
+            });
+        }
     });
+    
 });
 
 function findGameByPlayer(socketId) {
