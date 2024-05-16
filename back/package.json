@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "node server.js",
-    "start": "NODE_ENV=production node server.js",
+    "dev": "node Server.js",
+    "start": "NODE_ENV=production node Server.js",
     "test": "jest"
   },
   "jest": {

@@ -1,4 +1,4 @@
-const { FORMS, rotate, getRandomPiece } = require('../tetris/pieces');
+const { FORMS, rotate, getRandomPiece } = require('../Pieces');
 
 describe('Tetris Pieces', () => {
     test('FORMS should contain the correct predefined shapes and colors', () => {
