@@ -1,4 +1,4 @@
-// File: /Users/celinejunker/redtetrisjs/front/src/app/[room]/[player_name]/page.js
+// File: /Users/celinejunker/red-tetris/front/src/app/[room]/[player_name]/page.js
 import * as entry from '../../../../../src/app/[room]/[player_name]/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

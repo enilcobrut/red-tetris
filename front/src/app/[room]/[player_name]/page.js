@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import BackgroundAnimation from '../../components/BackgroundAnimation';
 import Paragraph from '@/app/components/Paragraph';
 import GameCanva from '@/app/components/game/GameCanva';
@@ -11,6 +11,8 @@ export default function Game() {
   const { socket } = useSocket();
   const { roomInfo } = useRoom();
   const hasRequested = useRef(false);
+  const [spectrums, setSpectrums] = useState({});
+
   const  { username } =  useUser();
 
   useEffect(() => {
@@ -27,6 +29,25 @@ export default function Game() {
 }, [socket, username, roomInfo.roomName]);
 
     
+
+useEffect(() => {
+
+  if (socket) {
+
+    const handleSpectrumUpdate = (data) => {
+      console.log("Spectrum update received:", data);
+      setSpectrums(prev => ({
+        ...prev,
+        [data.playerSocketId]: data.spectrumGrid
+      }));
+    };
+
+    socket.on('update_spectrums', handleSpectrumUpdate);
+
+    return () => socket.off('update_spectrums', handleSpectrumUpdate);
+  }
+}, [socket]);
+
   return (
     <div className="flex items-center justify-center p-10 h-full w-full">
       <BackgroundAnimation />
@@ -39,8 +60,30 @@ export default function Game() {
           <div className='flex flex-col'>
             <Paragraph neon='blue'>Room: {roomInfo.roomName}</Paragraph>
             {roomInfo.players.map((player, index) => (
-                            <Paragraph key={index}>{player.name}</Paragraph>
-                        ))}
+              socket.id !== player.socketId && (
+                <div key={index} className="player-spectrum">
+                  <Paragraph>{player.name}</Paragraph>
+                  {spectrums[player.socketId] && spectrums[player.socketId].length > 0 && (
+  <div className="spectrum-grid">
+    {Array.from({ length: spectrums[player.socketId][0].length }).map((_, colIndex) => ( // Générer des colonnes basées sur la longueur de la première rangée
+      <div key={colIndex} className="grid-column">
+        {spectrums[player.socketId].map((row, rowIndex) => (
+          <div
+            key={`${colIndex}-${rowIndex}`}
+            className="grid-cell"
+            style={{ backgroundColor: row[colIndex].color }} // Utiliser row[colIndex] pour accéder à la cellule correcte
+          />
+        ))}
+      </div>
+    ))}
+  </div>
+)}
+
+                </div>
+              )
+            ))}
+
+
           </div>
         </div>
       </div>

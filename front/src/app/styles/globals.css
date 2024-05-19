@@ -214,3 +214,34 @@ body {
     aspect-ratio: 1; /* Maintient chaque cellule comme un carré */
     border: 1px solid #1D1A40; /* Bordure pour chaque cellule pour la visibilité */
 }
+
+
+
+/* Styles pour le conteneur de chaque grille spectre */
+.spectrum-grid {
+    display: grid;
+    grid-template-columns: repeat(10, 20px); /* 10 colonnes, chaque cellule de 20px de large */
+    grid-template-rows: repeat(20, 20px); /* 20 lignes, chaque cellule de 20px de haut */
+    grid-gap: 1px; /* Espacement de 1px entre les cellules */
+    background: #333; /* Couleur de fond pour les grilles */
+    padding: 5px; /* Espacement autour de la grille */
+    border: 2px solid #444; /* Bordure autour de la grille */
+}
+
+.spectrum-grid-cell {
+    width: 20px; /* Largeur de chaque cellule */
+    height: 20px; /* Hauteur de chaque cellule */
+    display: inline-block; /* Pour que les cellules soient alignées correctement */
+    border: 1px solid #555; /* Petite bordure pour chaque cellule pour les distinguer */
+    background-color: #ddd; /* Couleur de fond par défaut des cellules */
+}
+
+.spectrum-grid-cell.filled {
+    background-color: #666; /* Couleur plus sombre pour les cellules occupées */
+}
+
+/* Styles pour chaque rangée de la grille */
+.grid-row {
+    display: flex; /* Utiliser flexbox pour aligner les cellules horizontalement */
+    justify-content: start;
+}

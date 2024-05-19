@@ -207,13 +207,13 @@ class Game {
     
     /*make the pieces move, check the colision, update the grid, and check cleared lines then get the next piece and updategrid again*/
     movePieceDownForPlayer(io, player) {
-        console.log(player)
+      //  console.log(player)
         if (!player) {
             player = this.players.find(player => player.socketId === socketId);
         }
         const grid = this.grids.get(player.socketId);
         const currentPiece = this.currentPieces.get(player.socketId);
-        console.log(currentPiece)
+       // console.log(currentPiece)
         let newPosition = { ...currentPiece.position, y: currentPiece.position.y + 1 };
     
         if (this.isValidPlacement(grid, currentPiece.shape, newPosition)) {
@@ -221,6 +221,8 @@ class Game {
             this.broadcastGridUpdate(io, player.socketId);
         } else {
             this.clearFullLines(grid, player);
+            this.checkSommet(io, grid, player)
+
             const newPiece = this.getNextPiece(player);
             if (!this.isValidPlacement(grid, newPiece.shape, newPiece.position)) {
                 clearInterval(player.updateInterval);
@@ -351,6 +353,32 @@ class Game {
 
         }
     }
+
+    checkSommet(io, grid, player) {
+
+        const spectrumGrid = this.createEmptyGrid();
+
+        for (let col = 0; col < 10; col++) {
+            let firstFilledFound = false;
+    
+            for (let row = 0; row < 20; row++) {
+                if (!firstFilledFound && grid[row][col].filled) {
+                    firstFilledFound = true;
+                }
+                if (firstFilledFound) {
+                    spectrumGrid[row][col] = { filled: true, color: 'gray' };
+                }
+            }
+        }
+       console.log("\n\n#######  GRID ###########\n\n", grid);
+       console.log("\n\n#######  SPECTRUM GRID ###########\n\n", spectrumGrid);
+    
+    
+    
+        // Envoyer la grille spectre à tous les joueurs dans la room sauf au joueur qui a mis à jour sa grille
+        io.to(this.roomName).emit('update_spectrums', { playerSocketId: player.socketId, spectrumGrid });
+    }
+    
 
     /*same but right*/
 
