@@ -262,11 +262,21 @@ class Game {
             this.checkSommet(io, grid, player)
 
             const newPiece = this.getNextPiece(player);
+            
             if (!this.isValidPlacement(grid, newPiece.shape, newPiece.position)) {
                 clearInterval(player.updateInterval);
                 io.to(player.socketId).emit('game_over');
                 console.log(`Game over for player ${player.username}`);
                 this.removePlayer(player.socketId);
+    
+                const remainingPlayers = this.players.filter(p => p.socketId !== player.socketId);
+                if (remainingPlayers.length === 1) {
+                    const lastPlayer = remainingPlayers[0];
+                    clearInterval(lastPlayer.updateInterval);
+                    io.to(lastPlayer.socketId).emit('game_over');
+                    console.log(`Game over for player ${lastPlayer.username}`);
+                    this.removePlayer(lastPlayer.socketId);
+                }
             } else {
                 this.currentPieces.set(player.socketId, newPiece);
                 this.updateGrid(grid, newPiece, newPiece.position);
@@ -512,6 +522,15 @@ class Game {
                 io.to(player.socketId).emit('game_over');
                 console.log(`Game over for player ${player.username}`);
                 this.removePlayer(player.socketId);
+                const remainingPlayers = this.players.filter(p => p.socketId !== player.socketId);
+
+                if (remainingPlayers.length === 1) {
+                    const lastPlayer = remainingPlayers[0];
+                    clearInterval(lastPlayer.updateInterval);
+                    io.to(lastPlayer.socketId).emit('game_over');
+                    console.log(`Game over for player ${lastPlayer.username}`);
+                    this.removePlayer(lastPlayer.socketId);
+                }
             } else {
                 this.currentPieces.set(socketId, newPiece);
                 this.updateGrid(grid, newPiece, newPiece.position);
