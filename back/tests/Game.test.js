@@ -2,6 +2,7 @@ const Game = require('../Game');
 const Player = require('../Player');
 
 console.log = jest.fn(); // Suppress console.log
+jest.useFakeTimers();
 
 jest.mock('../Player', () => {
     return jest.fn().mockImplementation((username, socketId) => {

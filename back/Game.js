@@ -494,6 +494,8 @@ class Game {
         this.updateGrid(grid, currentPiece, newPosition);
         this.broadcastGridUpdate(io, socketId);
         this.clearFullLines(grid, player);
+        this.checkSommet(io, grid, player)
+
         const newPiece = this.getNextPiece(player);
         if (!this.isValidPlacement(grid, newPiece.shape, newPiece.position)) {
             clearInterval(player.updateInterval);
