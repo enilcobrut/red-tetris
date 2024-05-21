@@ -132,7 +132,7 @@ io.on('connection', socket => {
     
         // Check each game to see if the disconnected socket has an impact
         Object.keys(activeGames).forEach(room => {
-            if (games[room].players.some(player => player.socketId === socket.id)) {
+            if (activeGames[room].players.some(player => player.socketId === socket.id)) {
                 found = true;  // Marquer comme trouvé
                 console.log("uwuwuwu");
                 if (activeGames[room].handleDisconnect(io, socket.id)) {
