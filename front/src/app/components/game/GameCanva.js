@@ -104,7 +104,7 @@ const GameCanva = () => {
                     {grid.map((row, rowIndex) => (
                         <div
                             key={`${colIndex}-${rowIndex}`}
-                            className="grid-cell"
+                            className={`grid-cell ${row[colIndex].color !== 'transparent' && row[colIndex].color !== 'rgba(0, 0, 0, 0)' ? 'filled-cell' : ''}`}
                             style={{ backgroundColor: row[colIndex].color }}
                         />
                     ))}
