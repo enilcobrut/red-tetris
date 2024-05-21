@@ -3,12 +3,29 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "node server.js",
-    "start": "NODE_ENV=production node server.js"
+    "dev": "node Server.js",
+    "start": "NODE_ENV=production node Server.js",
+    "test": "jest --coverage"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "collectCoverage": true,
+    "coverageDirectory": "coverage",
+    "coverageThreshold": {
+      "global": {
+        "statements": 70,
+        "functions": 70,
+        "lines": 70,
+        "branches": 50
+      }
+    }
   },
   "dependencies": {
     "express": "^4.19.2",
     "sanitize-html": "^2.13.0",
-    "socket.io": "^4.7.5"
+    "socket-io": "^1.0.0",
+    "socket.io": "^4.7.5",
+    "socket.io-client": "^4.7.5",
+    "supertest": "^7.0.0"
   }
 }

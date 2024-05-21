@@ -1,4 +1,3 @@
-// back/tetris/pieces.js
 const FORMS = [
     { shape: [[1, 1, 1, 1]], color: 'cyan' }, // I
     { shape: [[1, 1], [1, 1]], color: 'yellow' }, // O
@@ -15,24 +14,23 @@ const FORMS = [
  * @return {Array<Array<number>>} The rotated piece.
  */
 const rotate = (piece) => {
-    // Transpose the matrix
-    let rotatedPiece = piece[0].map((val, index) => piece.map(row => row[index]));
-    rotatedPiece.forEach(row => row.reverse());
+    // Transpose the matrix and then reverse each row to rotate clockwise
+    let rotatedPiece = piece[0].map((val, index) => piece.map(row => row[index]).reverse());
     return rotatedPiece;
 };
 
-
 /**
  * Get a random piece from the predefined forms.
- * @return {Object} A piece object with shape and color.
+ * @return {Object} A piece object with shape, color, and initial position.
  */
-// back/tetris/pieces.js
 const getRandomPiece = () => {
     const randomIndex = Math.floor(Math.random() * FORMS.length);
-    let piece = { ...FORMS[0] };
-    console.log(piece);
-    piece.position = { x: 5, y: 0 };
-    return piece;
+    const template = FORMS[randomIndex];
+    return {
+        shape: template.shape,
+        color: template.color,
+        position: { x: 5, y: 0 }
+    };
 };
 
 module.exports = { FORMS, rotate, getRandomPiece };

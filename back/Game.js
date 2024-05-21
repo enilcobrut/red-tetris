@@ -1,55 +1,60 @@
 const Player = require('./Player');
 const Piece = require('./Piece');
 
-/*an instance of game is created when someone create a room*/
-
-
+/**
+ * An instance of Game is created when someone creates a room.
+ */
 class Game {
     constructor(roomName, onDelete) {
-        this.roomName = roomName; //name of the room
-        this.players = []; // list of  players who joined 
-        this.owner = null; // the owner of the room (not set yet I think)
-        this.pieceQueue = []; // list of the piece that will be used for the game (same for every players)
-        this.updateInterval = 0; // useless now
-        this.grids = new Map(); // map with all grid for all players, socket will be the keys, for each grid's case there will be a boolean, if its filled or not, and a color
-        this.cols = 10;
-        this.rows = 20;
-        this.currentPieces = new Map(); // each players will have a map which their own list of piece (parce que ca causait beaucoup de probleme d utiliser celle de la classe pour tout le monde) (but there is maybe a better way to do)
-        this.onDelete = onDelete; // callBack to delete inside the class
+        this.roomName = roomName; // Name of the room
+        this.players = []; // List of players who joined
+        this.owner = null; // Owner of the room (initially not set)
+        this.pieceQueue = []; // List of pieces that will be used for the game (same for every player)
+        this.updateInterval = 0; // Currently not used
+        this.grids = new Map(); // Map with grids for all players; socket IDs are keys, grid cells contain boolean and color
+        this.cols = 10; // Number of columns in the grid
+        this.rows = 20; // Number of rows in the grid
+        this.currentPieces = new Map(); // Each player has their own list of pieces
+        this.onDelete = onDelete; // Callback to delete the game room
     }
 
-    /*Piece Fonction START , I tried to do inside the Piece class but it didnt work so .. */
+    /**
+     * Generate pieces for the game.
+     * @param {number} count - Number of pieces to generate.
+     */
+    generatePieces(count = 1000) {
+        const templates = [
+            { shape: [[1], [1], [1], [1]], color: 'cyan', position: { x: 5, y: 0 } },
+            { shape: [[1, 1], [1, 1]], color: 'yellow', position: { x: 5, y: 0 } },
+            { shape: [[0, 1, 0], [1, 1, 1]], color: 'purple', position: { x: 5, y: 0 } },
+            { shape: [[1, 0, 0], [1, 1, 1]], color: 'orange', position: { x: 5, y: 0 } },
+            { shape: [[0, 0, 1], [1, 1, 1]], color: 'blue', position: { x: 5, y: 0 } },
+            { shape: [[0, 1, 1], [1, 1, 0]], color: 'red', position: { x: 5, y: 0 } },
+            { shape: [[1, 1, 0], [0, 1, 1]], color: 'green', position: { x: 5, y: 0 } }
+        ];
 
-
-    /* generate the pieces for a game */
-        generatePieces(count = 1000) {
-            const templates = [
-                { shape: [[1], [1], [1], [1]], color: 'cyan', position: { x: 5, y: 0 } },
-                { shape: [[1, 1], [1, 1]], color: 'yellow', position: { x: 5, y: 0 } },
-                { shape: [[0, 1, 0], [1, 1, 1]], color: 'purple', position: { x: 5, y: 0 } },
-                { shape: [[1, 0, 0], [1, 1, 1]], color: 'orange', position: { x: 5, y: 0 } },
-                { shape: [[0, 0, 1], [1, 1, 1]], color: 'blue', position: { x: 5, y: 0 } },
-                { shape: [[0, 1, 1], [1, 1, 0]], color: 'red', position: { x: 5, y: 0 } },
-                { shape: [[1, 1, 0], [0, 1, 1]], color: 'green', position: { x: 5, y: 0 } }
-            ];
-
-            while (this.pieceQueue.length < count) {
-                let bag = templates.slice();
-                while (bag.length > 0 && this.pieceQueue.length < count) {
-                    const randomIndex = Math.floor(Math.random() * bag.length);
-                    const template = bag.splice(randomIndex, 1)[0];
-                    this.pieceQueue.push(Piece.createFromTemplate(template));
-                }
+        while (this.pieceQueue.length < count) {
+            let bag = templates.slice();
+            while (bag.length > 0 && this.pieceQueue.length < count) {
+                const randomIndex = Math.floor(Math.random() * bag.length);
+                const template = bag.splice(randomIndex, 1)[0];
+                this.pieceQueue.push(Piece.createFromTemplate(template));
             }
-            console.log(`Generated ${count} pieces for the game.`);
         }
+        console.log(`Generated ${count} pieces for the game.`);
+    }
 
-    /* rotate the piece when keyup is pressed , and update grid */
-
+    /**
+     * Rotate the current piece for a player and update the grid.
+     * @param {object} io - Socket.io instance.
+     * @param {string} socketId - Player's socket ID.
+     * @param {boolean} clockwise - Direction of rotation.
+     */
     rotate(io, socketId, clockwise = true) {
         const grid = this.grids.get(socketId);
         const currentPiece = this.currentPieces.get(socketId);
         if (!currentPiece) return;
+
         currentPiece.shape.forEach((row, dy) => {
             row.forEach((value, dx) => {
                 if (value) {
@@ -61,11 +66,14 @@ class Game {
                 }
             });
         });
+
         const newShape = this.rotateMatrix(currentPiece.shape, clockwise);
         const newPiece = new Piece(newShape, currentPiece.color, { ...currentPiece.position });
+
         if (this.isValidPlacement(grid, newPiece.shape, newPiece.position)) {
             currentPiece.shape = newShape;
         }
+
         currentPiece.shape.forEach((row, dy) => {
             row.forEach((value, dx) => {
                 if (value) {
@@ -77,15 +85,21 @@ class Game {
                 }
             });
         });
+
         this.broadcastGridUpdate(io, socketId);
     }
-    
-    /*usefull function to rotate piece thx chatgpt*/
 
+    /**
+     * Rotate a matrix (piece shape).
+     * @param {array} matrix - The matrix to rotate.
+     * @param {boolean} clockwise - Direction of rotation.
+     * @returns {array} The rotated matrix.
+     */
     rotateMatrix(matrix, clockwise) {
         const rows = matrix.length;
         const cols = matrix[0].length;
         let rotatedMatrix = Array.from({ length: cols }, () => Array(rows));
+
         for (let row = 0; row < rows; row++) {
             for (let col = 0; col < cols; col++) {
                 if (clockwise) {
@@ -95,20 +109,23 @@ class Game {
                 }
             }
         }
+
         return rotatedMatrix;
     }
 
-    /*Piece Function END*/
-
-
-    /*grid function START */
-
+    /**
+     * Create an empty grid for a player.
+     * @returns {array} The empty grid.
+     */
     createEmptyGrid() {
         return Array.from({ length: 20 }, () => 
             Array.from({ length: 10 }, () => ({ filled: false, color: 'transparent' })));
     }
 
-    // not used yet but will be used to show the spect
+    /**
+     * Get grid data for all players.
+     * @returns {object} The grid data.
+     */
     getGridData() {
         const gridData = {};
         this.players.forEach(player => {
@@ -122,8 +139,12 @@ class Game {
         return gridData;
     }
 
-    /*very usefull function that will update the grid with a new piece and new positions :)*/
-
+    /**
+     * Update the grid with the new piece position.
+     * @param {array} grid - The grid to update.
+     * @param {object} piece - The piece to place.
+     * @param {object} newPosition - The new position of the piece.
+     */
     updateGrid(grid, piece, newPosition) {
         piece.shape.forEach((row, dy) => {
             row.forEach((value, dx) => {
@@ -136,6 +157,7 @@ class Game {
                 }
             });
         });
+
         piece.shape.forEach((row, dy) => {
             row.forEach((value, dx) => {
                 if (value) {
@@ -147,17 +169,25 @@ class Game {
                 }
             });
         });
+
         piece.position = newPosition;
     }
 
-    /*grid function END*/
-
-    /*useful fonction to find player, add player into the game etc */
-
+    /**
+     * Find a player by username.
+     * @param {string} username - The username to search for.
+     * @returns {object} The player object, or undefined if not found.
+     */
     findPlayer(username) {
         return this.players.find(player => player.username === username);
     }
 
+    /**
+     * Add a player to the game.
+     * @param {string} username - The player's username.
+     * @param {string} socketId - The player's socket ID.
+     * @param {boolean} isOwner - Whether the player is the room owner.
+     */
     addPlayer(username, socketId, isOwner = false) {
         const player = new Player(username, socketId);
         if (isOwner || this.players.length === 0) {
@@ -168,34 +198,37 @@ class Game {
         console.log(`${username} joined room ${this.roomName}`);
     }
 
-    /*redirect all players to the game*/
-
+    /**
+     * Redirect all players to the game.
+     * @param {object} io - Socket.io instance.
+     */
     redirectGame(io) {
         io.to(this.roomName).emit('redirect_game', {
             room: this.roomName,
             url: `/${this.roomName}/${this.owner.username}`
         });
     }
-    
-    /*start the game, generate the piece, initialise the grid for each player then start the interval (every players has his own interval so when someone loose it doesnt stop for the rest*/
+
+    /**
+     * Start the game: generate pieces, initialize grids, and start intervals for players.
+     * @param {object} io - Socket.io instance.
+     */
     startGame(io) {
         this.generatePieces();
-        // this.pieceQueue.slice(0, 10).forEach((piece, index) => { // was just to show the if the piece were correct because.. hehe
-        //     console.log(`Piece ${index + 1}: ${piece.color}`);
-        // });
+
         this.players.forEach(player => {
             this.grids.set(player.socketId, this.createEmptyGrid());
             let initialPiece = this.getNextPiece(player);
             this.currentPieces.set(player.socketId, initialPiece);
             this.startPlayerInterval(io, player);
-
         });
     }
 
-
-
-
-    /*start the movement, every second*/
+    /**
+     * Start the movement interval for a player.
+     * @param {object} io - Socket.io instance.
+     * @param {object} player - The player object.
+     */
     startPlayerInterval(io, player) {
         if (player.updateInterval) {
             clearInterval(player.updateInterval);
@@ -204,18 +237,20 @@ class Game {
             this.movePieceDownForPlayer(io, player);
         }, 1000);
     }
-    
-    /*make the pieces move, check the colision, update the grid, and check cleared lines then get the next piece and updategrid again*/
+
+    /**
+     * Move the current piece down for a player, check for collisions, and update the grid.
+     * @param {object} io - Socket.io instance.
+     * @param {object} player - The player object.
+     */
     movePieceDownForPlayer(io, player) {
-      //  console.log(player)
         if (!player) {
             player = this.players.find(player => player.socketId === socketId);
         }
         const grid = this.grids.get(player.socketId);
         const currentPiece = this.currentPieces.get(player.socketId);
-       // console.log(currentPiece)
         let newPosition = { ...currentPiece.position, y: currentPiece.position.y + 1 };
-    
+
         if (this.isValidPlacement(grid, currentPiece.shape, newPosition)) {
             this.updateGrid(grid, currentPiece, newPosition);
             this.broadcastGridUpdate(io, player.socketId);
@@ -233,17 +268,23 @@ class Game {
                 this.currentPieces.set(player.socketId, newPiece);
                 this.updateGrid(grid, newPiece, newPiece.position);
                 this.broadcastGridUpdate(io, player.socketId);
-
             }
         }
     }
 
-    /*check the cohision for every direction .. (horrible function I agree)*/
+    /**
+     * Check if a piece can be placed at a given position on the grid.
+     * @param {array} grid - The grid to check.
+     * @param {array} shape - The piece shape.
+     * @param {object} position - The position to check.
+     * @param {string} direction - The direction to check (default is 'down').
+     * @returns {boolean} True if the placement is valid, false otherwise.
+     */
     isValidPlacement(grid, shape, position, direction = 'down') {
         const { x, y } = position;
         const numRows = grid.length;
         const numCols = grid[0].length;
-    
+
         if (direction === 'down') {
             const lowestPoints = new Array(shape[0].length).fill(-1);
             for (let row = 0; row < shape.length; row++) {
@@ -253,13 +294,13 @@ class Game {
                     }
                 }
             }
-    
+
             for (let col = 0; col < lowestPoints.length; col++) {
                 if (lowestPoints[col] !== -1) {
                     const row = lowestPoints[col];
                     const gridX = x + col;
                     const gridY = y + row;
-    
+
                     if (gridY >= numRows || gridX >= numCols || gridX < 0 || gridY < 0 || (gridY < numRows && grid[gridY][gridX] && grid[gridY][gridX].filled)) {
                         return false;
                     }
@@ -275,7 +316,7 @@ class Game {
                     }
                 }
             }
-    
+
             for (let row = 0; row < leftmostPoints.length; row++) {
                 if (leftmostPoints[row] !== -1) {
                     const col = leftmostPoints[row];
@@ -296,7 +337,7 @@ class Game {
                     }
                 }
             }
-    
+
             for (let row = 0; row < rightmostPoints.length; row++) {
                 if (rightmostPoints[row] !== -1) {
                     const col = rightmostPoints[row];
@@ -308,16 +349,18 @@ class Game {
                 }
             }
         }
-    
+
         return true;
     }
-    
-    
 
-    /*delete the line and update score*/
-    //TODO check if the line==4 for a special score tetris? idk the rules
+    /**
+     * Clear full lines and update the player's score.
+     * @param {array} grid - The grid to clear lines from.
+     * @param {object} player - The player object.
+     */
     clearFullLines(grid, player) {
         let linesCleared = 0;
+        let points = 0;
         for (let row = 0; row < this.rows; row++) {
             if (grid[row].every(cell => cell.filled)) {
                 grid.splice(row, 1);
@@ -327,17 +370,19 @@ class Game {
         }
         const scorePerLine = 100;
         player.score += scorePerLine * linesCleared;
+        if (linesCleared === 4) {
+            player.score += 400;
+            console.log(`Player ${player.username} cleared a Tetris!`);
+        } else if (linesCleared > 0) {
+            console.log(`Player ${player.username} cleared ${linesCleared} lines.`);
+        }
     }
 
-
-
-    
-
-
-
-    /* event START*/
-
-    /*left, move the piece check cohision update the grid*/
+    /**
+     * Move the current piece left for a player.
+     * @param {object} io - Socket.io instance.
+     * @param {string} socketId - Player's socket ID.
+     */
     movePlayerPieceLeft(io, socketId) {
         const player = this.players.find(player => player.socketId === socketId);
         if (!player) return;
@@ -345,12 +390,10 @@ class Game {
         const currentPiece = this.currentPieces.get(socketId);
         const newPosition = { ...currentPiece.position, x: currentPiece.position.x - 1 };
 
-       // console.log("left pressed");
         if (this.isValidPlacement(this.grids.get(socketId), currentPiece.shape, newPosition, 'left')) {
             this.updateGrid(this.grids.get(socketId), currentPiece, newPosition);
             this.currentPieces.set(socketId, {...currentPiece, position: newPosition});
             this.broadcastGridUpdate(io, socketId);
-
         }
     }
 
@@ -374,14 +417,18 @@ class Game {
        console.log("\n\n#######  SPECTRUM GRID ###########\n\n", spectrumGrid);
     
     
-    
-        // Envoyer la grille spectre à tous les joueurs dans la room sauf au joueur qui a mis à jour sa grille
+        // Send grid spectrum to everyone expect the player itself
         io.to(this.roomName).emit('update_spectrums', { playerSocketId: player.socketId, spectrumGrid });
     }
     
 
     /*same but right*/
 
+    /**
+     * Move the current piece right for a player.
+     * @param {object} io - Socket.io instance.
+     * @param {string} socketId - Player's socket ID.
+     */
     movePlayerPieceRight(io, socketId) {
         const player = this.players.find(player => player.socketId === socketId);
         if (!player) return;
@@ -393,11 +440,14 @@ class Game {
             this.updateGrid(this.grids.get(socketId), currentPiece, newPosition);
             this.currentPieces.set(socketId, {...currentPiece, position: newPosition});
             this.broadcastGridUpdate(io, player.socketId);
-
         }
     }
 
-    /*when keydown is press, clear interval and use another more faster*/
+    /**
+     * Make the piece fall faster when the down key is pressed.
+     * @param {object} io - Socket.io instance.
+     * @param {string} socketId - Player's socket ID.
+     */
     fall(io, socketId) {
         const player = this.players.find(player => player.socketId === socketId);
         if (player) {
@@ -406,64 +456,62 @@ class Game {
             player.updateInterval = setInterval(() => {
                 this.movePieceDownForPlayer(io, player);
             }, 100);
-          //  console.log("fall !")
         }
     }
 
-
-    /*when keydown isnt press anymore, clear interval and use 1s*/
-
-
+    /**
+     * Restore the normal falling speed when the down key is released.
+     * @param {object} io - Socket.io instance.
+     * @param {string} socketId - Player's socket ID.
+     */
     stopFall(io, socketId) {
         const player = this.players.find(player => player.socketId === socketId);
-
         if (player) {
             player.fall = true;
             clearInterval(player.updateInterval);
-
             player.updateInterval = setInterval(() => {
                 this.movePieceDownForPlayer(io, player);
             }, 1000);
-          //  console.log("fall !")
         }
     }
 
-
-    /* when space is press*/
+    /**
+     * Drop the current piece to the bottom when the space key is pressed.
+     * @param {object} io - Socket.io instance.
+     * @param {string} socketId - Player's socket ID.
+     */
     dropPiece(io, socketId) {
         const grid = this.grids.get(socketId);
         const currentPiece = this.currentPieces.get(socketId);
         let newPosition = { ...currentPiece.position };
         const player = this.players.find(player => player.socketId === socketId);
         player.dropped = true;
+
         while (this.isValidPlacement(grid, currentPiece.shape, { ...newPosition, y: newPosition.y + 1 })) {
             newPosition.y += 1;
         }
-    
+
         this.updateGrid(grid, currentPiece, newPosition);
-    
         this.broadcastGridUpdate(io, socketId);
-            this.clearFullLines(grid, player);
-            const newPiece = this.getNextPiece(player);
-            if (!this.isValidPlacement(grid, newPiece.shape, newPiece.position)) {
-                clearInterval(player.updateInterval);
-                io.to(player.socketId).emit('game_over');
-                console.log(`Game over for player ${player.username}`);
-                this.removePlayer(player.socketId);
-
-            } else {
-                this.currentPieces.set(socketId, newPiece);
-                this.updateGrid(grid, newPiece, newPiece.position);
-                this.broadcastGridUpdate(io, socketId);
-                player.dropped = false;
-            }
+        this.clearFullLines(grid, player);
+        const newPiece = this.getNextPiece(player);
+        if (!this.isValidPlacement(grid, newPiece.shape, newPiece.position)) {
+            clearInterval(player.updateInterval);
+            io.to(player.socketId).emit('game_over');
+            console.log(`Game over for player ${player.username}`);
+            this.removePlayer(player.socketId);
+        } else {
+            this.currentPieces.set(socketId, newPiece);
+            this.updateGrid(grid, newPiece, newPiece.position);
+            this.broadcastGridUpdate(io, socketId);
+            player.dropped = false;
+        }
     }
-    
 
-    /*event END*/
-
-    /* delete a player from the game room when its game over for him */
-    
+    /**
+     * Remove a player from the game room when it's game over for them.
+     * @param {string} socketId - Player's socket ID.
+     */
     removePlayer(socketId) {
         this.players = this.players.filter(p => p.socketId !== socketId);
         this.grids.delete(socketId);
@@ -472,14 +520,22 @@ class Game {
             this.onDelete(this.roomName);
         }
     }
-    
 
-
+    /**
+     * Broadcast the updated grid to a player.
+     * @param {object} io - Socket.io instance.
+     * @param {string} socketId - Player's socket ID.
+     */
     broadcastGridUpdate(io, socketId) {
         const grid = this.grids.get(socketId);
         io.to(socketId).emit('grid_update', { grid });
     }
-        
+
+    /**
+     * Get the next piece for a player.
+     * @param {object} player - The player object.
+     * @returns {object} The next piece.
+     */
     getNextPiece(player) {
         if (player.currentPieceIndex >= this.pieceQueue.length) {
             this.generatePieces(1000);
@@ -488,6 +544,10 @@ class Game {
         return Piece.createFromTemplate(pieceTemplate);
     }
 
+    /**
+     * Get data about the game room.
+     * @returns {object} The room data.
+     */
     getRoomData() {
         return {
             roomName: this.roomName,
@@ -499,23 +559,28 @@ class Game {
             owner: this.owner.username
         };
     }
+
+    /**
+     * Handle player disconnection.
+     * @param {object} io - Socket.io instance.
+     * @param {string} socketId - Player's socket ID.
+     * @returns {boolean} True if disconnection is handled.
+     */
     handleDisconnect(io, socketId) {
         this.players.forEach(player => {
             io.to(player.socketId).emit('game_over', {
                 message: "Game has ended due to a player disconnecting. You will be redirected."
             });
-                clearInterval(player.updateInterval);
+            clearInterval(player.updateInterval);
         });
-    
+
         clearInterval(this.updateInterval);
         this.pieceQueue = [];
         this.players.currentPieceIndex = 0;
         this.players = [];
-    
+
         return true;
     }
-    
-    
 }
 
 module.exports = Game;

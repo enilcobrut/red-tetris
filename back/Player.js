@@ -8,7 +8,7 @@ class Player {
         this.score = 0;
         this.dropped = false;
         this.fall = false;
-        this.updateInterval = null; // Ajout de la référence d'intervalle ici
+        this.updateInterval = null; // Reference to the interval
     }
 }
 module.exports = Player;
