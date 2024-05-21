@@ -9,6 +9,7 @@ class Player {
         this.dropped = false;
         this.fall = false;
         this.updateInterval = null; // Reference to the interval
+        this.dropInterval = 0;
     }
 }
 module.exports = Player;

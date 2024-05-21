@@ -54,7 +54,7 @@ useEffect(() => {
       <div className='flex flex-col mb-10 items-center justify-center h-full w-full'>
         <div className='flex flex-row gap-10 h-full w-full items-center justify-center'>
           <div className="game-container items-center justify-center">
-            <Paragraph neon='magenta'>username {username}</Paragraph>
+            <Paragraph neon='magenta'>{username}</Paragraph>
             <GameCanva/>
           </div>
           <div className='flex flex-col'>

@@ -234,6 +234,9 @@ class Game {
             clearInterval(player.updateInterval);
         }
         player.updateInterval = setInterval(() => {
+            if (player.drpped == true) {
+                clearInterval(player.updateInterval);
+            }
             this.movePieceDownForPlayer(io, player);
         }, 1000);
     }
@@ -359,10 +362,14 @@ class Game {
      * @param {object} player - The player object.
      */
     clearFullLines(grid, player) {
+        player.dropInterval = 0;
         let linesCleared = 0;
         let points = 0;
         for (let row = 0; row < this.rows; row++) {
             if (grid[row].every(cell => cell.filled)) {
+                if (player.dropInterval == 0) {
+                    player.dropInterval = 150;
+                }
                 grid.splice(row, 1);
                 grid.unshift(new Array(this.cols).fill({ filled: false, color: 'transparent' }));
                 linesCleared++;
@@ -455,7 +462,7 @@ class Game {
             clearInterval(player.updateInterval);
             player.updateInterval = setInterval(() => {
                 this.movePieceDownForPlayer(io, player);
-            }, 100);
+            }, 70);
         }
     }
 
@@ -481,11 +488,12 @@ class Game {
      * @param {string} socketId - Player's socket ID.
      */
     dropPiece(io, socketId) {
+        const player = this.players.find(player => player.socketId === socketId);
+        player.dropped = true;
+        clearInterval(player.updateInterval);
         const grid = this.grids.get(socketId);
         const currentPiece = this.currentPieces.get(socketId);
         let newPosition = { ...currentPiece.position };
-        const player = this.players.find(player => player.socketId === socketId);
-        player.dropped = true;
 
         while (this.isValidPlacement(grid, currentPiece.shape, { ...newPosition, y: newPosition.y + 1 })) {
             newPosition.y += 1;
@@ -494,20 +502,26 @@ class Game {
         this.updateGrid(grid, currentPiece, newPosition);
         this.broadcastGridUpdate(io, socketId);
         this.clearFullLines(grid, player);
-        this.checkSommet(io, grid, player)
 
-        const newPiece = this.getNextPiece(player);
-        if (!this.isValidPlacement(grid, newPiece.shape, newPiece.position)) {
-            clearInterval(player.updateInterval);
-            io.to(player.socketId).emit('game_over');
-            console.log(`Game over for player ${player.username}`);
-            this.removePlayer(player.socketId);
-        } else {
-            this.currentPieces.set(socketId, newPiece);
-            this.updateGrid(grid, newPiece, newPiece.position);
-            this.broadcastGridUpdate(io, socketId);
-            player.dropped = false;
-        }
+        setTimeout(() => {
+            this.checkSommet(io, grid, player)
+
+            const newPiece = this.getNextPiece(player);
+            if (!this.isValidPlacement(grid, newPiece.shape, newPiece.position)) {
+                clearInterval(player.updateInterval);
+                io.to(player.socketId).emit('game_over');
+                console.log(`Game over for player ${player.username}`);
+                this.removePlayer(player.socketId);
+            } else {
+                this.currentPieces.set(socketId, newPiece);
+                this.updateGrid(grid, newPiece, newPiece.position);
+                this.broadcastGridUpdate(io, socketId);
+                player.updateInterval = setInterval(() => {
+                    this.movePieceDownForPlayer(io, player);
+                }, 1000);
+            }
+        }, player.dropInterval);
+
     }
 
     /**
