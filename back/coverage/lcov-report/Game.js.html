@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">77.58% </span>
+                <span class="strong">82.26% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>218/281</span>
+                <span class='fraction'>232/282</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">59.84% </span>
+                <span class="strong">64.39% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>79/132</span>
+                <span class='fraction'>85/132</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">83.63% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>46/55</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">81.81% </span>
-                <span class="quiet">Functions</span>
-                <span class='fraction'>45/55</span>
-            </div>
-        
-            
-            <div class='fl pad1y space-right2'>
-                <span class="strong">77.38% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>195/252</span>
+                <span class='fraction'>207/253</span>
             </div>
         
             
@@ -649,7 +649,9 @@
 <a name='L584'></a><a href='#L584'>584</a>
 <a name='L585'></a><a href='#L585'>585</a>
 <a name='L586'></a><a href='#L586'>586</a>
-<a name='L587'></a><a href='#L587'>587</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L587'></a><a href='#L587'>587</a>
+<a name='L588'></a><a href='#L588'>588</a>
+<a name='L589'></a><a href='#L589'>589</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -769,8 +771,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">12x</span>
-<span class="cline-any cline-yes">2400x</span>
+<span class="cline-any cline-yes">14x</span>
+<span class="cline-any cline-yes">2800x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1050,26 +1052,26 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">20x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">20x</span>
+<span class="cline-any cline-yes">400x</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">400x</span>
+<span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1145,6 +1147,8 @@
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -1634,28 +1638,28 @@ class Game {
         }
     }
 &nbsp;
-<span class="fstat-no" title="function not covered" >    ch</span>eckSommet(io, grid, player) {
+    checkSommet(io, grid, player) {
 &nbsp;
-        const spectrumGrid = <span class="cstat-no" title="statement not covered" >this.createEmptyGrid();</span>
+        const spectrumGrid = this.createEmptyGrid();
 &nbsp;
-<span class="cstat-no" title="statement not covered" >        for (let col = <span class="cstat-no" title="statement not covered" >0;</span> col &lt; 10; col++) {</span>
-            let firstFilledFound = <span class="cstat-no" title="statement not covered" >false;</span>
+        for (let col = 0; col &lt; 10; col++) {
+            let firstFilledFound = false;
     
-<span class="cstat-no" title="statement not covered" >            for (let row = <span class="cstat-no" title="statement not covered" >0;</span> row &lt; 20; row++) {</span>
-<span class="cstat-no" title="statement not covered" >                if (!firstFilledFound &amp;&amp; grid[row][col].filled) {</span>
-<span class="cstat-no" title="statement not covered" >                    firstFilledFound = true;</span>
+            for (let row = 0; row &lt; 20; row++) {
+                if (!firstFilledFound &amp;&amp; grid[row][col].filled) {
+                    firstFilledFound = true;
                 }
-<span class="cstat-no" title="statement not covered" >                if (firstFilledFound) {</span>
-<span class="cstat-no" title="statement not covered" >                    spectrumGrid[row][col] = { filled: true, color: 'gray' };</span>
+                if (firstFilledFound) {
+                    spectrumGrid[row][col] = { filled: true, color: 'gray' };
                 }
             }
         }
-<span class="cstat-no" title="statement not covered" >       console.log("\n\n#######  GRID ###########\n\n", grid);</span>
-<span class="cstat-no" title="statement not covered" >       console.log("\n\n#######  SPECTRUM GRID ###########\n\n", spectrumGrid);</span>
+       console.log("\n\n#######  GRID ###########\n\n", grid);
+       console.log("\n\n#######  SPECTRUM GRID ###########\n\n", spectrumGrid);
     
     
         // Send grid spectrum to everyone expect the player itself
-<span class="cstat-no" title="statement not covered" >        io.to(this.roomName).emit('update_spectrums', { playerSocketId: player.socketId, spectrumGrid });</span>
+        io.to(this.roomName).emit('update_spectrums', { playerSocketId: player.socketId, spectrumGrid });
     }
     
 &nbsp;
@@ -1731,6 +1735,8 @@ class Game {
         this.updateGrid(grid, currentPiece, newPosition);
         this.broadcastGridUpdate(io, socketId);
         this.clearFullLines(grid, player);
+        this.checkSommet(io, grid, player)
+&nbsp;
         const newPiece = this.getNextPiece(player);
         <span class="missing-if-branch" title="if path not taken" >I</span>if (!this.isValidPlacement(grid, newPiece.shape, newPiece.position)) {
 <span class="cstat-no" title="statement not covered" >            clearInterval(player.updateInterval);</span>
@@ -1828,7 +1834,7 @@ module.exports = Game;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-05-21T10:03:52.608Z
+                at 2024-05-21T13:30:25.024Z
             </div>
         <script src="prettify.js"></script>
         <script>
