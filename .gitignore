@@ -6,6 +6,7 @@
 .pnp.js
 .yarn/install-state.gz
 /back/coverage
+/front/coverage
 **/.next/
 /out/
 /build
