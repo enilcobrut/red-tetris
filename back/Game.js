@@ -16,6 +16,7 @@ class Game {
         this.rows = 20; // Number of rows in the grid
         this.currentPieces = new Map(); // Each player has their own list of pieces
         this.onDelete = onDelete; // Callback to delete the game room
+        this.pendingPenalties = new Map(); // Map to store pending penalty lines for each player
     }
 
     /**
@@ -61,7 +62,7 @@ class Game {
                     const x = dx + currentPiece.position.x;
                     const y = dy + currentPiece.position.y;
                     if (x >= 0 && x < this.cols && y >= 0 && y < this.rows) {
-                        grid[y][x] = { filled: false, color: 'transparent' };
+                        grid[y][x] = { filled: false, color: 'transparent', indestructible: grid[y][x].indestructible };
                     }
                 }
             });
@@ -80,7 +81,7 @@ class Game {
                     const x = dx + currentPiece.position.x;
                     const y = dy + currentPiece.position.y;
                     if (x >= 0 && x < this.cols && y >= 0 && y < this.rows) {
-                        grid[y][x] = { filled: true, color: currentPiece.color };
+                        grid[y][x] = { filled: true, color: currentPiece.color, indestructible: grid[y][x].indestructible };
                     }
                 }
             });
@@ -119,7 +120,7 @@ class Game {
      */
     createEmptyGrid() {
         return Array.from({ length: 20 }, () => 
-            Array.from({ length: 10 }, () => ({ filled: false, color: 'transparent' })));
+            Array.from({ length: 10 }, () => ({ filled: false, color: 'transparent', indestructible: false })));
     }
 
     /**
@@ -132,7 +133,7 @@ class Game {
             const grid = this.grids.get(player.socketId);
             if (grid) {
                 gridData[player.socketId] = grid.map(row => 
-                    row.map(cell => ({ filled: cell.filled, color: cell.color }))
+                    row.map(cell => ({ filled: cell.filled, color: cell.color, indestructible: cell.indestructible }))
                 );
             }
         });
@@ -152,7 +153,7 @@ class Game {
                     const x = dx + piece.position.x;
                     const y = dy + piece.position.y;
                     if (x >= 0 && x < this.cols && y >= 0 && y < this.rows) {
-                        grid[y][x] = { filled: false, color: 'transparent' };
+                        grid[y][x] = { filled: false, color: 'transparent', indestructible: grid[y][x].indestructible };
                     }
                 }
             });
@@ -164,13 +165,26 @@ class Game {
                     const x = dx + newPosition.x;
                     const y = dy + newPosition.y;
                     if (x >= 0 && x < this.cols && y >= 0 && y < this.rows) {
-                        grid[y][x] = { filled: true, color: piece.color };
+                        grid[y][x] = { filled: true, color: piece.color, indestructible: grid[y][x].indestructible };
                     }
                 }
             });
         });
 
         piece.position = newPosition;
+    }
+
+    /**
+     * Apply pending penalty lines to a player's grid.
+     * @param {array} grid - The player's grid.
+     * @param {string} socketId - The player's socket ID.
+     */
+    applyPendingPenalties(grid, socketId) {
+        const penalties = this.pendingPenalties.get(socketId) || 0;
+        if (penalties > 0) {
+            this.addPenaltyLines(grid, penalties);
+            this.pendingPenalties.set(socketId, 0); // Reset pending penalties
+        }
     }
 
     /**
@@ -234,7 +248,7 @@ class Game {
             clearInterval(player.updateInterval);
         }
         player.updateInterval = setInterval(() => {
-            if (player.drpped == true) {
+            if (player.dropped) {
                 clearInterval(player.updateInterval);
             }
             this.movePieceDownForPlayer(io, player);
@@ -258,30 +272,40 @@ class Game {
             this.updateGrid(grid, currentPiece, newPosition);
             this.broadcastGridUpdate(io, player.socketId);
         } else {
-            this.clearFullLines(grid, player);
-            this.checkSommet(io, grid, player)
+            this.handlePieceLanding(io, grid, player);
+        }
+    }
 
-            const newPiece = this.getNextPiece(player);
-            
-            if (!this.isValidPlacement(grid, newPiece.shape, newPiece.position)) {
-                clearInterval(player.updateInterval);
-                io.to(player.socketId).emit('game_over');
-                console.log(`Game over for player ${player.username}`);
-                this.removePlayer(player.socketId);
-    
-                const remainingPlayers = this.players.filter(p => p.socketId !== player.socketId);
-                if (remainingPlayers.length === 1) {
-                    const lastPlayer = remainingPlayers[0];
-                    clearInterval(lastPlayer.updateInterval);
-                    io.to(lastPlayer.socketId).emit('game_over');
-                    console.log(`Game over for player ${lastPlayer.username}`);
-                    this.removePlayer(lastPlayer.socketId);
-                }
-            } else {
-                this.currentPieces.set(player.socketId, newPiece);
-                this.updateGrid(grid, newPiece, newPiece.position);
-                this.broadcastGridUpdate(io, player.socketId);
+    /**
+     * Handle the landing of a piece.
+     * @param {object} io - Socket.io instance.
+     * @param {array} grid - The grid.
+     * @param {object} player - The player.
+     */
+    handlePieceLanding(io, grid, player) {
+        this.clearFullLines(io, grid, player);
+        this.checkSommet(io, grid, player);
+
+        const newPiece = this.getNextPiece(player);
+        if (!this.isValidPlacement(grid, newPiece.shape, newPiece.position)) {
+            clearInterval(player.updateInterval);
+            io.to(player.socketId).emit('game_over');
+            console.log(`Game over for player ${player.username}`);
+            this.removePlayer(player.socketId);
+
+            const remainingPlayers = this.players.filter(p => p.socketId !== player.socketId);
+            if (remainingPlayers.length === 1) {
+                const lastPlayer = remainingPlayers[0];
+                clearInterval(lastPlayer.updateInterval);
+                io.to(lastPlayer.socketId).emit('game_over');
+                console.log(`Game over for player ${lastPlayer.username}`);
+                this.removePlayer(lastPlayer.socketId);
             }
+        } else {
+            this.applyPendingPenalties(grid, player.socketId);
+            this.currentPieces.set(player.socketId, newPiece);
+            this.updateGrid(grid, newPiece, newPiece.position);
+            this.broadcastGridUpdate(io, player.socketId);
         }
     }
 
@@ -368,30 +392,68 @@ class Game {
 
     /**
      * Clear full lines and update the player's score.
+     * Notify other players about the lines cleared.
+     * @param {object} io - Socket.io instance.
      * @param {array} grid - The grid to clear lines from.
      * @param {object} player - The player object.
      */
-    clearFullLines(grid, player) {
+    clearFullLines(io, grid, player) {
         player.dropInterval = 0;
         let linesCleared = 0;
-        let points = 0;
         for (let row = 0; row < this.rows; row++) {
-            if (grid[row].every(cell => cell.filled)) {
+            if (grid[row].every(cell => cell.filled && !cell.indestructible)) {
                 if (player.dropInterval == 0) {
                     player.dropInterval = 150;
                 }
                 grid.splice(row, 1);
-                grid.unshift(new Array(this.cols).fill({ filled: false, color: 'transparent' }));
+                grid.unshift(new Array(this.cols).fill({ filled: false, color: 'transparent', indestructible: false }));
                 linesCleared++;
             }
         }
-        const scorePerLine = 100;
-        player.score += scorePerLine * linesCleared;
-        if (linesCleared === 4) {
-            player.score += 400;
-            console.log(`Player ${player.username} cleared a Tetris!`);
-        } else if (linesCleared > 0) {
-            console.log(`Player ${player.username} cleared ${linesCleared} lines.`);
+        if (linesCleared > 0) {
+            const scorePerLine = 100;
+            player.score += scorePerLine * linesCleared;
+            if (linesCleared === 4) {
+                player.score += 400;
+                console.log(`Player ${player.username} cleared a Tetris!`);
+            } else {
+                console.log(`Player ${player.username} cleared ${linesCleared} lines.`);
+            }
+            if (linesCleared > 1) {
+                this.sendPenaltyLines(io, player, linesCleared - 1);
+            } 
+        }
+    }
+
+    /**
+     * Send penalty lines to other players.
+     * @param {object} io - Socket.io instance.
+     * @param {object} clearingPlayer - The player who cleared lines.
+     * @param {number} penaltyLines - The number of penalty lines to send.
+     */
+    sendPenaltyLines(io, clearingPlayer, penaltyLines) {
+        if (penaltyLines <= 0) return;
+
+        this.players.forEach(player => {
+            if (player.socketId !== clearingPlayer.socketId) {
+                const currentPenalties = this.pendingPenalties.get(player.socketId) || 0;
+                this.pendingPenalties.set(player.socketId, currentPenalties + penaltyLines);
+                this.broadcastGridUpdate(io, player.socketId);
+            }
+        });
+    }
+
+    /**
+     * Add penalty lines to a player's grid.
+     * @param {array} grid - The player's grid.
+     * @param {number} penaltyLines - The number of penalty lines to add.
+     */
+    addPenaltyLines(grid, penaltyLines) {
+        const penaltyRow = new Array(this.cols).fill({ filled: true, color: 'gray', indestructible: true });
+
+        for (let i = 0; i < penaltyLines; i++) {
+            grid.shift(); // Remove the top row
+            grid.push([...penaltyRow]); // Add a penalty line at the bottom
         }
     }
 
@@ -415,31 +477,26 @@ class Game {
     }
 
     checkSommet(io, grid, player) {
-
         const spectrumGrid = this.createEmptyGrid();
 
-        for (let col = 0; col < 10; col++) {
+        for (let col = 0; col < this.cols; col++) {
             let firstFilledFound = false;
     
-            for (let row = 0; row < 20; row++) {
+            for (let row = 0; row < this.rows; row++) {
                 if (!firstFilledFound && grid[row][col].filled) {
                     firstFilledFound = true;
                 }
                 if (firstFilledFound) {
-                    spectrumGrid[row][col] = { filled: true, color: 'gray' };
+                    spectrumGrid[row][col] = { filled: true, color: 'gray', indestructible: grid[row][col].indestructible };
                 }
             }
         }
-       console.log("\n\n#######  GRID ###########\n\n", grid);
-       console.log("\n\n#######  SPECTRUM GRID ###########\n\n", spectrumGrid);
-    
+    //    console.log("\n\n#######  GRID ###########\n\n", grid);
+    //    console.log("\n\n#######  SPECTRUM GRID ###########\n\n", spectrumGrid);
     
         // Send grid spectrum to everyone expect the player itself
         io.to(this.roomName).emit('update_spectrums', { playerSocketId: player.socketId, spectrumGrid });
     }
-    
-
-    /*same but right*/
 
     /**
      * Move the current piece right for a player.
@@ -511,10 +568,10 @@ class Game {
 
         this.updateGrid(grid, currentPiece, newPosition);
         this.broadcastGridUpdate(io, socketId);
-        this.clearFullLines(grid, player);
+        this.clearFullLines(io, grid, player);
 
         setTimeout(() => {
-            this.checkSommet(io, grid, player)
+            this.checkSommet(io, grid, player);
 
             const newPiece = this.getNextPiece(player);
             if (!this.isValidPlacement(grid, newPiece.shape, newPiece.position)) {
@@ -532,6 +589,7 @@ class Game {
                     this.removePlayer(lastPlayer.socketId);
                 }
             } else {
+                this.applyPendingPenalties(grid, player.socketId);
                 this.currentPieces.set(socketId, newPiece);
                 this.updateGrid(grid, newPiece, newPiece.position);
                 this.broadcastGridUpdate(io, socketId);
