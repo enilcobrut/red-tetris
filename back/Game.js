@@ -1,6 +1,9 @@
 const Player = require('./Player');
 const Piece = require('./Piece');
 
+const DEFAULT_PIECES = 1000;
+const DEFAULT_INTERVAL = 1000;
+
 /**
  * An instance of Game is created when someone creates a room.
  */
@@ -23,7 +26,7 @@ class Game {
      * Generate pieces for the game.
      * @param {number} count - Number of pieces to generate.
      */
-    generatePieces(count = 1000) {
+    generatePieces(count = DEFAULT_PIECES) {
         const templates = [
             { shape: [[1], [1], [1], [1]], color: 'cyan', position: { x: 5, y: 0 } },
             { shape: [[1, 1], [1, 1]], color: 'yellow', position: { x: 5, y: 0 } },
@@ -252,7 +255,7 @@ class Game {
                 clearInterval(player.updateInterval);
             }
             this.movePieceDownForPlayer(io, player);
-        }, 1000);
+        }, DEFAULT_INTERVAL);
     }
 
     /**
@@ -545,7 +548,7 @@ class Game {
             clearInterval(player.updateInterval);
             player.updateInterval = setInterval(() => {
                 this.movePieceDownForPlayer(io, player);
-            }, 1000);
+            }, DEFAULT_INTERVAL);
         }
     }
 
@@ -595,7 +598,7 @@ class Game {
                 this.broadcastGridUpdate(io, socketId);
                 player.updateInterval = setInterval(() => {
                     this.movePieceDownForPlayer(io, player);
-                }, 1000);
+                }, DEFAULT_INTERVAL);
             }
         }, player.dropInterval);
 
@@ -631,7 +634,7 @@ class Game {
      */
     getNextPiece(player) {
         if (player.currentPieceIndex >= this.pieceQueue.length) {
-            this.generatePieces(1000);
+            this.generatePieces(DEFAULT_PIECES);
         }
         const pieceTemplate = this.pieceQueue[player.currentPieceIndex++];
         return Piece.createFromTemplate(pieceTemplate);
