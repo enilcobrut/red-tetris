@@ -1,12 +1,20 @@
 const Game = require('../Game');
 const Player = require('../Player');
+const Piece = require('../Piece');
 
 console.log = jest.fn(); // Suppress console.log
 jest.useFakeTimers();
 
 jest.mock('../Player', () => {
     return jest.fn().mockImplementation((username, socketId) => {
-        return { username, socketId, isOwner: false, score: 0, updateInterval: null }; // Add any other default properties you expect
+        return { 
+            username, 
+            socketId, 
+            isOwner: false, 
+            score: 0, 
+            updateInterval: null,
+            dropInterval: 0 // Add dropInterval property here
+        }; 
     });
 });
 
@@ -159,7 +167,7 @@ describe('Game class', () => {
         const grid = game.createEmptyGrid();
         expect(grid.length).toBe(20);
         expect(grid[0].length).toBe(10);
-        expect(grid[0][0]).toEqual({ filled: false, color: 'transparent' });
+        expect(grid[0][0]).toEqual({ filled: false, color: 'transparent', indestructible: false });
     });
 
     test('getGridData returns correct data', () => {
@@ -264,17 +272,42 @@ describe('Game class', () => {
     });
 
     test('clearFullLines clears lines and updates score correctly', () => {
+        const io = { to: jest.fn().mockReturnThis(), emit: jest.fn() };
         const grid = game.createEmptyGrid();
         grid[0].fill({ filled: true, color: 'red' });
         const player = new Player('testUser', 'testSocketId');
         game.players.push(player);
-
-        game.clearFullLines(grid, player);
-
+        game.grids.set(player.socketId, grid);
+    
+        game.clearFullLines(io, grid, player);
+    
         expect(grid[0].every(cell => !cell.filled)).toBe(true);
         expect(player.score).toBe(100);
     });
 
+    test('sendPenaltyLines adds penalties to pendingPenalties', () => {
+        const io = { to: jest.fn().mockReturnThis(), emit: jest.fn() };
+        const player1 = new Player('player1', 'socket1');
+        const player2 = new Player('player2', 'socket2');
+        game.players.push(player1, player2);
+    
+        game.sendPenaltyLines(io, player1, 2);
+    
+        expect(game.pendingPenalties.get('socket2')).toBe(2);
+    });
+
+    test('applyPendingPenalties correctly applies penalties', () => {
+        const grid = game.createEmptyGrid();
+        const socketId = 'testSocketId';
+        game.pendingPenalties.set(socketId, 2);
+    
+        game.applyPendingPenalties(grid, socketId);
+    
+        expect(grid[18].every(cell => cell.filled && cell.indestructible)).toBe(true);
+        expect(grid[19].every(cell => cell.filled && cell.indestructible)).toBe(true);
+        expect(game.pendingPenalties.get(socketId)).toBe(0);
+    });
+    
     test('movePlayerPieceLeft moves piece correctly', () => {
         const io = { to: jest.fn().mockReturnThis(), emit: jest.fn() };
         const player = new Player('testUser', 'testSocketId');
@@ -413,4 +446,79 @@ describe('Game class', () => {
         expect(io.emit).toHaveBeenCalledWith('game_over', expect.any(Object));
         expect(game.players.length).toBe(0);
     });
+
+    test('checkSommet updates spectrum correctly', () => {
+        const io = { to: jest.fn().mockReturnThis(), emit: jest.fn() };
+        const socketId = 'testSocketId';
+        const player = new Player('testUser', socketId);
+        game.players.push(player);
+        const grid = game.createEmptyGrid();
+
+        // Fill some cells in the grid to create a spectrum
+        grid[18][0].filled = true;
+        grid[17][1].filled = true;
+        grid[16][2].filled = true;
+        grid[15][3].filled = true;
+
+        game.grids.set(socketId, grid);
+
+        game.checkSommet(io, grid, player);
+
+        const spectrumGrid = game.createEmptyGrid();
+        for (let row = 15; row < game.rows; row++) {
+            spectrumGrid[row][0] = { filled: true, color: 'gray', indestructible: false };
+            spectrumGrid[row][1] = { filled: true, color: 'gray', indestructible: false };
+            spectrumGrid[row][2] = { filled: true, color: 'gray', indestructible: false };
+            spectrumGrid[row][3] = { filled: true, color: 'gray', indestructible: false };
+        }
+
+        expect(io.to).toHaveBeenCalledWith(game.roomName);
+    });
+
+    test('handlePieceLanding handles piece landing correctly', () => {
+        const io = { to: jest.fn().mockReturnThis(), emit: jest.fn() };
+        const player = new Player('testUser', 'testSocketId');
+        const grid = game.createEmptyGrid();
+    
+        // Simulate a piece landing
+        grid[19].fill({ filled: true, color: 'red' });
+    
+        game.players.push(player);
+        game.grids.set(player.socketId, grid);
+        game.currentPieces.set(player.socketId, {
+            shape: [[1, 1], [1, 0]],
+            color: 'red',
+            position: { x: 0, y: 18 }
+        });
+    
+        // Mock methods to observe their calls
+        game.clearFullLines = jest.fn();
+        game.checkSommet = jest.fn();
+        game.getNextPiece = jest.fn(() => ({
+            shape: [[1, 1], [1, 0]],
+            color: 'red',
+            position: { x: 0, y: 0 }
+        }));
+        game.isValidPlacement = jest.fn(() => true);
+        game.applyPendingPenalties = jest.fn();
+        game.updateGrid = jest.fn();
+        game.broadcastGridUpdate = jest.fn();
+        game.removePlayer = jest.fn();
+    
+        // Call the method
+        game.handlePieceLanding(io, grid, player);
+    
+        // Assert that the methods were called correctly
+        expect(game.clearFullLines).toHaveBeenCalledWith(io, grid, player);
+        expect(game.checkSommet).toHaveBeenCalledWith(io, grid, player);
+        expect(game.getNextPiece).toHaveBeenCalledWith(player);
+        expect(game.isValidPlacement).toHaveBeenCalledWith(grid, expect.any(Array), { x: 0, y: 0 });
+        expect(game.applyPendingPenalties).toHaveBeenCalledWith(grid, player.socketId);
+        expect(game.updateGrid).toHaveBeenCalledWith(grid, expect.any(Object), { x: 0, y: 0 });
+        expect(game.broadcastGridUpdate).toHaveBeenCalledWith(io, player.socketId);
+    
+        // Assert that game over is not called in this scenario
+        expect(io.to).not.toHaveBeenCalledWith(player.socketId, 'game_over');
+        expect(game.removePlayer).not.toHaveBeenCalled();
+    });    
 });

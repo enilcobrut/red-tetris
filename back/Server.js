@@ -141,9 +141,7 @@ io.on('connection', socket => {
                 }
             }
         });
-        console.log("EEE");
         if (!found) {
-            console.log("CCC");
             io.to(socket.id).emit('handle_disconnect', {
                 message: "You were not in any game room, but the disconnect was handled."
             });
