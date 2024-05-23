@@ -630,7 +630,6 @@ class Game {
                 const lastPlayer = this.players[0];
                 clearInterval(lastPlayer.updateInterval);
                 this.updateHistory(lastPlayer.username, true, true);
-                io.to(lastPlayer.socketId).emit('game_over');
                 console.log(`Game over for player ${lastPlayer.username}`);
                 this.removePlayer(lastPlayer.socketId);
             }
