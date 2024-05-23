@@ -1,9 +1,24 @@
+const fs = require('fs');
+const path = require('path');
 const Game = require('../Game');
 const Player = require('../Player');
 const Piece = require('../Piece');
+const {
+    readJsonFile,
+    writeJsonFile,
+    PERSONAL_BEST_FILE,
+    LEADERBOARD_FILE,
+    HISTORY_FILE
+} = require('../JsonHandlers');
 
 console.log = jest.fn(); // Suppress console.log
 jest.useFakeTimers();
+
+// Mock the fs methods
+jest.mock('fs', () => ({
+    readFileSync: jest.fn(),
+    writeFileSync: jest.fn()
+}));
 
 jest.mock('../Player', () => {
     return jest.fn().mockImplementation((username, socketId) => {
@@ -371,10 +386,18 @@ describe('Game class', () => {
         const player = new Player('testUser', 'testSocketId');
         game.players.push(player);
 
+        // Mock the methods
+        game.updatePersonalBest = jest.fn();
+        game.updateLeaderboard = jest.fn();
+        game.updateHistory = jest.fn();
+
         game.removePlayer(player.socketId);
 
         expect(game.players.length).toBe(0);
         expect(game.grids.size).toBe(0);
+        expect(game.updatePersonalBest).toHaveBeenCalledWith(player.username, player.score);
+        expect(game.updateLeaderboard).toHaveBeenCalledWith(player.username, player.score);
+        expect(game.updateHistory).toHaveBeenCalledWith(player.username, false, false);
     });
 
     test('broadcastGridUpdate emits correct event', () => {
@@ -521,4 +544,79 @@ describe('Game class', () => {
         expect(io.to).not.toHaveBeenCalledWith(player.socketId, 'game_over');
         expect(game.removePlayer).not.toHaveBeenCalled();
     });    
+
+    test('updatePersonalBest updates the personal best correctly', () => {
+        const mockData = [
+            { username: 'testUser', scores: [200, 150, 100] }
+        ];
+        fs.readFileSync.mockReturnValue(JSON.stringify(mockData));
+        fs.writeFileSync.mockResolvedValueOnce();
+
+        game.updatePersonalBest('testUser', 250);
+
+        expect(fs.writeFileSync).toHaveBeenCalledWith(
+            PERSONAL_BEST_FILE,
+            JSON.stringify([
+                { username: 'testUser', scores: [250, 200, 150, 100] }
+            ], null, 2),
+            'utf8'
+        );
+    });
+
+    test('updateLeaderboard updates the leaderboard correctly', () => {
+        const mockData = [
+            { username: 'testUser1', score: 200 },
+            { username: 'testUser2', score: 150 }
+        ];
+        fs.readFileSync.mockReturnValue(JSON.stringify(mockData));
+        fs.writeFileSync.mockResolvedValueOnce();
+
+        game.updateLeaderboard('testUser', 250);
+
+        expect(fs.writeFileSync).toHaveBeenCalledWith(
+            LEADERBOARD_FILE,
+            JSON.stringify([
+                { username: 'testUser', score: 250 },
+                { username: 'testUser1', score: 200 },
+                { username: 'testUser2', score: 150 }
+            ], null, 2),
+            'utf8'
+        );
+    });
+
+    test('updateHistory updates the history correctly for win', () => {
+        const mockData = [
+            { username: 'testUser', played: 10, win: 5, loss: 5 }
+        ];
+        fs.readFileSync.mockReturnValue(JSON.stringify(mockData));
+        fs.writeFileSync.mockResolvedValueOnce();
+
+        game.updateHistory('testUser', true, true);
+
+        expect(fs.writeFileSync).toHaveBeenCalledWith(
+            HISTORY_FILE,
+            JSON.stringify([
+                { username: 'testUser', played: 11, win: 6, loss: 5 }
+            ], null, 2),
+            'utf8'
+        );
+    });
+
+    test('updateHistory updates the history correctly for loss', () => {
+        const mockData = [
+            { username: 'testUser', played: 10, win: 5, loss: 5 }
+        ];
+        fs.readFileSync.mockReturnValue(JSON.stringify(mockData));
+        fs.writeFileSync.mockResolvedValueOnce();
+
+        game.updateHistory('testUser', false, true);
+
+        expect(fs.writeFileSync).toHaveBeenCalledWith(
+            HISTORY_FILE,
+            JSON.stringify([
+                { username: 'testUser', played: 11, win: 5, loss: 6 }
+            ], null, 2),
+            'utf8'
+        );
+    });
 });

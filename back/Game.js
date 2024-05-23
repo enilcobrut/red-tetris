@@ -1,5 +1,6 @@
 const Player = require('./Player');
 const Piece = require('./Piece');
+const { readJsonFile, writeJsonFile, PERSONAL_BEST_FILE, LEADERBOARD_FILE, HISTORY_FILE } = require('./JsonHandlers');
 
 const DEFAULT_PIECES = 1000;
 const DEFAULT_INTERVAL = 1000;
@@ -494,8 +495,6 @@ class Game {
                 }
             }
         }
-    //    console.log("\n\n#######  GRID ###########\n\n", grid);
-    //    console.log("\n\n#######  SPECTRUM GRID ###########\n\n", spectrumGrid);
     
         // Send grid spectrum to everyone expect the player itself
         io.to(this.roomName).emit('update_spectrums', { playerSocketId: player.socketId, spectrumGrid });
@@ -609,12 +608,99 @@ class Game {
      * @param {string} socketId - Player's socket ID.
      */
     removePlayer(socketId) {
-        this.players = this.players.filter(p => p.socketId !== socketId);
-        this.grids.delete(socketId);
-        this.currentPieces.delete(socketId);
-        if (this.players.length === 0) {
-            this.onDelete(this.roomName);
+        const player = this.players.find(p => p.socketId === socketId);
+        const originalPlayerCount = this.players.length;
+
+        if (player) {
+            if (originalPlayerCount === 1) {
+                this.updatePersonalBest(player.username, player.score);
+                this.updateLeaderboard(player.username, player.score);
+            }
+            // Remove the player from the game
+            this.players = this.players.filter(p => p.socketId !== socketId);
+            this.grids.delete(socketId);
+            this.currentPieces.delete(socketId);
+            this.updateHistory(player.username, false, originalPlayerCount > 1);
+
+            // Check if there are no players left
+            if (this.players.length === 0) {
+                this.onDelete(this.roomName);
+            } else if (this.players.length === 1 && originalPlayerCount > 1) {
+                // If only one player remains, update their history as a win
+                const lastPlayer = this.players[0];
+                clearInterval(lastPlayer.updateInterval);
+                this.updateHistory(lastPlayer.username, true, true);
+                io.to(lastPlayer.socketId).emit('game_over');
+                console.log(`Game over for player ${lastPlayer.username}`);
+                this.removePlayer(lastPlayer.socketId);
+            }
         }
+    }
+
+    /**
+     * Update the Personal Best file for the player.
+     * @param {string} username - The player's username.
+     * @param {number} score - The player's score.
+     */
+    updatePersonalBest(username, score) {
+        const personalBest = readJsonFile(PERSONAL_BEST_FILE);
+
+        let userScores = personalBest.find(entry => entry.username === username);
+        if (userScores) {
+            userScores.scores.push(score);
+            userScores.scores.sort((a, b) => b - a);
+            userScores.scores = userScores.scores.slice(0, 10);
+        } else {
+            personalBest.push({ username, scores: [score] });
+        }
+
+        writeJsonFile(PERSONAL_BEST_FILE, personalBest);
+    }
+
+    /**
+     * Update the Leaderboard file with the player's score.
+     * @param {string} username - The player's username.
+     * @param {number} score - The player's score.
+     */
+    updateLeaderboard(username, score) {
+        const leaderboard = readJsonFile(LEADERBOARD_FILE);
+
+        leaderboard.push({ username, score });
+        leaderboard.sort((a, b) => b.score - a.score);
+        const top50 = leaderboard.slice(0, 50);
+
+        writeJsonFile(LEADERBOARD_FILE, top50);
+    }
+
+    /**
+     * Update the History file for the player.
+     * @param {string} username - The player's username.
+     * @param {boolean} win - Whether the player won or lost.
+     * @param {boolean} isMultiplayer - Whether the game was multiplayer.
+     */
+    updateHistory(username, win, isMultiplayer) {
+        const history = readJsonFile(HISTORY_FILE);
+
+        let playerHistory = history.find(entry => entry.username === username);
+        if (playerHistory) {
+            playerHistory.played += 1;
+            if (isMultiplayer) {
+                if (win) {
+                    playerHistory.win += 1;
+                } else {
+                    playerHistory.loss += 1;
+                }
+            }
+        } else {
+            history.push({ 
+                username, 
+                played: 1, 
+                win: isMultiplayer && win ? 1 : 0, 
+                loss: isMultiplayer && !win ? 1 : 0 
+            });
+        }
+
+        writeJsonFile(HISTORY_FILE, history);
     }
 
     /**
