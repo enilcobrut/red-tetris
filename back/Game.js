@@ -295,11 +295,14 @@ class Game {
             clearInterval(player.updateInterval);
             io.to(player.socketId).emit('game_over');
             console.log(`Game over for player ${player.username}`);
+            console.log("uwu");
             this.removePlayer(player.socketId);
 
             const remainingPlayers = this.players.filter(p => p.socketId !== player.socketId);
             if (remainingPlayers.length === 1) {
                 const lastPlayer = remainingPlayers[0];
+                console.log("here last playerr");
+                console.log(lastPlayer);
                 clearInterval(lastPlayer.updateInterval);
                 io.to(lastPlayer.socketId).emit('game_over');
                 console.log(`Game over for player ${lastPlayer.username}`);
@@ -581,10 +584,13 @@ class Game {
                 io.to(player.socketId).emit('game_over');
                 console.log(`Game over for player ${player.username}`);
                 this.removePlayer(player.socketId);
+                
                 const remainingPlayers = this.players.filter(p => p.socketId !== player.socketId);
 
                 if (remainingPlayers.length === 1) {
                     const lastPlayer = remainingPlayers[0];
+                    console.log("here last playerr");
+                    console.log(lastPlayer);    
                     clearInterval(lastPlayer.updateInterval);
                     io.to(lastPlayer.socketId).emit('game_over');
                     console.log(`Game over for player ${lastPlayer.username}`);
@@ -631,6 +637,7 @@ class Game {
                 clearInterval(lastPlayer.updateInterval);
                 this.updateHistory(lastPlayer.username, true, true);
                 console.log(`Game over for player ${lastPlayer.username}`);
+                io.to(lastPlayer.socketId).emit('game_over');
                 this.removePlayer(lastPlayer.socketId);
             }
         }
@@ -740,6 +747,67 @@ class Game {
             owner: this.owner.username
         };
     }
+
+        /**
+     * Remove a player from the game room when he leave and update the new owner.
+     * @param {string} socketId - Player's socket ID.
+     */
+    removePlayerRoom(socketId) {
+        const playerIndex = this.players.findIndex(player => player.socketId === socketId);
+        if (playerIndex === -1) {
+            console.log('Player not found.');
+            return;
+        }
+
+        const [removedPlayer] = this.players.splice(playerIndex, 1);
+        console.log(`${removedPlayer.username} has left the room ${this.roomName}`);
+
+        if (removedPlayer.isOwner) {
+            if (this.players.length > 0) {
+                this.players[0].isOwner = true;
+                this.owner = this.players[0];
+                console.log(`${this.owner.username} is now the owner of the room.`);
+            } else {
+                this.owner = null;
+                console.log('No players left in the room. Room will be deleted.');
+                this.onDelete();
+            }
+        }
+        this.grids.delete(socketId);
+        this.currentPieces.delete(socketId);
+        this.pendingPenalties.delete(socketId);
+
+    }
+
+
+    removePlayerRoom(socketId) {
+        const playerIndex = this.players.findIndex(player => player.socketId === socketId);
+        if (playerIndex === -1) {
+            console.log('Player not found.');
+            return;
+        }
+
+        const [removedPlayer] = this.players.splice(playerIndex, 1);
+        console.log(`${removedPlayer.username} has left the room ${this.roomName}`);
+
+        if (removedPlayer.isOwner) {
+            if (this.players.length > 0) {
+                this.players[0].isOwner = true;
+                this.owner = this.players[0];
+                console.log(`${this.owner.username} is now the owner of the room.`);
+            } else {
+                this.owner = null;
+                console.log('No players left in the room. Room will be deleted.');
+                this.onDelete();
+            }
+        }
+        this.grids.delete(socketId);
+        this.currentPieces.delete(socketId);
+        this.pendingPenalties.delete(socketId);
+
+    }
+
+
 
     /**
      * Handle player disconnection.

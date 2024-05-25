@@ -3,7 +3,7 @@ const http = require('http');
 const { Server } = require('socket.io');
 const sanitizeHtml = require('sanitize-html');
 const Game = require('./Game');
-const Piece = require('./Piece');
+const path = require('path');
 
 // Initialize Express app and HTTP server
 const app = express();
@@ -18,6 +18,13 @@ const io = new Server(server, {
         credentials: true
     }
 });
+
+app.use(express.static(path.join(__dirname, 'build')));
+
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
+
 
 // Object to store active games by room name
 const activeGames = {};
@@ -60,6 +67,26 @@ io.on('connection', socket => {
         }
         io.to(room).emit('room_update', activeGames[room].getRoomData());
     });
+
+    socket.on('leave_room', ({ room, username }) => {
+        const game = activeGames[room];
+        if (!game) {
+            console.error("Room not found");
+            return;
+        }
+
+        game.removePlayerRoom(socket.id);
+
+        // Check if the game should be deleted or not
+        if (game.players.length === 0) {
+            console.log("no more room must ");
+
+        } else {
+            io.to(room).emit('room_update', game.getRoomData());
+            console.log(`Updated room data sent after ${username} left the room.`);
+        }
+    });
+
 
     // Redirect game event
     socket.on('redirect_game', ({ username, room }) => {
@@ -151,7 +178,7 @@ io.on('connection', socket => {
 });
 
 // Start the server
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3000;
 server.listen(PORT, '0.0.0.0', () => {
     console.log(`Server listening on http://localhost:${PORT}`);
 });

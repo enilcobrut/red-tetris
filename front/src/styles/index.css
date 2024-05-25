@@ -1,0 +1,259 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Press+Start+2P:wght@400&display=swap");
+
+
+body {
+	background-color: #110023;
+	/* dark-purple */
+	overflow: hidden;
+}
+
+
+
+.font-2 {
+	display: flex;
+	flex-direction: column;
+	gap: 30px;
+	font-family: "Press Start 2P";
+	color: white;
+	text-shadow: 0px 0px 10px #F0F;
+	font-size: 25px;
+	z-index: 5;
+  	justify-content: center;
+	align-items: center;
+  }
+
+
+.font-tetris {
+	display: flex;
+	flex-direction: column;
+	gap: 30px;
+	font-family: "Press Start 2P";
+	color: white;
+	text-shadow: 0px 0px 10px #F0F;
+	font-size: 40px;
+	z-index: 5;
+  	justify-content: center;
+	align-items: center;
+  }
+  
+.font-username {
+	display: flex;
+	flex-direction: column;
+	gap: 10;
+	font-family: "Press Start 2P";
+	color: white;
+	text-shadow: 0px 0px 10px #0FF;
+	font-size: 20px;
+
+}
+
+
+.font-players {
+	display: flex;
+	flex-direction: column;
+	gap: 10;
+	font-family: "Press Start 2P";
+	color: white;
+	text-shadow: 0px 0px 10px #0FF;
+	font-size: 16px;
+
+}
+
+
+.username-container {
+	z-index: 20;
+	display: flex;
+	padding: 30px;
+	flex-direction: column;
+	align-items: center;
+	gap: 10px;
+	flex: 1 0 0;
+	align-self: stretch;
+	border-radius: 16px;
+	border: 1px solid var(--borders-border-primary, #FFF);
+	background: var(--surfaces-surface-secondary, #1D1A40);
+}
+
+.input-username {
+	font-family: "Press Start 2P";
+	color: white;
+	background-color: #110023;
+	border-radius: 16px;
+	font-size: 20px;
+	text-align: center; /* Centre le texte horizontalement */
+	padding: 10px 0; /* Ajustez pour le centrage vertical si nécessaire */
+	margin-top: 15px;
+	width: 100%; 
+  }
+  .button-neon {
+	width: 100%; /* Prend toute la largeur disponible */
+	padding: 14px 20px; /* Padding spécifié */
+	border-radius: 16px; /* Rayon de bordure */
+	border: 2px solid #FFFFFF; /* Bordure blanche */
+	background-color: transparent; /* Couleur de fond transparente */
+	box-shadow: 0 0 10px 0 #00FFFF; /* Ombre portée (effet néon) */
+	font-size: 16px; /* Taille de police (ajustable) */
+	color: white; /* Couleur du texte */
+	font-family: 'Press Start 2P', sans-serif; /* Police */
+	display: flex; /* Utilisation de Flexbox */
+	justify-content: center; /* Centrage horizontal du contenu */
+	align-items: center; /* Centrage vertical du contenu */
+	cursor: pointer; /* Style du curseur */
+	margin-top: 5px;
+  }
+  
+  .button-blue {
+	box-shadow: 0 0 10px 0 #00FFFF; /* Ombre portée pour bleu */
+
+  }
+  
+  .button-magenta {
+	box-shadow: 0 0 10px 0 magenta; /* Ombre portée pour magenta */
+  }
+  
+
+
+/*room user*/
+
+.room-layout {
+	display: grid;
+	justify-content: center;
+	width: 100%;
+	height: 100%;
+	padding: 0 20px;
+	align-items: center;
+	justify-content: center;
+	gap: 1rem;
+	grid-template-areas:
+		'User-Scores Create-Room HallOfFame'
+		'User-Scores Room-List HallOfFame';
+	grid-template-columns: 275px minmax(auto, 750px) 275px;
+	grid-template-rows: 25fr 10fr;
+}
+
+.User-Scores {
+	grid-area: User-Scores;
+}
+
+.Create-Room {
+	grid-area: Create-Room;
+}
+.HallOfFame {
+	grid-area: HallOfFame;
+}
+
+.Room-List {
+	grid-area: Room-List;
+}
+
+
+.halloffame {
+	display: flex;
+	padding: 15px;
+	flex-direction: column;
+	align-items: center;
+	gap: 10px;
+	flex: 1 0 0;
+	align-self: stretch;
+	border-radius: 16px;
+	border: 1px solid var(--borders-border-primary, #FFF);
+	background: var(--surfaces-surface-secondary, #1D1A40);
+}
+
+
+
+.waiting-container {
+    z-index: 20;
+    display: flex;
+    padding: 30px;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    align-self: center;  /* Centre le conteneur sans l'étirer */
+    border-radius: 16px;
+    border: 1px solid var(--borders-border-primary, #FFF);
+    background: var(--surfaces-surface-secondary, #1D1A40);
+    width: auto;  /* Assure que le conteneur s'adapte à son contenu */
+    max-width: 100%;  /* Empêche le conteneur de déborder de son conteneur parent */
+}
+
+
+.game-container {
+	display: flex;
+	padding: 30px;
+	flex-direction: column;
+	align-items: center;
+	gap: 10px;
+	flex: 1 0 auto;
+	align-self: stretch;
+	border-radius: 16px;
+	border: 1px solid var(--borders-border-primary, #FFF);
+	background: var(--surfaces-surface-secondary, #1D1A40);
+	box-sizing: border-box; /* Inclut le padding dans la largeur */
+	max-width: 400px; /* Largeur maximale de la grille pour contrôler la taille des cellules */
+
+
+
+  }
+  .game-grid {
+    display: grid;
+    grid-template-rows: repeat(20, 1fr); /* 20 lignes proportionnelles aux colonnes */
+    grid-template-columns: repeat(10, minmax(0, 1fr)); /* 10 colonnes avec une largeur maximale flexible */
+    max-width: 300px; /* Largeur maximale de la grille pour contrôler la taille des cellules */
+    margin: auto; /* Centre la grille dans le conteneur */
+    width: 100%; /* Utilise toute la largeur disponible jusqu'à la largeur maximale */
+    height: auto; /* Hauteur ajustée automatiquement à la content de la grille */
+    background-color: #110023; /* Fond noir strictement à la grille */
+    border-radius: 0;
+    aspect-ratio: 1 / 2; /* Maintient un rapport hauteur/largeur constant */
+    overflow: hidden;
+}
+.grid-cell {
+    width: 100%; /* Utilise toute la largeur de la colonne de grille */
+    aspect-ratio: 1; /* Maintient chaque cellule comme un carré */
+    border: 1px solid #1D1A40; /* Bordure pour chaque cellule pour la visibilité */
+}
+
+
+
+/* Styles pour le conteneur de chaque grille spectre */
+.spectrum-grid {
+    display: grid;
+    grid-template-columns: repeat(10, 20px); /* 10 colonnes, chaque cellule de 20px de large */
+    grid-template-rows: repeat(20, 20px); /* 20 lignes, chaque cellule de 20px de haut */
+    grid-gap: 1px; /* Espacement de 1px entre les cellules */
+    background: #333; /* Couleur de fond pour les grilles */
+    padding: 5px; /* Espacement autour de la grille */
+    border: 2px solid #444; /* Bordure autour de la grille */
+}
+
+.spectrum-grid-cell {
+    width: 20px; /* Largeur de chaque cellule */
+    height: 20px; /* Hauteur de chaque cellule */
+    display: inline-block; /* Pour que les cellules soient alignées correctement */
+    border: 1px solid #555; /* Petite bordure pour chaque cellule pour les distinguer */
+    background-color: #ddd; /* Couleur de fond par défaut des cellules */
+}
+
+.spectrum-grid-cell.filled {
+    background-color: #666; /* Couleur plus sombre pour les cellules occupées */
+}
+
+/* Styles pour chaque rangée de la grille */
+.grid-row {
+    display: flex; /* Utiliser flexbox pour aligner les cellules horizontalement */
+    justify-content: start;
+}
+
+
+.filled-cell {
+    border: 1px solid #FFFFFF;
+    box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.8),
+                inset 0 0 20px rgba(255, 255, 255, 0.1),
+                0 0 5px #000000;
+    border-radius: 4px;
+}

@@ -3,8 +3,11 @@ launch: install run
 install:
 	@(cd back && npm install) && (cd front && npm install)
 
+build:
+	@(cd front && npm run build)
+
 run:
-	@(cd back && npm run dev &) && (cd front && npm run dev &)
+	@(cd back && node Server.js)
 
 stop:
 	@killall node 2> /dev/null || true
