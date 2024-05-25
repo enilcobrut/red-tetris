@@ -296,7 +296,7 @@ class Game {
             io.to(player.socketId).emit('game_over');
             console.log(`Game over for player ${player.username}`);
             console.log("uwu");
-            this.removePlayer(player.socketId);
+            this.removePlayer(io, player.socketId);
 
             const remainingPlayers = this.players.filter(p => p.socketId !== player.socketId);
             if (remainingPlayers.length === 1) {
@@ -306,7 +306,7 @@ class Game {
                 clearInterval(lastPlayer.updateInterval);
                 io.to(lastPlayer.socketId).emit('game_over');
                 console.log(`Game over for player ${lastPlayer.username}`);
-                this.removePlayer(lastPlayer.socketId);
+                this.removePlayer(io, lastPlayer.socketId);
             }
         } else {
             this.applyPendingPenalties(grid, player.socketId);
@@ -583,7 +583,7 @@ class Game {
                 clearInterval(player.updateInterval);
                 io.to(player.socketId).emit('game_over');
                 console.log(`Game over for player ${player.username}`);
-                this.removePlayer(player.socketId);
+                this.removePlayer(io, player.socketId);
                 
                 const remainingPlayers = this.players.filter(p => p.socketId !== player.socketId);
 
@@ -594,7 +594,7 @@ class Game {
                     clearInterval(lastPlayer.updateInterval);
                     io.to(lastPlayer.socketId).emit('game_over');
                     console.log(`Game over for player ${lastPlayer.username}`);
-                    this.removePlayer(lastPlayer.socketId);
+                    this.removePlayer(io, lastPlayer.socketId);
                 }
             } else {
                 this.applyPendingPenalties(grid, player.socketId);
@@ -613,7 +613,7 @@ class Game {
      * Remove a player from the game room when it's game over for them.
      * @param {string} socketId - Player's socket ID.
      */
-    removePlayer(socketId) {
+    removePlayer(io, socketId) {
         const player = this.players.find(p => p.socketId === socketId);
         const originalPlayerCount = this.players.length;
 
@@ -638,7 +638,7 @@ class Game {
                 this.updateHistory(lastPlayer.username, true, true);
                 console.log(`Game over for player ${lastPlayer.username}`);
                 io.to(lastPlayer.socketId).emit('game_over');
-                this.removePlayer(lastPlayer.socketId);
+                this.removePlayer(io, lastPlayer.socketId);
             }
         }
     }
