@@ -21,6 +21,8 @@ class Game {
         this.currentPieces = new Map(); // Each player has their own list of pieces
         this.onDelete = onDelete; // Callback to delete the game room
         this.pendingPenalties = new Map(); // Map to store pending penalty lines for each player
+        this.originalPlayerCount = 0; // Track the number of players at the start of the game
+        this.started = false; // Track if the game has started
     }
 
     /**
@@ -60,17 +62,7 @@ class Game {
         const currentPiece = this.currentPieces.get(socketId);
         if (!currentPiece) return;
 
-        currentPiece.shape.forEach((row, dy) => {
-            row.forEach((value, dx) => {
-                if (value) {
-                    const x = dx + currentPiece.position.x;
-                    const y = dy + currentPiece.position.y;
-                    if (x >= 0 && x < this.cols && y >= 0 && y < this.rows) {
-                        grid[y][x] = { filled: false, color: 'transparent', indestructible: grid[y][x].indestructible };
-                    }
-                }
-            });
-        });
+        this.clearPieceFromGrid(grid, currentPiece);
 
         const newShape = this.rotateMatrix(currentPiece.shape, clockwise);
         const newPiece = new Piece(newShape, currentPiece.color, { ...currentPiece.position });
@@ -79,17 +71,7 @@ class Game {
             currentPiece.shape = newShape;
         }
 
-        currentPiece.shape.forEach((row, dy) => {
-            row.forEach((value, dx) => {
-                if (value) {
-                    const x = dx + currentPiece.position.x;
-                    const y = dy + currentPiece.position.y;
-                    if (x >= 0 && x < this.cols && y >= 0 && y < this.rows) {
-                        grid[y][x] = { filled: true, color: currentPiece.color, indestructible: grid[y][x].indestructible };
-                    }
-                }
-            });
-        });
+        this.placePieceOnGrid(grid, currentPiece);
 
         this.broadcastGridUpdate(io, socketId);
     }
@@ -123,8 +105,8 @@ class Game {
      * @returns {array} The empty grid.
      */
     createEmptyGrid() {
-        return Array.from({ length: 20 }, () => 
-            Array.from({ length: 10 }, () => ({ filled: false, color: 'transparent', indestructible: false })));
+        return Array.from({ length: this.rows }, () => 
+            Array.from({ length: this.cols }, () => ({ filled: false, color: 'transparent', indestructible: false })));
     }
 
     /**
@@ -151,6 +133,17 @@ class Game {
      * @param {object} newPosition - The new position of the piece.
      */
     updateGrid(grid, piece, newPosition) {
+        this.clearPieceFromGrid(grid, piece);
+        piece.position = newPosition;
+        this.placePieceOnGrid(grid, piece);
+    }
+
+    /**
+     * Clear a piece from the grid.
+     * @param {array} grid - The grid to clear the piece from.
+     * @param {object} piece - The piece to clear.
+     */
+    clearPieceFromGrid(grid, piece) {
         piece.shape.forEach((row, dy) => {
             row.forEach((value, dx) => {
                 if (value) {
@@ -162,20 +155,25 @@ class Game {
                 }
             });
         });
+    }
 
+    /**
+     * Place a piece on the grid.
+     * @param {array} grid - The grid to place the piece on.
+     * @param {object} piece - The piece to place.
+     */
+    placePieceOnGrid(grid, piece) {
         piece.shape.forEach((row, dy) => {
             row.forEach((value, dx) => {
                 if (value) {
-                    const x = dx + newPosition.x;
-                    const y = dy + newPosition.y;
+                    const x = dx + piece.position.x;
+                    const y = dy + piece.position.y;
                     if (x >= 0 && x < this.cols && y >= 0 && y < this.rows) {
                         grid[y][x] = { filled: true, color: piece.color, indestructible: grid[y][x].indestructible };
                     }
                 }
             });
         });
-
-        piece.position = newPosition;
     }
 
     /**
@@ -232,6 +230,7 @@ class Game {
      * @param {object} io - Socket.io instance.
      */
     startGame(io) {
+        this.originalPlayerCount = this.players.length;
         this.generatePieces();
 
         this.players.forEach(player => {
@@ -240,6 +239,7 @@ class Game {
             this.currentPieces.set(player.socketId, initialPiece);
             this.startPlayerInterval(io, player);
         });
+        this.started = true;
     }
 
     /**
@@ -265,9 +265,6 @@ class Game {
      * @param {object} player - The player object.
      */
     movePieceDownForPlayer(io, player) {
-        if (!player) {
-            player = this.players.find(player => player.socketId === socketId);
-        }
         const grid = this.grids.get(player.socketId);
         const currentPiece = this.currentPieces.get(player.socketId);
         let newPosition = { ...currentPiece.position, y: currentPiece.position.y + 1 };
@@ -293,21 +290,8 @@ class Game {
         const newPiece = this.getNextPiece(player);
         if (!this.isValidPlacement(grid, newPiece.shape, newPiece.position)) {
             clearInterval(player.updateInterval);
-           // io.to(player.socketId).emit('game_over');
             console.log(`Game over for player ${player.username}`);
-            console.log("uwu");
             this.removePlayer(io, player.socketId);
-
-         //   const remainingPlayers = this.players.filter(p => p.socketId !== player.socketId);
-            // if (remainingPlayers.length === 1) {
-            //     const lastPlayer = remainingPlayers[0];
-            //     console.log("here last playerr");
-            //     console.log(lastPlayer);
-            //     clearInterval(lastPlayer.updateInterval);
-            //     io.to(lastPlayer.socketId).emit('game_over');
-            //     console.log(`Game over for player ${lastPlayer.username}`);
-            //     this.removePlayer(io, lastPlayer.socketId);
-            // }
         } else {
             this.applyPendingPenalties(grid, player.socketId);
             this.currentPieces.set(player.socketId, newPiece);
@@ -483,6 +467,12 @@ class Game {
         }
     }
 
+    /**
+     * Check and update the sommet (top) of the grid for a player.
+     * @param {object} io - Socket.io instance.
+     * @param {array} grid - The grid to check.
+     * @param {object} player - The player object.
+     */
     checkSommet(io, grid, player) {
         const spectrumGrid = this.createEmptyGrid();
 
@@ -499,7 +489,7 @@ class Game {
             }
         }
     
-        // Send grid spectrum to everyone expect the player itself
+        // Send grid spectrum to everyone except the player itself
         io.to(this.roomName).emit('update_spectrums', { playerSocketId: player.socketId, spectrumGrid });
     }
 
@@ -597,19 +587,18 @@ class Game {
 
     /**
      * Remove a player from the game room when it's game over for them.
+     * @param {object} io - Socket.io instance.
      * @param {string} socketId - Player's socket ID.
      */
     removePlayer(io, socketId) {
         const player = this.players.find(p => p.socketId === socketId);
-        const originalPlayerCount = this.players.length;
-
-        console.log(player);
+    
         if (player) {
-            console.log("score : ", player.score);
+            console.log(`Removing player ${player.username} with score ${player.score}`);
             io.to(player.socketId).emit('game_over', { score: player.score });
-
+    
             clearInterval(player.updateInterval);
-            if (originalPlayerCount === 1) {
+            if (this.originalPlayerCount === 1) {
                 this.updatePersonalBest(player.username, player.score);
                 this.updateLeaderboard(player.username, player.score);
             }
@@ -617,15 +606,18 @@ class Game {
             this.players = this.players.filter(p => p.socketId !== socketId);
             this.grids.delete(socketId);
             this.currentPieces.delete(socketId);
-            this.updateHistory(player.username, false, originalPlayerCount > 1);
-
+            this.updateHistory(player.username, false, this.originalPlayerCount > 1);
+    
             // Check if there are no players left
-            if (this.players.length === 0) {
+            if (this.players.length === 0 && this.areAllResourcesCleared()) {
                 this.onDelete(this.roomName);
-            } else if (this.players.length === 1 && originalPlayerCount > 1) {
+            } else if (this.players.length === 0) {
+                clearAllResources();
+                this.onDelete(this.roomName);
+            }
+            if (this.players.length === 1 && this.originalPlayerCount > 1) {
                 // If only one player remains, update their history as a win
                 const lastPlayer = this.players[0];
-            //    clearInterval(lastPlayer.updateInterval);
                 this.updateHistory(lastPlayer.username, true, true);
                 console.log(`Game over for player ${lastPlayer.username}`);
                 io.to(lastPlayer.socketId).emit('game_over');
@@ -633,7 +625,32 @@ class Game {
             }
         }
     }
-
+    
+    /**
+     * Check if all resources are cleared.
+     * @returns {boolean} True if all resources are cleared, false otherwise.
+     */
+    areAllResourcesCleared() {
+        return this.players.length === 0 && 
+               this.grids.size === 0 && 
+               this.currentPieces.size === 0 &&
+               this.pieceQueue.length === 0 &&
+               this.pendingPenalties.size === 0;
+    }
+    
+    /**
+     * Clear all resources.
+     */
+    clearAllResources() {
+        this.players = [];
+        this.grids.clear();
+        this.currentPieces.clear();
+        this.pieceQueue = [];
+        this.pendingPenalties.clear();
+        clearInterval(this.updateInterval);
+    }
+    
+    
     /**
      * Update the Personal Best file for the player.
      * @param {string} username - The player's username.
@@ -739,11 +756,10 @@ class Game {
         };
     }
 
-        /**
-     * Remove a player from the game room when he leave and update the new owner.
+    /**
+     * Remove a player from the game room when they leave and update the new owner.
      * @param {string} socketId - Player's socket ID.
      */
-
     removePlayerRoom(socketId) {
         const playerIndex = this.players.findIndex(player => player.socketId === socketId);
         if (playerIndex === -1) {
@@ -768,10 +784,7 @@ class Game {
         this.grids.delete(socketId);
         this.currentPieces.delete(socketId);
         this.pendingPenalties.delete(socketId);
-
     }
-
-
 
     /**
      * Handle player disconnection.

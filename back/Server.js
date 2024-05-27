@@ -53,7 +53,6 @@ io.on('connection', socket => {
         callback({ success: true, username: cleanUsername });
     });
 
-    // Join room event
     socket.on('join_room', ({ username, room }) => {
         socket.join(room);
         if (!activeGames[room]) {
@@ -61,9 +60,11 @@ io.on('connection', socket => {
                 console.log(`Deleting room ${room}`);
                 delete activeGames[room];
             });
-            activeGames[room].addPlayer(username, socket.id, true);
-        } else {
-            activeGames[room].addPlayer(username, socket.id);
+            if (activeGames[room].started == false) {
+                activeGames[room].addPlayer(username, socket.id, true);
+            }
+        } else if (activeGames[room].started == false) {
+                activeGames[room].addPlayer(username, socket.id);
         }
         io.to(room).emit('room_update', activeGames[room].getRoomData());
     });
@@ -181,6 +182,7 @@ io.on('connection', socket => {
                 found = true;
                 if (activeGames[room].handleDisconnect(io, socket.id)) {
                     console.log(`Deleting room ${room}`);
+
                     delete activeGames[room];
                 }
             }

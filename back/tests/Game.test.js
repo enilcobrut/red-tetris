@@ -383,23 +383,28 @@ describe('Game class', () => {
     });    
 
     test('removePlayer removes player correctly', () => {
+        const io = { to: jest.fn().mockReturnThis(), emit: jest.fn() };
         const player = new Player('testUser', 'testSocketId');
         game.players.push(player);
-
+        game.originalPlayerCount = 1; // Ensure this is set for the test
+    
         // Mock the methods
         game.updatePersonalBest = jest.fn();
         game.updateLeaderboard = jest.fn();
         game.updateHistory = jest.fn();
-
-        game.removePlayer(player.socketId);
-
+    
+        game.removePlayer(io, player.socketId);
+    
         expect(game.players.length).toBe(0);
         expect(game.grids.size).toBe(0);
+        expect(game.currentPieces.size).toBe(0); // Ensure currentPieces is also cleared
         expect(game.updatePersonalBest).toHaveBeenCalledWith(player.username, player.score);
         expect(game.updateLeaderboard).toHaveBeenCalledWith(player.username, player.score);
         expect(game.updateHistory).toHaveBeenCalledWith(player.username, false, false);
-    });
-
+        expect(io.to).toHaveBeenCalledWith(player.socketId); // Ensure 'game_over' event is emitted
+        expect(io.emit).toHaveBeenCalledWith('game_over', { score: player.score });
+    });    
+    
     test('broadcastGridUpdate emits correct event', () => {
         const io = { to: jest.fn().mockReturnThis(), emit: jest.fn() };
         const player = new Player('testUser', 'testSocketId');
