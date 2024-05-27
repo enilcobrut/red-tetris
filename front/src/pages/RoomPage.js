@@ -4,6 +4,7 @@ import Paragraph from '../components/Paragraph';
 import GameCanva from '../components/game/GameCanva';
 import { useRoom } from '../context/RoomContext';
 import {  useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 const RoomPage = () => {
     const { socket } = useSelector(state => state.socket);
@@ -11,7 +12,7 @@ const RoomPage = () => {
     const hasRequested = useRef(false);
     const [spectrums, setSpectrums] = useState({});
     const username = useSelector(state => state.user.username);  // Utilisez useSelector pour obtenir l'username
-
+    const navigate = useNavigate();
   useEffect(() => {
     console.log("Socket:", socket);
     console.log("Username:", username);
@@ -25,7 +26,12 @@ const RoomPage = () => {
     }
 }, [socket, username, roomInfo.roomName, roomInfo.owner]);
 
-    
+  const handleClick = () => {
+    navigate('/lobby');
+    socket.emit('leave_game', { username, room: roomInfo.roomName });
+
+
+  }
 
 useEffect(() => {
 
@@ -46,28 +52,33 @@ useEffect(() => {
 }, [socket]);
 
   return (
-    <div className="flex items-center justify-center p-10 h-full w-full">
+    <div className="flex items-center justify-center p-5 h-full w-full">
       <BackgroundAnimation />
-      <div className='flex flex-col mb-10 items-center justify-center h-full w-full'>
+      <div className='flex flex-col p-5 h-full w-full gap-2'>
+        <div className='flex flex-row justify-evenly'>
+          <div role='button' className='button-leave' onClick={handleClick}>
+            <Paragraph neon='blue'>LEAVE</Paragraph>
+          </div>
+          <Paragraph neon='blue'>{roomInfo.roomName}</Paragraph>
+        </div>
         <div className='flex flex-row gap-10 h-full w-full items-center justify-center'>
           <div className="game-container items-center justify-center">
             <Paragraph neon='magenta'>{username}</Paragraph>
             <GameCanva/>
           </div>
           <div className='flex flex-col'>
-            <Paragraph neon='blue'>Room: {roomInfo.roomName}</Paragraph>
             {roomInfo.players.map((player, index) => (
               socket.id !== player.socketId && (
                 <div key={index} className="player-spectrum">
                   <Paragraph>{player.name}</Paragraph>
                   {spectrums[player.socketId] && spectrums[player.socketId].length > 0 && (
-  <div className="spectrum-grid">
+          <div className="game-spectrum">
     {Array.from({ length: spectrums[player.socketId][0].length }).map((_, colIndex) => ( // Générer des colonnes basées sur la longueur de la première rangée
       <div key={colIndex} className="grid-column">
         {spectrums[player.socketId].map((row, rowIndex) => (
           <div
             key={`${colIndex}-${rowIndex}`}
-            className="grid-cell"
+            className="grid-cell-spectrum"
             style={{ backgroundColor: row[colIndex].color }} // Utiliser row[colIndex] pour accéder à la cellule correcte
           />
         ))}

@@ -18,9 +18,7 @@ export const RoomProvider = ({ children }) => {
                 setRoomInfo(roomData);
                 setIsOwner(roomData.ownerSocketId === socket.id);
             };
-            console.log("www");
             socket.on('room_update', handleRoomUpdate);
-
             return () => {
                 socket.off('room_update', handleRoomUpdate);
             };

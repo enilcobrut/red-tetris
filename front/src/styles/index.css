@@ -26,6 +26,17 @@ body {
 	align-items: center;
   }
 
+  .font-3 {
+	font-family: "Press Start 2P";
+	color: white;
+	text-shadow: 0px 0px 10px #F0F;
+	font-size: 20px;
+	z-index: 5;
+  	justify-content: center;
+	align-items: center;
+  }
+
+
 
 .font-tetris {
 	display: flex;
@@ -47,6 +58,16 @@ body {
 	font-family: "Press Start 2P";
 	color: white;
 	text-shadow: 0px 0px 10px #0FF;
+	font-size: 20px;
+
+}
+
+.font-4 {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-family: "Press Start 2P";
+	color: white;
 	font-size: 20px;
 
 }
@@ -91,6 +112,22 @@ body {
   }
   .button-neon {
 	width: 100%; /* Prend toute la largeur disponible */
+	padding: 14px 20px; /* Padding spécifié */
+	border-radius: 16px; /* Rayon de bordure */
+	border: 2px solid #FFFFFF; /* Bordure blanche */
+	background-color: transparent; /* Couleur de fond transparente */
+	box-shadow: 0 0 10px 0 #00FFFF; /* Ombre portée (effet néon) */
+	font-size: 16px; /* Taille de police (ajustable) */
+	color: white; /* Couleur du texte */
+	font-family: 'Press Start 2P', sans-serif; /* Police */
+	display: flex; /* Utilisation de Flexbox */
+	justify-content: center; /* Centrage horizontal du contenu */
+	align-items: center; /* Centrage vertical du contenu */
+	cursor: pointer; /* Style du curseur */
+	margin-top: 5px;
+  }
+
+  .button-leave {
 	padding: 14px 20px; /* Padding spécifié */
 	border-radius: 16px; /* Rayon de bordure */
 	border: 2px solid #FFFFFF; /* Bordure blanche */
@@ -218,36 +255,25 @@ body {
     border: 1px solid #1D1A40; /* Bordure pour chaque cellule pour la visibilité */
 }
 
-
-
-/* Styles pour le conteneur de chaque grille spectre */
-.spectrum-grid {
+.game-spectrum {
     display: grid;
-    grid-template-columns: repeat(10, 20px); /* 10 colonnes, chaque cellule de 20px de large */
-    grid-template-rows: repeat(20, 20px); /* 20 lignes, chaque cellule de 20px de haut */
-    grid-gap: 1px; /* Espacement de 1px entre les cellules */
-    background: #333; /* Couleur de fond pour les grilles */
-    padding: 5px; /* Espacement autour de la grille */
-    border: 2px solid #444; /* Bordure autour de la grille */
+    grid-template-rows: repeat(20, 1fr); /* 20 lignes proportionnelles aux colonnes */
+    grid-template-columns: repeat(10, minmax(0, 1fr)); /* 10 colonnes avec une largeur maximale flexible */
+    max-width: 300px; /* Largeur maximale de la grille pour contrôler la taille des cellules */
+    margin: auto; /* Centre la grille dans le conteneur */
+    width: 100%; /* Utilise toute la largeur disponible jusqu'à la largeur maximale */
+    height: auto; /* Hauteur ajustée automatiquement à la content de la grille */
+    background-color: #110023; /* Fond noir strictement à la grille */
+    border-radius: 0;
+    aspect-ratio: 1 / 2; /* Maintient un rapport hauteur/largeur constant */
+    overflow: hidden;
+    border: 1px solid white; /* Bordure pour chaque cellule pour la visibilité */
+}
+.grid-cell-spectrum {
+    width: 100%; /* Utilise toute la largeur de la colonne de grille */
+    aspect-ratio: 1; /* Maintient chaque cellule comme un carré */
 }
 
-.spectrum-grid-cell {
-    width: 20px; /* Largeur de chaque cellule */
-    height: 20px; /* Hauteur de chaque cellule */
-    display: inline-block; /* Pour que les cellules soient alignées correctement */
-    border: 1px solid #555; /* Petite bordure pour chaque cellule pour les distinguer */
-    background-color: #ddd; /* Couleur de fond par défaut des cellules */
-}
-
-.spectrum-grid-cell.filled {
-    background-color: #666; /* Couleur plus sombre pour les cellules occupées */
-}
-
-/* Styles pour chaque rangée de la grille */
-.grid-row {
-    display: flex; /* Utiliser flexbox pour aligner les cellules horizontalement */
-    justify-content: start;
-}
 
 
 .filled-cell {
@@ -256,4 +282,33 @@ body {
                 inset 0 0 20px rgba(255, 255, 255, 0.1),
                 0 0 5px #000000;
     border-radius: 4px;
+}
+
+
+
+.modal {
+	position: fixed;
+	padding: 10px;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.6);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	z-index: 9999;
+
+}
+
+.modal-content {
+	display: flex;
+	justify-content: center;
+	flex-direction: column;
+	background-color: #110023;
+	border-radius: 16px;
+	border: 1px solid #FFF;
+	gap: 20px;
+	z-index: 9999;
+	padding: 20px;
 }

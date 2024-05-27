@@ -88,6 +88,24 @@ io.on('connection', socket => {
     });
 
 
+    socket.on('leave_game', ({ room, username }) => {
+        const game = activeGames[room];
+        if (!game) {
+            console.error("Room not found");
+            return;
+        }    
+        // Find the player using the username
+        const player = game.findPlayer(username);
+        if (player) {
+            console.log("playeur found");
+            game.removePlayer(io, player.socketId);
+        } else {
+            console.error("Player not found in room");
+        }
+    });
+    
+
+
     // Redirect game event
     socket.on('redirect_game', ({ username, room }) => {
         const game = activeGames[room];
@@ -160,8 +178,7 @@ io.on('connection', socket => {
         // Check each game to see if the disconnected socket has an impact
         Object.keys(activeGames).forEach(room => {
             if (activeGames[room].players.some(player => player.socketId === socket.id)) {
-                found = true;  // Marquer comme trouvé
-                console.log("uwuwuwu");
+                found = true;
                 if (activeGames[room].handleDisconnect(io, socket.id)) {
                     console.log(`Deleting room ${room}`);
                     delete activeGames[room];

@@ -14,8 +14,6 @@ const WaitingRoomPage = () => {
 
 
     useEffect(() => {
-         console.log(roomInfo);
-  
           if (!isConnected || error) {
             console.error("Socket is not connected or an error occurred", error);
             navigate('/');
@@ -36,7 +34,6 @@ const WaitingRoomPage = () => {
         }, [socket, isConnected, error, navigate, roomInfo]);
     const startGame = () => {
         if (roomInfo.roomName && username && username === roomInfo.owner) {
-            console.log("start front");
             socket.emit('redirect_game', { room: roomInfo.roomName, username });
         } else {
             console.error('Les informations nécessaires pour démarrer le jeu ne sont pas disponibles.');
