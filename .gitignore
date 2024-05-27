@@ -21,3 +21,4 @@ yarn-error.log*
 next-env.d.t
 front/.next/*
 back/db/*.json
+back/build/*

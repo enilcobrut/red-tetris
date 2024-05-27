@@ -196,6 +196,7 @@ io.on('connection', socket => {
 
 // Start the server
 const PORT = process.env.PORT || 3000;
+const HOST = process.env.REACT_APP_SOCKET_URL || "localhost";
 server.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server listening on http://localhost:${PORT}`);
+    console.log(`Server listening on ${HOST}:${PORT}`);
 });

@@ -11,7 +11,10 @@ export const connectSocket = createAsyncThunk(
   'socket/connect',
   async (_, { rejectWithValue }) => {
     try {
-      const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3000';
+      console.log('Environment variable REACT_APP_SOCKET_URL:', process.env.REACT_APP_SOCKET_URL);
+      const HOSTNAME = process.env.REACT_APP_SOCKET_URL || "localhost";
+      const PORT = process.env.PORT || 3000;
+      const socketUrl = `http://${HOSTNAME}:${PORT}`;
       const socket = io(socketUrl, { transports: ['websocket'] });
       return socket;
     } catch (error) {
@@ -50,13 +53,7 @@ const socketSlice = createSlice({
         state.isConnected = false;
       });
   }
-
-
-
 });
-
-
-// Dans socketSlice.js
 
 export const emitEvent = createAsyncThunk(
   'socket/emitEvent',
@@ -74,6 +71,5 @@ export const emitEvent = createAsyncThunk(
     });
   }
 );
-
 
 export default socketSlice.reducer;
