@@ -266,6 +266,8 @@ class Game {
     movePieceDownForPlayer(io, player) {
         const grid = this.grids.get(player.socketId);
         const currentPiece = this.currentPieces.get(player.socketId);
+        if (!currentPiece)
+            return ;
         let newPosition = { ...currentPiece.position, y: currentPiece.position.y + 1 };
 
         if (this.isValidPlacement(grid, currentPiece.shape, newPosition)) {
@@ -473,6 +475,8 @@ class Game {
         if (!player) return;
 
         const currentPiece = this.currentPieces.get(socketId);
+        if (!currentPiece)
+            return;
         const newPosition = { ...currentPiece.position, x: currentPiece.position.x - 1 };
 
         if (this.isValidPlacement(this.grids.get(socketId), currentPiece.shape, newPosition, 'left')) {
@@ -518,6 +522,8 @@ class Game {
         if (!player) return;
 
         const currentPiece = this.currentPieces.get(socketId);
+        if (!currentPiece)
+            return;
         const newPosition = { ...currentPiece.position, x: currentPiece.position.x + 1 };
 
         if (this.isValidPlacement(this.grids.get(socketId), currentPiece.shape, newPosition, 'right')) {
@@ -570,6 +576,8 @@ class Game {
         clearInterval(player.updateInterval);
         const grid = this.grids.get(socketId);
         const currentPiece = this.currentPieces.get(socketId);
+        if (!currentPiece)
+            return;
         let newPosition = { ...currentPiece.position };
 
         while (this.isValidPlacement(grid, currentPiece.shape, { ...newPosition, y: newPosition.y + 1 })) {
@@ -740,9 +748,11 @@ class Game {
      * @param {string} socketId - Player's socket ID.
      */
     broadcastGridUpdate(io, socketId) {
+        const player = this.players.find(p => p.socketId === socketId);
         const grid = this.grids.get(socketId);
-        io.to(socketId).emit('grid_update', { grid });
-    }
+        const score = player ? player.score : 0;  // Assurez-vous que player existe pour éviter les erreurs
+        io.to(socketId).emit('grid_update', { grid, score });
+        }
 
     /**
      * Get the next piece for a player.
