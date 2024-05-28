@@ -624,4 +624,40 @@ describe('Game class', () => {
             'utf8'
         );
     });
+
+    test('clearFullLines handles Perfect Clear correctly', () => {
+        const io = { to: jest.fn().mockReturnThis(), emit: jest.fn() };
+        const grid = game.createEmptyGrid();
+    
+        // Fill the grid such that the entire grid will be cleared
+        for (let row = 0; row < 4; row++) {
+            grid[row].fill({ filled: true, color: 'red' });
+        }
+    
+        const player = new Player('testUser', 'testSocketId');
+        game.players.push(player);
+        game.grids.set(player.socketId, grid);
+    
+        const opponent = new Player('opponentUser', 'opponentSocketId');
+        game.players.push(opponent);
+    
+        // Mock the sendPenaltyLines method to observe its calls
+        game.sendPenaltyLines = jest.fn();
+    
+        // Call the clearFullLines method
+        game.clearFullLines(io, grid, player);
+    
+        // Check that the player's score has been updated correctly
+        expect(player.score).toBe(5400); // 5400 points for a Perfect Clear
+    
+        // Check that 10 penalty lines were sent to the opponent
+        expect(game.sendPenaltyLines).toHaveBeenCalledWith(io, player, 10);
+    
+        // Check that the grid is empty after the Perfect Clear
+        expect(grid.every(row => row.every(cell => !cell.filled))).toBe(true);
+    
+        // Check the console log for Perfect Clear message
+        expect(console.log).toHaveBeenCalledWith(`Player ${player.username} achieved a Perfect Clear!`);
+    });
+    
 });

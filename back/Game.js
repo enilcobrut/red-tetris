@@ -393,7 +393,7 @@ class Game {
         let linesCleared = 0;
         for (let row = 0; row < this.rows; row++) {
             if (grid[row].every(cell => cell.filled && !cell.indestructible)) {
-                if (player.dropInterval == 0) {
+                if (player.dropInterval === 0) {
                     player.dropInterval = 150;
                 }
                 grid.splice(row, 1);
@@ -404,16 +404,32 @@ class Game {
         if (linesCleared > 0) {
             const scorePerLine = 100;
             player.score += scorePerLine * linesCleared;
-            if (linesCleared === 4) {
-                player.score += 400;
-                console.log(`Player ${player.username} cleared a Tetris!`);
+
+            if (linesCleared === 4 && this.isPerfectClear(grid)) {
+                player.score += 5000; // Reward 5000 points for a Perfect Clear
+                this.sendPenaltyLines(io, player, 10); // Send 10 penalty lines to opponents
+                console.log(`Player ${player.username} achieved a Perfect Clear!`);
             } else {
-                console.log(`Player ${player.username} cleared ${linesCleared} lines.`);
+                if (linesCleared === 4) {
+                    player.score += 400; // Additional 400 points for clearing 4 lines (Tetris)
+                    console.log(`Player ${player.username} cleared a Tetris!`);
+                } else {
+                    console.log(`Player ${player.username} cleared ${linesCleared} lines.`);
+                }
+                if (linesCleared > 1) {
+                    this.sendPenaltyLines(io, player, linesCleared - 1);
+                }
             }
-            if (linesCleared > 1) {
-                this.sendPenaltyLines(io, player, linesCleared - 1);
-            } 
         }
+    }
+    
+    /**
+     * Check if the grid is completely empty (Perfect Clear).
+     * @param {array} grid - The grid to check.
+     * @returns {boolean} True if the grid is empty, false otherwise.
+     */
+    isPerfectClear(grid) {
+        return grid.every(row => row.every(cell => !cell.filled));
     }
 
     /**
