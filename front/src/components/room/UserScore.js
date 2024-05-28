@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-
+import Paragraph from '../Paragraph';
 const UserScore = ({ className }) => {
     const { socket } = useSelector(state => state.socket);
     const [scores, setScores] = useState([]);
@@ -44,29 +44,108 @@ const UserScore = ({ className }) => {
 
     return (
         <div className={`halloffame ${className}`}>
-            <div className='font-username'>USER SCORE</div>
-            <h2>{username}</h2>
+            <div className='flex flex-col gap-5 w-full justify-center items-center'>
+            <div className='font-username-2'>{username} SCORE</div>
             {scores.length > 0 ? (
-                <ol>
+                <div className="list-container w-full overflow-y-auto pr-2">  {/* Add the list-container class here */}
                     {scores.map((score, index) => (
-                        <li key={index}>
-                            {index + 1}: {score}
-                        </li>
+                        <div key={index} className="list-item w-full px-2 py-4">  {/* Add the list-item class here */}
+                                <Paragraph 
+                                    displayFlex={false} 
+                                    size="small"
+                                    style={{ color: 'white' }}
+                                    className="shrink-0">
+                                   {index + 1}
+                                </Paragraph>
+                                <Paragraph 
+                                    displayFlex={false} 
+                                    size="small"
+                                    style={{ color: 'white' }}
+                                    className="shrink-0">
+                                   {score}
+                                </Paragraph>
+                        </div>
                     ))}
-                </ol>
-            ) : (
-                <p>Loading scores...</p>
-            )}
-            <h3>Multiplayer</h3>
-            {history ? (
-                <div>
-                    <p>Played: {history.played}</p>
-                    <p>Won: {history.win}</p>
-                    <p>Lost: {history.loss}</p>
                 </div>
             ) : (
-                <p>Loading history...</p>
+                <div className="list-item-2 w-full p-5">
+
+                <Paragraph 
+                displayFlex={false} 
+                size="small"
+                style={{ color: 'white' }}>
+                NO SCORE YET GO PLAY A GAME !
+            </Paragraph>
+            </div>
             )}
+
+            <div className='font-username-2'>MULTIPLAYERS-STAT</div>
+            {history ? (
+                <div className="list-container w-full overflow-y-auto pr-2">  {/* Add the list-container class here */}
+                    <div className="list-item w-full px-2 py-4">
+                        <Paragraph 
+                            displayFlex={false} 
+                            size="small"
+                            style={{ color: 'white' }}
+                            className="shrink-0">
+                            PLAYED
+                        </Paragraph>
+                        <Paragraph 
+                            displayFlex={false} 
+                            size="small"
+                            style={{ color: 'white' }}
+                            className="shrink-0">
+                            {history.played}
+                        </Paragraph>
+
+                    </div>
+                    <div className="list-item w-full px-2 py-4">
+                        <Paragraph 
+                            displayFlex={false} 
+                            size="small"
+                            style={{ color: 'white' }}
+                            className="shrink-0">
+                            WON
+                        </Paragraph>
+                        <Paragraph 
+                            displayFlex={false} 
+                            size="small"
+                            style={{ color: 'white' }}
+                            className="shrink-0">
+                            {history.win}
+                        </Paragraph>
+
+                    </div>
+                    <div className="list-item w-full px-2 py-4">
+                        <Paragraph 
+                            displayFlex={false} 
+                            size="small"
+                            style={{ color: 'white' }}
+                            className="shrink-0">
+                            LOST
+                        </Paragraph>
+                        <Paragraph 
+                            displayFlex={false} 
+                            size="small"
+                            style={{ color: 'white' }}
+                            className="shrink-0">
+                            {history.loss}
+                        </Paragraph>
+
+                    </div>
+                </div>
+            ) : (
+                <div className="list-item-2 w-full p-5">
+                <Paragraph 
+                displayFlex={false} 
+                size="small">
+                    NO MULTI HISTORY YET
+                    GO PLAY GAME IN MULTI !            
+                </Paragraph>
+
+                </div>
+            )}
+            </div>
         </div>
     );
 };

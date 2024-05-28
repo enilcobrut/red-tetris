@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-
+import Paragraph from '../Paragraph';
 const HallOfFame = ({ className }) => {
     const { socket } = useSelector(state => state.socket);
     const [data, setData] = useState([]);
@@ -40,20 +40,41 @@ const HallOfFame = ({ className }) => {
 
     return (
         <div className={`halloffame ${className}`}>
-            <div className='font-username'>HALL OF FAME</div>
+            <div className='font-username-2 mb-5'>HALL OF FAME</div>
             {data.length > 0 ? (
-                <ol>
-                    {data.map((item, index) => (
-                        <li key={index}>
-                            Rank {index + 1}: {item.username} - {item.score}
-                        </li>
-                    ))}
-                </ol>
+                <div className="list-container w-full overflow-y-auto pr-2">  {/* Add the list-container class here */}
+                        {data.map((item, index) => (
+                            <div key={index} className="list-item w-full px-2 py-4">  {/* Add the list-item class here */}
+                                <Paragraph 
+                                    displayFlex={false} 
+                                    size="small"
+                                    style={{ color: 'white' }}
+                                    className="shrink-0">
+                                   {index + 1}
+                                </Paragraph>
+                                <Paragraph 
+                                    displayFlex={false} 
+                                    size="small"
+                                    style={{ color: 'white' }}
+                                    className="shrink-0">
+                                    {item.username}    
+                                </Paragraph>                                
+                                  <Paragraph 
+                                    displayFlex={false} 
+                                    size="small"
+                                    style={{ color: 'white' }}
+                                    className="shrink-0">
+                                    {item.score}    
+                                </Paragraph> 
+                            </div>
+                        ))}
+                </div>
             ) : (
                 <p>Loading...</p>
             )}
         </div>
     );
+
 }
 
 export default HallOfFame;

@@ -7,8 +7,8 @@
 
 body {
 	background-color: #110023;
-	/* dark-purple */
 	overflow: hidden;
+	/* dark-purple */
 }
 
 
@@ -61,6 +61,18 @@ body {
 	font-size: 20px;
 
 }
+
+.font-username-2 {
+	display: flex;
+	flex-direction: column;
+	gap: 10;
+	font-family: "Press Start 2P";
+	color: white;
+	text-shadow: 0px 0px 10px #0FF;
+	font-size: 12px;
+
+}
+
 
 .font-4 {
 	display: flex;
@@ -311,4 +323,39 @@ body {
 	gap: 20px;
 	z-index: 9999;
 	padding: 20px;
+}
+
+
+
+.list-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	flex: 1 0 0;
+	gap:5px
+}
+
+.list-item {
+	display: flex;
+	justify-content: space-between;
+	/* Add this line */
+	height: 40px;
+	align-items: center;
+	align-self: stretch;
+	border-radius: 8px;
+	background: #110023;
+	gap: 10px;
+}
+
+
+.list-item-2 {
+	display: flex;
+	justify-content: center;
+	/* Add this line */
+	height: 60px;
+	align-items: center;
+	align-self: stretch;
+	border-radius: 8px;
+	background: #110023;
+	gap: 10px;
 }
