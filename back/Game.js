@@ -612,7 +612,7 @@ class Game {
             if (this.players.length === 0 && this.areAllResourcesCleared()) {
                 this.onDelete(this.roomName);
             } else if (this.players.length === 0) {
-                clearAllResources();
+                this.clearAllResources();
                 this.onDelete(this.roomName);
             }
             if (this.players.length === 1 && this.originalPlayerCount > 1) {

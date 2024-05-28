@@ -52,22 +52,28 @@ io.on('connection', socket => {
         });
         callback({ success: true, username: cleanUsername });
     });
-
     socket.on('join_room', ({ username, room }) => {
-        socket.join(room);
-        if (!activeGames[room]) {
-            activeGames[room] = new Game(room, () => {
-                console.log(`Deleting room ${room}`);
-                delete activeGames[room];
-            });
-            if (activeGames[room].started == false) {
-                activeGames[room].addPlayer(username, socket.id, true);
+        if (activeGames[room] && activeGames[room].started) {
+            console.error("alrdy started");
+            socket.emit('join_error', { message: 'Cannot join. The game has already started.' });
+        } else {
+            socket.join(room);
+            if (!activeGames[room]) {
+                activeGames[room] = new Game(room, () => {
+                    console.log(`Deleting room ${room}`);
+                    delete activeGames[room];
+                });
             }
-        } else if (activeGames[room].started == false) {
-                activeGames[room].addPlayer(username, socket.id);
+            
+            if (!activeGames[room].started) {
+                activeGames[room].addPlayer(username, socket.id, activeGames[room].players.length === 0);
+            }
+    
+            io.to(room).emit('room_update', activeGames[room].getRoomData());
         }
-        io.to(room).emit('room_update', activeGames[room].getRoomData());
     });
+    
+    
 
     socket.on('leave_room', ({ room, username }) => {
         const game = activeGames[room];

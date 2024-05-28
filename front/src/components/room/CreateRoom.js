@@ -3,16 +3,12 @@ import Button from '../Button';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
-
 const CreateRoom = ({ className }) => {
     const navigate = useNavigate();
-    const {  socket } = useSelector((state) => state.socket);
+    const { socket } = useSelector(state => state.socket);
     const username = useSelector(state => state.user.username);
-
-
+    const [canNavigate, setCanNavigate] = useState(true);
     const [roomName, setRoomName] = useState('');
-
-    // Conditional destructuring to handle cases where contexts might be null
 
     const handleInputChange = (e) => {
         setRoomName(e.target.value);
@@ -20,8 +16,23 @@ const CreateRoom = ({ className }) => {
 
     const handleClick = () => {
         if (socket && username && roomName) {
+            const handleJoinError = (error) => {
+                setCanNavigate(false);
+                alert(error.message);
+                socket.off('join_error', handleJoinError);
+            };
+
+            socket.on('join_error', handleJoinError);
+
             socket.emit('join_room', { username, room: roomName });
-            navigate('/waitingRoom');
+            setCanNavigate(true);
+
+            socket.once('room_update', () => {
+                if (canNavigate) {
+                    navigate('/waitingRoom');
+                    socket.off('join_error', handleJoinError);
+                }
+            });
         } else {
             console.error("Socket not connected, username or roomName is empty.");
         }

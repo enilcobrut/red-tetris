@@ -38,7 +38,7 @@ useEffect(() => {
   if (socket) {
 
     const handleSpectrumUpdate = (data) => {
-      console.log("Spectrum update received:", data);
+     // console.log("Spectrum update received:", data);
       setSpectrums(prev => ({
         ...prev,
         [data.playerSocketId]: data.spectrumGrid
