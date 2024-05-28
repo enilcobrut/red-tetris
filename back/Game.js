@@ -14,7 +14,6 @@ class Game {
         this.players = []; // List of players who joined
         this.owner = null; // Owner of the room (initially not set)
         this.pieceQueue = []; // List of pieces that will be used for the game (same for every player)
-        this.updateInterval = 0; // Currently not used
         this.grids = new Map(); // Map with grids for all players; socket IDs are keys, grid cells contain boolean and color
         this.cols = 10; // Number of columns in the grid
         this.rows = 20; // Number of rows in the grid
@@ -617,12 +616,13 @@ class Game {
             if (this.originalPlayerCount === 1) {
                 this.updatePersonalBest(player.username, player.score);
                 this.updateLeaderboard(player.username, player.score);
+            } else {
+                this.updateHistory(player.username, false, this.originalPlayerCount > 1);
             }
             // Remove the player from the game
             this.players = this.players.filter(p => p.socketId !== socketId);
             this.grids.delete(socketId);
             this.currentPieces.delete(socketId);
-            this.updateHistory(player.username, false, this.originalPlayerCount > 1);
     
             // Check if there are no players left
             if (this.players.length === 0 && this.areAllResourcesCleared()) {
@@ -658,12 +658,12 @@ class Game {
      * Clear all resources.
      */
     clearAllResources() {
+        this.players.forEach(player => clearInterval(player.updateInterval));
         this.players = [];
         this.grids.clear();
         this.currentPieces.clear();
         this.pieceQueue = [];
         this.pendingPenalties.clear();
-        clearInterval(this.updateInterval);
     }
     
     
@@ -717,6 +717,7 @@ class Game {
             if (isMultiplayer) {
                 if (win) {
                     playerHistory.win += 1;
+                    playerHistory.played -= 1;
                 } else {
                     playerHistory.loss += 1;
                 }
@@ -816,7 +817,6 @@ class Game {
             clearInterval(player.updateInterval);
         });
 
-        clearInterval(this.updateInterval);
         this.pieceQueue = [];
         this.players.currentPieceIndex = 0;
         this.players = [];

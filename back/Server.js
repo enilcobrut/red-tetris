@@ -4,6 +4,7 @@ const { Server } = require('socket.io');
 const sanitizeHtml = require('sanitize-html');
 const Game = require('./Game');
 const path = require('path');
+const fs = require('fs');
 
 // Initialize Express app and HTTP server
 const app = express();
@@ -40,6 +41,38 @@ function findGameByPlayer(socketId) {
 io.on('connection', socket => {
     console.log('A user connected', socket.id);
 
+    const sendData = (event, filePath, filterFn) => {
+        fs.readFile(filePath, 'utf8', (err, data) => {
+            if (err) {
+                console.error('Error reading file:', err);
+                socket.emit(event, { error: 'Error reading file' });
+                return;
+            }
+
+            const jsonData = JSON.parse(data);
+            const filteredData = filterFn ? jsonData.filter(filterFn) : jsonData;
+            //console.log(`Sending data for ${event}:`, filteredData);
+            socket.emit(event, filteredData);
+        });
+    };
+    
+    // Handle getData event from client
+    socket.on('getData', () => {
+        const filePath = path.join(__dirname, 'db/Leaderboard.json');
+        sendData('data', filePath);
+    });
+
+    socket.on('getPlayerScores', (username) => {
+        const filePath = path.join(__dirname, 'db/PersonalBest.json');
+        sendData('playerScores', filePath, player => player.username === username);
+    });
+
+    socket.on('getPlayerHistory', (username) => {
+        const filePath = path.join(__dirname, 'db/History.json');
+        sendData('playerHistory', filePath, player => player.username === username);
+    });
+
+
     // Validate username event
     socket.on('validate_username', ({ username }, callback) => {
         if (!username || typeof username !== 'string' || username.trim().length === 0) {
@@ -54,7 +87,7 @@ io.on('connection', socket => {
     });
     socket.on('join_room', ({ username, room }) => {
         if (activeGames[room] && activeGames[room].started) {
-            console.error("alrdy started");
+            console.error("Game already started!");
             socket.emit('join_error', { message: 'Cannot join. The game has already started.' });
         } else {
             socket.join(room);
