@@ -288,7 +288,7 @@ body {
 	border-radius: 16px;
 	border: 1px solid var(--borders-border-primary, #FFF);
 	background: var(--surfaces-surface-secondary, #1D1A40);
-	opacity: 0.7;
+	opacity:0.7;
 }
 
 .log {
@@ -383,52 +383,22 @@ body {
     border: 1px solid #1D1A40; /* Bordure pour chaque cellule pour la visibilité */
 }
 
-.spectrum-player {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
-    margin: 0 auto;
-    padding: 15px;
-    align-items: flex-start;
-    border-radius: 16px;
-    border: 1px solid #FFF;
-    background: #1D1A40;
-    opacity: 0.7;
-}
-
-.player-spectrum {
-    flex: 1 1 21%; /* Prend au moins 21% de l'espace disponible, permettant jusqu'à 4 éléments par ligne */
-    max-width: 300px; /* Limite la taille maximale de chaque spectrum */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-@media (max-width: 800px) {
-    .player-spectrum {
-        flex: 1 1 46%; /* Change pour deux éléments par ligne sur les écrans plus petits */
-    }
-}
-
-@media (max-width: 500px) {
-    .player-spectrum {
-        flex: 1 1 100%; /* Un seul élément par ligne sur les très petits écrans */
-    }
-}
-
 .game-spectrum {
-    width: 100%; /* Utilise toute la largeur disponible de son conteneur */
     display: grid;
-    grid-template-columns: repeat(10, 1fr);
-    grid-template-rows: repeat(20, 1fr);
-    aspect-ratio: 1 / 2;
-    background-color: #110023;
+    grid-template-rows: repeat(20, 1fr); /* 20 lignes proportionnelles aux colonnes */
+    grid-template-columns: repeat(10, minmax(0, 1fr)); /* 10 colonnes avec une largeur maximale flexible */
+    max-width: 300px; /* Largeur maximale de la grille pour contrôler la taille des cellules */
+    margin: auto; /* Centre la grille dans le conteneur */
+    width: 100%; /* Utilise toute la largeur disponible jusqu'à la largeur maximale */
+    height: auto; /* Hauteur ajustée automatiquement à la content de la grille */
+    background-color: #110023; /* Fond noir strictement à la grille */
+    border-radius: 0;
+    aspect-ratio: 1 / 2; /* Maintient un rapport hauteur/largeur constant */
+    overflow: hidden;
 }
-
 .grid-cell-spectrum {
-    width: 100%;
-    aspect-ratio: 1;
+    width: 100%; /* Utilise toute la largeur de la colonne de grille */
+    aspect-ratio: 1; /* Maintient chaque cellule comme un carré */
 }
 
 
