@@ -51,7 +51,7 @@ io.on('connection', socket => {
 
             const jsonData = JSON.parse(data);
             const filteredData = filterFn ? jsonData.filter(filterFn) : jsonData;
-            //console.log(`Sending data for ${event}:`, filteredData);
+           // console.log(`Sending data for ${event}:`, filteredData);
             socket.emit(event, filteredData);
         });
     };

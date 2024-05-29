@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {  useSelector } from 'react-redux';
-import Paragraph from '../Paragraph';
 import Button from '../Button'
-const GameCanva = () => {
+const GameCanva = ({ className }) => {
     const { socket } = useSelector(state => state.socket);
     const [isModalOpen, setModalOpen] = useState(false);
     const [PlayerScore, setPlayerScore] = useState('');
@@ -67,7 +66,7 @@ const GameCanva = () => {
             return;
         }
     
-        const handleGridUpdate = ({ grid: receivedGrid }) => {
+        const handleGridUpdate = ({ grid: receivedGrid, score }) => {
             if (receivedGrid.length === cols && receivedGrid[0].length === rows) {
                 console.error("Grid dimensions are transposed. Correcting...");
                 const correctedGrid = receivedGrid[0].map((_, colIndex) =>
@@ -79,6 +78,11 @@ const GameCanva = () => {
             } else {
                 console.error("Incorrect grid structure", receivedGrid);
             }
+            if (score !== undefined) {
+                setPlayerScore(score);
+                console.log(`Score update: ${score}`);
+            }
+    
         };
         const handleGameOver = (data) => {
             if (data && data.score !== undefined) {
@@ -110,7 +114,7 @@ const GameCanva = () => {
 
     return (
         <>
-            <div className="game-grid">
+            <div className={`game-grid ${className}`}>
                 {Array.from({ length: cols }).map((_, colIndex) => (
                     <div key={colIndex} className="grid-column">
                         {grid.map((row, rowIndex) => (
