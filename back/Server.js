@@ -68,7 +68,7 @@ io.on('connection', socket => {
     });
 
     socket.on('getPlayerHistory', (username) => {
-        const filePath = path.join(__dirname, 'db/History.json');
+        const filePath = path.join(__dirname, 'db/Statistics.json');
         sendData('playerHistory', filePath, player => player.username === username);
     });
 

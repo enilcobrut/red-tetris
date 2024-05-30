@@ -391,7 +391,7 @@ describe('Game class', () => {
         // Mock the methods
         game.updatePersonalBest = jest.fn();
         game.updateLeaderboard = jest.fn();
-        game.updateHistory = jest.fn();
+        game.updateStatistics = jest.fn();
     
         game.removePlayer(io, player.socketId);
     
@@ -400,7 +400,7 @@ describe('Game class', () => {
         expect(game.currentPieces.size).toBe(0); // Ensure currentPieces is also cleared
         expect(game.updatePersonalBest).toHaveBeenCalledWith(player.username, player.score);
         expect(game.updateLeaderboard).toHaveBeenCalledWith(player.username, player.score);
-        expect(game.updateHistory).toHaveBeenCalledWith(player.username, false, false);
+        expect(game.updateStatistics).toHaveBeenCalledWith(player.username, false, false);
         expect(io.to).toHaveBeenCalledWith(player.socketId); // Ensure 'game_over' event is emitted
         expect(io.emit).toHaveBeenCalledWith('game_over', { score: player.score });
     });    
@@ -589,14 +589,14 @@ describe('Game class', () => {
         );
     });
 
-    test('updateHistory updates the history correctly for win', () => {
+    test('updateStatistics updates the history correctly for win', () => {
         const mockData = [
             { username: 'testUser', played: 10, win: 5, loss: 5 }
         ];
         fs.readFileSync.mockReturnValue(JSON.stringify(mockData));
         fs.writeFileSync.mockResolvedValueOnce();
 
-        game.updateHistory('testUser', true, true);
+        game.updateStatistics('testUser', true, true);
 
         expect(fs.writeFileSync).toHaveBeenCalledWith(
             HISTORY_FILE,
@@ -607,14 +607,14 @@ describe('Game class', () => {
         );
     });
 
-    test('updateHistory updates the history correctly for loss', () => {
+    test('updateStatistics updates the history correctly for loss', () => {
         const mockData = [
             { username: 'testUser', played: 10, win: 5, loss: 5 }
         ];
         fs.readFileSync.mockReturnValue(JSON.stringify(mockData));
         fs.writeFileSync.mockResolvedValueOnce();
 
-        game.updateHistory('testUser', false, true);
+        game.updateStatistics('testUser', false, true);
 
         expect(fs.writeFileSync).toHaveBeenCalledWith(
             HISTORY_FILE,

@@ -75,7 +75,7 @@ describe('JsonHandlers', () => {
         });
 
         it('should have correct HISTORY_FILE path', () => {
-            const expectedPath = path.join(__dirname, '../db/History.json');
+            const expectedPath = path.join(__dirname, '../db/Statistics.json');
             expect(HISTORY_FILE).toBe(expectedPath);
         });
     });

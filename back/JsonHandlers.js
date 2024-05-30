@@ -3,7 +3,7 @@ const path = require('path');
 
 const PERSONAL_BEST_FILE = path.join(__dirname, 'db/PersonalBest.json');
 const LEADERBOARD_FILE = path.join(__dirname, 'db/Leaderboard.json');
-const HISTORY_FILE = path.join(__dirname, 'db/History.json');
+const HISTORY_FILE = path.join(__dirname, 'db/Statistics.json');
 
 function readJsonFile(filePath) {
     try {

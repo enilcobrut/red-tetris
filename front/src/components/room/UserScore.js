@@ -20,7 +20,7 @@ const UserScore = ({ className }) => {
             };
 
             const handleHistory = (jsonData) => {
-                console.log('History received:', jsonData);
+                console.log('Statistics received:', jsonData);
                 const playerHistory = jsonData.find(player => player.username === username);
                 if (playerHistory) {
                     setHistory(playerHistory);
