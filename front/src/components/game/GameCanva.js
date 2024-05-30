@@ -115,6 +115,8 @@ const GameCanva = ({ className }) => {
     return (
         <>
             <div className={`game-grid ${className}`}>
+
+                
                 {Array.from({ length: cols }).map((_, colIndex) => (
                     <div key={colIndex} className="grid-column">
                         {grid.map((row, rowIndex) => (
