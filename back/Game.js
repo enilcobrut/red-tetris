@@ -748,7 +748,7 @@ class Game {
      * @param {boolean} win - Whether the player won or lost.
      * @param {boolean} isMultiplayer - Whether the game was multiplayer.
      */
-    updateStatistics(username, win, isMultiplayer, linesCleared, tetrisScored, isSinglePlayer = false) {
+    updateStatistics(username, win, isMultiplayer, linesCleared = 0, tetrisScored = 0, isSinglePlayer = false) {
         const history = readJsonFile(STAT_FILE);
     
         let playerHistory = history.find(entry => entry.username === username);

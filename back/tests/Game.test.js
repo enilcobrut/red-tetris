@@ -27,7 +27,6 @@ jest.mock('../Player', () => {
             socketId, 
             isOwner: false, 
             score: 0, 
-            updateInterval: null,
             dropInterval: 0 // Add dropInterval property here
         }; 
     });
@@ -59,7 +58,6 @@ describe('Game class', () => {
         expect(game.players).toEqual([]);
         expect(game.owner).toBeNull();
         expect(game.pieceQueue).toEqual([]);
-        expect(game.updateInterval).toBe(0);
         expect(game.grids.size).toBe(0);
         expect(game.cols).toBe(10);
         expect(game.rows).toBe(20);
@@ -400,7 +398,7 @@ describe('Game class', () => {
         expect(game.currentPieces.size).toBe(0); // Ensure currentPieces is also cleared
         expect(game.updatePersonalBest).toHaveBeenCalledWith(player.username, player.score);
         expect(game.updateLeaderboard).toHaveBeenCalledWith(player.username, player.score);
-        expect(game.updateStatistics).toHaveBeenCalledWith(player.username, false, false);
+        expect(game.updateStatistics).toHaveBeenCalledWith(player.username, false, false, 0, 0, true);
         expect(io.to).toHaveBeenCalledWith(player.socketId); // Ensure 'game_over' event is emitted
         expect(io.emit).toHaveBeenCalledWith('game_over', { score: player.score });
     });    
@@ -591,7 +589,7 @@ describe('Game class', () => {
 
     test('updateStatistics updates the history correctly for win', () => {
         const mockData = [
-            { username: 'testUser', played: 10, win: 5, loss: 5 }
+            { username: 'testUser', played: 11, win: 5, loss: 6, linesCleared: 100, tetrisScored: 10}
         ];
         fs.readFileSync.mockReturnValue(JSON.stringify(mockData));
         fs.writeFileSync.mockResolvedValueOnce();
@@ -601,7 +599,7 @@ describe('Game class', () => {
         expect(fs.writeFileSync).toHaveBeenCalledWith(
             STAT_FILE,
             JSON.stringify([
-                { username: 'testUser', played: 11, win: 6, loss: 5 }
+                { username: 'testUser', played: 11, win: 6, loss: 5, linesCleared: 100, tetrisScored: 10}
             ], null, 2),
             'utf8'
         );
@@ -609,17 +607,17 @@ describe('Game class', () => {
 
     test('updateStatistics updates the history correctly for loss', () => {
         const mockData = [
-            { username: 'testUser', played: 10, win: 5, loss: 5 }
+            { username: 'testUser', played: 10, win: 5, loss: 5, linesCleared: 100, tetrisScored: 10}
         ];
         fs.readFileSync.mockReturnValue(JSON.stringify(mockData));
         fs.writeFileSync.mockResolvedValueOnce();
 
-        game.updateStatistics('testUser', false, true);
+        game.updateStatistics('testUser', false, true, 0, 0);
 
         expect(fs.writeFileSync).toHaveBeenCalledWith(
             STAT_FILE,
             JSON.stringify([
-                { username: 'testUser', played: 11, win: 5, loss: 6 }
+                { username: 'testUser', played: 11, win: 5, loss: 6, linesCleared: 100, tetrisScored: 10}
             ], null, 2),
             'utf8'
         );
