@@ -13,6 +13,9 @@ const RoomPage = () => {
     const [spectrums, setSpectrums] = useState({});
     const username = useSelector(state => state.user.username);  // Utilisez useSelector pour obtenir l'username
     const navigate = useNavigate();
+    const [logs, setLogs] = useState([]); // State to store logs
+    const [remindingPlayer, setRemindingPlayer] = useState(0)
+
 
     const displayMode = roomInfo.players.length === 1 ? 'SINGLE MODE' : 'MULTI MODE';
 
@@ -40,6 +43,20 @@ useEffect(() => {
 
   if (socket) {
 
+    const handleLogUpdate = (data) => {
+      if (data.logs) {
+          setLogs(data.logs);
+      }
+      if (data.remindingPlayer !== undefined) {
+          setRemindingPlayer(data.remindingPlayer);
+      }
+  };
+
+  socket.on('log_update', handleLogUpdate);
+
+
+
+
     const handleSpectrumUpdate = (data) => {
      // console.log("Spectrum update received:", data);
       setSpectrums(prev => ({
@@ -50,9 +67,15 @@ useEffect(() => {
 
     socket.on('update_spectrums', handleSpectrumUpdate);
 
-    return () => socket.off('update_spectrums', handleSpectrumUpdate);
+    return () => {
+      socket.off('update_spectrums', handleSpectrumUpdate);
+      socket.off('log_update', handleLogUpdate);
+    }
   }
 }, [socket]);
+
+
+
 return (
   <div className="flex flex-col h-full w-full gap-10">
     <div className="flex items-center justify-between p-10 h-20"> {/* Nav Bar with minimal height */}
@@ -87,7 +110,12 @@ return (
         <div className='font-username-2'>LOGS</div>
 
         <div className='user-data-2'>
-          </div>
+        {logs.map((log, index) => (
+                        <div key={index}>
+                          <Paragraph displayFlex={false}>{log}</Paragraph></div> // Display each log entry
+                    ))}
+
+        </div>
 
 
       </div>
@@ -108,7 +136,7 @@ return (
             ) : (
                 // Otherwise, display the player list and their spectrums.
 <>
-    <Paragraph neon='blue'>REMINDING PLAYER : {roomInfo.players.length}/18</Paragraph>
+    <Paragraph neon='blue'>REMINDING PLAYER : {remindingPlayer} / {roomInfo.players.length}</Paragraph>
 
     <div className='spectrum-player h-full'>
         {roomInfo.players.map((player, index) => {

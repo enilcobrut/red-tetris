@@ -23,6 +23,7 @@ class Game {
         this.originalPlayerCount = 0; // Track the number of players at the start of the game
         this.started = false; // Track if the game has started
         this.logs = []; // New property to track logs
+        this.remindingPlayer = 0;
     }
 
     /**
@@ -231,6 +232,7 @@ class Game {
      */
     startGame(io) {
         this.originalPlayerCount = this.players.length;
+        this.remindingPlayer = this.players.length;
         this.generatePieces();
     
         this.players.forEach(player => {
@@ -628,6 +630,8 @@ class Game {
             console.log(`Removing player ${player.username} with score ${player.score}`);
             this.logs.push(`Removing player ${player.username} with score ${player.score}`);
             io.to(player.socketId).emit('game_over', { score: player.score });
+            this.remindingPlayer  = this.remindingPlayer - 1;
+
     
             clearInterval(player.updateInterval);
     
@@ -664,7 +668,7 @@ class Game {
                 this.onDelete(this.roomName);
             }
     
-            this.emitLogUpdate(io); // Emit log update
+            this.emitLogUpdate(io, this.remindingPlayer);
         }
     }
     
@@ -845,7 +849,7 @@ class Game {
      * @param {string} socketId - Player's socket ID.
      * @returns {boolean} True if disconnection is handled.
      */
-    handleDisconnect(io, socketId) {
+    handleDisconnect(io) {
         this.players.forEach(player => {
             io.to(player.socketId).emit('game_over', {
                 message: "Game has ended due to a player disconnecting. You will be redirected."
@@ -864,8 +868,14 @@ class Game {
      * Emit log updates to the front end.
      * @param {object} io - Socket.io instance.
      */
-    emitLogUpdate(io) {
-        io.to(this.roomName).emit('log_update', this.logs);
+    emitLogUpdate(io, includeRemindingPlayer = false) {
+        const data = {
+            logs: this.logs
+        };
+        if (includeRemindingPlayer) {
+            data.remindingPlayer = this.remindingPlayer;
+        }
+        io.to(this.roomName).emit('log_update', data);
     }
 }
 
