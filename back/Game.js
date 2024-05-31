@@ -186,12 +186,6 @@ class Game {
         if (penalties > 0) {
             this.addPenaltyLines(grid, penalties);
             this.pendingPenalties.set(socketId, 0); // Reset pending penalties
-    
-            // Validate current piece placement after penalties
-            const currentPiece = this.currentPieces.get(socketId);
-            if (currentPiece && !this.isValidPlacement(grid, currentPiece.shape, currentPiece.position)) {
-                this.handlePieceLanding(null, grid, this.players.find(p => p.socketId === socketId));
-            }
         }
     }    
 
@@ -477,14 +471,6 @@ class Game {
             grid.shift(); // Remove the top row
             grid.push([...penaltyRow]); // Add a penalty line at the bottom
         }
-    
-        // Validate all current pieces after applying penalties
-        this.players.forEach(player => {
-            const currentPiece = this.currentPieces.get(player.socketId);
-            if (currentPiece && !this.isValidPlacement(grid, currentPiece.shape, currentPiece.position)) {
-                this.handlePieceLanding(null, grid, player);
-            }
-        });
     }    
 
     /**
@@ -792,7 +778,7 @@ class Game {
         const grid = this.grids.get(socketId);
         const score = player ? player.score : 0;  // Assurez-vous que player existe pour éviter les erreurs
         io.to(socketId).emit('grid_update', { grid, score });
-        }
+    }
 
     /**
      * Get the next piece for a player.
