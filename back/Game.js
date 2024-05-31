@@ -22,6 +22,7 @@ class Game {
         this.pendingPenalties = new Map(); // Map to store pending penalty lines for each player
         this.originalPlayerCount = 0; // Track the number of players at the start of the game
         this.started = false; // Track if the game has started
+        this.logs = []; // New property to track logs
     }
 
     /**
@@ -231,7 +232,7 @@ class Game {
     startGame(io) {
         this.originalPlayerCount = this.players.length;
         this.generatePieces();
-
+    
         this.players.forEach(player => {
             this.grids.set(player.socketId, this.createEmptyGrid());
             let initialPiece = this.getNextPiece(player);
@@ -239,7 +240,8 @@ class Game {
             this.startPlayerInterval(io, player);
         });
         this.started = true;
-    }
+        this.emitLogUpdate(io);
+    }    
 
     /**
      * Start the movement interval for a player.
@@ -403,26 +405,32 @@ class Game {
             }
         }
         if (linesCleared > 0) {
+            player.linesCleared = (player.linesCleared || 0) + linesCleared; // Track lines cleared
             const scorePerLine = 100;
             player.score += scorePerLine * linesCleared;
-
+    
             if (linesCleared === 4 && this.isPerfectClear(grid)) {
                 player.score += 5000; // Reward 5000 points for a Perfect Clear
                 this.sendPenaltyLines(io, player, 10); // Send 10 penalty lines to opponents
                 console.log(`Player ${player.username} achieved a Perfect Clear!`);
+                this.logs.push(`Player ${player.username} achieved a Perfect Clear!`);
             } else {
                 if (linesCleared === 4) {
+                    player.tetrisScored = (player.tetrisScored || 0) + 1; // Track Tetris scored
                     player.score += 400; // Additional 400 points for clearing 4 lines (Tetris)
                     console.log(`Player ${player.username} cleared a Tetris!`);
+                    this.logs.push(`Player ${player.username} cleared a Tetris!`);
                 } else {
                     console.log(`Player ${player.username} cleared ${linesCleared} lines.`);
+                    this.logs.push(`Player ${player.username} cleared ${linesCleared} lines.`);
                 }
                 if (linesCleared > 1) {
                     this.sendPenaltyLines(io, player, linesCleared - 1);
                 }
             }
+            this.emitLogUpdate(io); // Emit log update
         }
-    }
+    }     
     
     /**
      * Check if the grid is completely empty (Perfect Clear).
@@ -618,6 +626,7 @@ class Game {
     
         if (player) {
             console.log(`Removing player ${player.username} with score ${player.score}`);
+            this.logs.push(`Removing player ${player.username} with score ${player.score}`);
             io.to(player.socketId).emit('game_over', { score: player.score });
     
             clearInterval(player.updateInterval);
@@ -625,7 +634,7 @@ class Game {
                 this.updatePersonalBest(player.username, player.score);
                 this.updateLeaderboard(player.username, player.score);
             } else {
-                this.updateHistory(player.username, false, this.originalPlayerCount > 1);
+                this.updateStatistics(player.username, false, this.originalPlayerCount > 1, player.linesCleared || 0, player.tetrisScored || 0);
             }
             // Remove the player from the game
             this.players = this.players.filter(p => p.socketId !== socketId);
@@ -642,13 +651,15 @@ class Game {
             if (this.players.length === 1 && this.originalPlayerCount > 1) {
                 // If only one player remains, update their history as a win
                 const lastPlayer = this.players[0];
-                this.updateHistory(lastPlayer.username, true, true);
+                this.updateStatistics(lastPlayer.username, true, true, lastPlayer.linesCleared || 0, lastPlayer.tetrisScored || 0);
                 console.log(`Game over for player ${lastPlayer.username}`);
+                this.logs.push(`Game over for player ${lastPlayer.username}`);
                 io.to(lastPlayer.socketId).emit('game_over');
                 this.removePlayer(io, lastPlayer.socketId);
             }
+            this.emitLogUpdate(io); // Emit log update
         }
-    }
+    }       
     
     /**
      * Check if all resources are cleared.
@@ -711,17 +722,19 @@ class Game {
     }
 
     /**
-     * Update the History file for the player.
+     * Update the Statistics file for the player.
      * @param {string} username - The player's username.
      * @param {boolean} win - Whether the player won or lost.
      * @param {boolean} isMultiplayer - Whether the game was multiplayer.
      */
-    updateHistory(username, win, isMultiplayer) {
+    updateStatistics(username, win, isMultiplayer, linesCleared, tetrisScored) {
         const history = readJsonFile(HISTORY_FILE);
-
+    
         let playerHistory = history.find(entry => entry.username === username);
         if (playerHistory) {
             playerHistory.played += 1;
+            playerHistory.linesCleared = (playerHistory.linesCleared || 0) + linesCleared;
+            playerHistory.tetrisScored = (playerHistory.tetrisScored || 0) + tetrisScored;
             if (isMultiplayer) {
                 if (win) {
                     playerHistory.win += 1;
@@ -735,12 +748,14 @@ class Game {
                 username, 
                 played: 1, 
                 win: isMultiplayer && win ? 1 : 0, 
-                loss: isMultiplayer && !win ? 1 : 0 
+                loss: isMultiplayer && !win ? 1 : 0,
+                linesCleared: linesCleared,
+                tetrisScored: tetrisScored
             });
         }
-
+    
         writeJsonFile(HISTORY_FILE, history);
-    }
+    }    
 
     /**
      * Broadcast the updated grid to a player.
@@ -833,6 +848,14 @@ class Game {
 
         return true;
     }
+}
+
+/**
+ * Emit log updates to the front end.
+ * @param {object} io - Socket.io instance.
+ */
+emitLogUpdate(io) {
+    io.to(this.roomName).emit('log_update', this.logs);
 }
 
 module.exports = Game;
