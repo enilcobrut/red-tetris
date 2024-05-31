@@ -1,6 +1,6 @@
 const Player = require('./Player');
 const Piece = require('./Piece');
-const { readJsonFile, writeJsonFile, PERSONAL_BEST_FILE, LEADERBOARD_FILE, HISTORY_FILE } = require('./JsonHandlers');
+const { readJsonFile, writeJsonFile, PERSONAL_BEST_FILE, LEADERBOARD_FILE, STAT_FILE } = require('./JsonHandlers');
 
 const DEFAULT_PIECES = 1000;
 const DEFAULT_INTERVAL = 1000;
@@ -186,8 +186,14 @@ class Game {
         if (penalties > 0) {
             this.addPenaltyLines(grid, penalties);
             this.pendingPenalties.set(socketId, 0); // Reset pending penalties
+    
+            // Validate current piece placement after penalties
+            const currentPiece = this.currentPieces.get(socketId);
+            if (currentPiece && !this.isValidPlacement(grid, currentPiece.shape, currentPiece.position)) {
+                this.handlePieceLanding(null, grid, this.players.find(p => p.socketId === socketId));
+            }
         }
-    }
+    }    
 
     /**
      * Find a player by username.
@@ -430,7 +436,7 @@ class Game {
             }
             this.emitLogUpdate(io); // Emit log update
         }
-    }     
+    }      
     
     /**
      * Check if the grid is completely empty (Perfect Clear).
@@ -466,12 +472,20 @@ class Game {
      */
     addPenaltyLines(grid, penaltyLines) {
         const penaltyRow = new Array(this.cols).fill({ filled: true, color: 'gray', indestructible: true });
-
+    
         for (let i = 0; i < penaltyLines; i++) {
             grid.shift(); // Remove the top row
             grid.push([...penaltyRow]); // Add a penalty line at the bottom
         }
-    }
+    
+        // Validate all current pieces after applying penalties
+        this.players.forEach(player => {
+            const currentPiece = this.currentPieces.get(player.socketId);
+            if (currentPiece && !this.isValidPlacement(grid, currentPiece.shape, currentPiece.position)) {
+                this.handlePieceLanding(null, grid, player);
+            }
+        });
+    }    
 
     /**
      * Move the current piece left for a player.
@@ -630,16 +644,31 @@ class Game {
             io.to(player.socketId).emit('game_over', { score: player.score });
     
             clearInterval(player.updateInterval);
+    
+            const isMultiplayer = this.originalPlayerCount > 1;
+    
             if (this.originalPlayerCount === 1) {
                 this.updatePersonalBest(player.username, player.score);
                 this.updateLeaderboard(player.username, player.score);
+                this.updateStatistics(player.username, false, false, player.linesCleared || 0, player.tetrisScored || 0, true);
             } else {
-                this.updateStatistics(player.username, false, this.originalPlayerCount > 1, player.linesCleared || 0, player.tetrisScored || 0);
+                this.updateStatistics(player.username, false, isMultiplayer, player.linesCleared || 0, player.tetrisScored || 0);
             }
+    
             // Remove the player from the game
             this.players = this.players.filter(p => p.socketId !== socketId);
             this.grids.delete(socketId);
             this.currentPieces.delete(socketId);
+    
+            // Check if there is only one player left in a multiplayer game
+            if (isMultiplayer && this.players.length === 1) {
+                const lastPlayer = this.players[0];
+                this.updateStatistics(lastPlayer.username, true, true, lastPlayer.linesCleared || 0, lastPlayer.tetrisScored || 0);
+                console.log(`Game over for player ${lastPlayer.username}! He won the game!`);
+                this.logs.push(`Game over for player ${lastPlayer.username}! He won the game!`);
+                io.to(lastPlayer.socketId).emit('game_over');
+                this.removePlayer(io, lastPlayer.socketId);
+            }
     
             // Check if there are no players left
             if (this.players.length === 0 && this.areAllResourcesCleared()) {
@@ -648,18 +677,10 @@ class Game {
                 this.clearAllResources();
                 this.onDelete(this.roomName);
             }
-            if (this.players.length === 1 && this.originalPlayerCount > 1) {
-                // If only one player remains, update their history as a win
-                const lastPlayer = this.players[0];
-                this.updateStatistics(lastPlayer.username, true, true, lastPlayer.linesCleared || 0, lastPlayer.tetrisScored || 0);
-                console.log(`Game over for player ${lastPlayer.username}`);
-                this.logs.push(`Game over for player ${lastPlayer.username}`);
-                io.to(lastPlayer.socketId).emit('game_over');
-                this.removePlayer(io, lastPlayer.socketId);
-            }
+    
             this.emitLogUpdate(io); // Emit log update
         }
-    }       
+    }
     
     /**
      * Check if all resources are cleared.
@@ -727,8 +748,8 @@ class Game {
      * @param {boolean} win - Whether the player won or lost.
      * @param {boolean} isMultiplayer - Whether the game was multiplayer.
      */
-    updateStatistics(username, win, isMultiplayer, linesCleared, tetrisScored) {
-        const history = readJsonFile(HISTORY_FILE);
+    updateStatistics(username, win, isMultiplayer, linesCleared, tetrisScored, isSinglePlayer = false) {
+        const history = readJsonFile(STAT_FILE);
     
         let playerHistory = history.find(entry => entry.username === username);
         if (playerHistory) {
@@ -738,23 +759,27 @@ class Game {
             if (isMultiplayer) {
                 if (win) {
                     playerHistory.win += 1;
+                    playerHistory.loss -= 1;
                     playerHistory.played -= 1;
                 } else {
                     playerHistory.loss += 1;
                 }
+            } else if (isSinglePlayer) {
+                playerHistory.single = (playerHistory.single || 0) + 1;
             }
         } else {
-            history.push({ 
-                username, 
-                played: 1, 
-                win: isMultiplayer && win ? 1 : 0, 
+            history.push({
+                username,
+                played: 1,
+                win: isMultiplayer && win ? 1 : 0,
                 loss: isMultiplayer && !win ? 1 : 0,
                 linesCleared: linesCleared,
-                tetrisScored: tetrisScored
+                tetrisScored: tetrisScored,
+                single: isSinglePlayer ? 1 : 0
             });
         }
     
-        writeJsonFile(HISTORY_FILE, history);
+        writeJsonFile(STAT_FILE, history);
     }    
 
     /**
@@ -848,14 +873,14 @@ class Game {
 
         return true;
     }
-}
 
-/**
- * Emit log updates to the front end.
- * @param {object} io - Socket.io instance.
- */
-emitLogUpdate(io) {
-    io.to(this.roomName).emit('log_update', this.logs);
+    /**
+     * Emit log updates to the front end.
+     * @param {object} io - Socket.io instance.
+     */
+    emitLogUpdate(io) {
+        io.to(this.roomName).emit('log_update', this.logs);
+    }
 }
 
 module.exports = Game;

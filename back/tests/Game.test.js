@@ -8,7 +8,7 @@ const {
     writeJsonFile,
     PERSONAL_BEST_FILE,
     LEADERBOARD_FILE,
-    HISTORY_FILE
+    STAT_FILE
 } = require('../JsonHandlers');
 
 console.log = jest.fn(); // Suppress console.log
@@ -599,7 +599,7 @@ describe('Game class', () => {
         game.updateStatistics('testUser', true, true);
 
         expect(fs.writeFileSync).toHaveBeenCalledWith(
-            HISTORY_FILE,
+            STAT_FILE,
             JSON.stringify([
                 { username: 'testUser', played: 11, win: 6, loss: 5 }
             ], null, 2),
@@ -617,7 +617,7 @@ describe('Game class', () => {
         game.updateStatistics('testUser', false, true);
 
         expect(fs.writeFileSync).toHaveBeenCalledWith(
-            HISTORY_FILE,
+            STAT_FILE,
             JSON.stringify([
                 { username: 'testUser', played: 11, win: 5, loss: 6 }
             ], null, 2),

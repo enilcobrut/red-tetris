@@ -5,7 +5,7 @@ const {
     writeJsonFile,
     PERSONAL_BEST_FILE,
     LEADERBOARD_FILE,
-    HISTORY_FILE
+    STAT_FILE
 } = require('../JsonHandlers');
 
 // Mock the fs methods
@@ -74,9 +74,9 @@ describe('JsonHandlers', () => {
             expect(LEADERBOARD_FILE).toBe(expectedPath);
         });
 
-        it('should have correct HISTORY_FILE path', () => {
+        it('should have correct STAT_FILE path', () => {
             const expectedPath = path.join(__dirname, '../db/Statistics.json');
-            expect(HISTORY_FILE).toBe(expectedPath);
+            expect(STAT_FILE).toBe(expectedPath);
         });
     });
 });
