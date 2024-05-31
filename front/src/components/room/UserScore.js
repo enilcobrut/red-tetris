@@ -11,9 +11,15 @@ const UserScore = ({ className }) => {
         if (socket && username) {
             const handleScores = (jsonData) => {
                 console.log('Data received:', jsonData);
-                const playerData = jsonData.find(player => player.username === username);
-                if (playerData && Array.isArray(playerData.scores)) {
-                    setScores(playerData.scores.sort((a, b) => b - a).slice(0, 5));
+                if (Array.isArray(jsonData)) {
+                    const playerData = jsonData.find(player => player.username === username);
+                    if (playerData && Array.isArray(playerData.scores)) {
+                        setScores(playerData.scores.sort((a, b) => b - a).slice(0, 5));
+                    } else {
+                        console.error('Received data is not valid:', jsonData);
+                    }
+                } else if (jsonData && jsonData.username === username && Array.isArray(jsonData.scores)) {
+                    setScores(jsonData.scores.sort((a, b) => b - a).slice(0, 5));
                 } else {
                     console.error('Received data is not valid:', jsonData);
                 }
@@ -21,9 +27,15 @@ const UserScore = ({ className }) => {
 
             const handleHistory = (jsonData) => {
                 console.log('Statistics received:', jsonData);
-                const playerHistory = jsonData.find(player => player.username === username);
-                if (playerHistory) {
-                    setHistory(playerHistory);
+                if (Array.isArray(jsonData)) {
+                    const playerHistory = jsonData.find(player => player.username === username);
+                    if (playerHistory) {
+                        setHistory(playerHistory);
+                    } else {
+                        console.error('Received history data is not valid:', jsonData);
+                    }
+                } else if (jsonData && jsonData.username === username) {
+                    setHistory(jsonData);
                 } else {
                     console.error('Received history data is not valid:', jsonData);
                 }
@@ -74,7 +86,7 @@ const UserScore = ({ className }) => {
                 displayFlex={false} 
                 size="small"
                 style={{ color: 'white' }}>
-                NO SCORE YET GO PLAY A GAME !
+                NO SCORE YET! GO PLAY A GAME !
             </Paragraph>
             </div>
             )}

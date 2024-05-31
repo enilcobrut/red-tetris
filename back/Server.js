@@ -26,7 +26,6 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
-
 // Object to store active games by room name
 const activeGames = {};
 
@@ -41,7 +40,7 @@ function findGameByPlayer(socketId) {
 io.on('connection', socket => {
     console.log('A user connected', socket.id);
 
-    const sendData = (event, filePath, filterFn) => {
+    const sendData = (event, filePath, filterFn, defaultValue) => {
         fs.readFile(filePath, 'utf8', (err, data) => {
             if (err) {
                 console.error('Error reading file:', err);
@@ -51,8 +50,11 @@ io.on('connection', socket => {
 
             const jsonData = JSON.parse(data);
             const filteredData = filterFn ? jsonData.filter(filterFn) : jsonData;
-           // console.log(`Sending data for ${event}:`, filteredData);
-            socket.emit(event, filteredData);
+            if (filteredData.length === 0) {
+                socket.emit(event, defaultValue);
+            } else {
+                socket.emit(event, filteredData);
+            }
         });
     };
     
@@ -64,14 +66,15 @@ io.on('connection', socket => {
 
     socket.on('getPlayerScores', (username) => {
         const filePath = path.join(__dirname, 'db/PersonalBest.json');
-        sendData('playerScores', filePath, player => player.username === username);
+        const defaultScores = { username, scores: [] };
+        sendData('playerScores', filePath, player => player.username === username, defaultScores);
     });
 
     socket.on('getPlayerHistory', (username) => {
         const filePath = path.join(__dirname, 'db/Statistics.json');
-        sendData('playerHistory', filePath, player => player.username === username);
+        const defaultHistory = { username, played: 0, single: 0, win: 0, loss: 0, linesCleared: 0, tetrisScored: 0 };
+        sendData('playerHistory', filePath, player => player.username === username, defaultHistory);
     });
-
 
     // Validate username event
     socket.on('validate_username', ({ username }, callback) => {
@@ -85,6 +88,7 @@ io.on('connection', socket => {
         });
         callback({ success: true, username: cleanUsername });
     });
+
     socket.on('join_room', ({ username, room }) => {
         if (activeGames[room] && activeGames[room].started) {
             console.error("Game already started!");
@@ -105,8 +109,6 @@ io.on('connection', socket => {
             io.to(room).emit('room_update', activeGames[room].getRoomData());
         }
     });
-    
-    
 
     socket.on('leave_room', ({ room, username }) => {
         const game = activeGames[room];
@@ -120,13 +122,11 @@ io.on('connection', socket => {
         // Check if the game should be deleted or not
         if (game.players.length === 0) {
             console.log("no more room must ");
-
         } else {
             io.to(room).emit('room_update', game.getRoomData());
             console.log(`Updated room data sent after ${username} left the room.`);
         }
     });
-
 
     socket.on('leave_game', ({ room, username }) => {
         const game = activeGames[room];
@@ -137,14 +137,12 @@ io.on('connection', socket => {
         // Find the player using the username
         const player = game.findPlayer(username);
         if (player) {
-            console.log("playeur found");
+            console.log("player found");
             game.removePlayer(io, player.socketId);
         } else {
             console.error("Player not found in room");
         }
     });
-    
-
 
     // Redirect game event
     socket.on('redirect_game', ({ username, room }) => {
