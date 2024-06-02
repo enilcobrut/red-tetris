@@ -8,14 +8,14 @@ const DEFAULT_SCORE = 100;
 const SCORE_MULTIPLIER_INCREMENT = 0.2;
 const INTERVAL_DECREMENT = 50;
 const MINIMUM_INTERVAL = 150;
-const LINES_PER_LEVEL = 1;
+const LINES_PER_LEVEL = 4;
 let SCORE_MULTIPLIER = 1.0;
 
 /**
  * An instance of Game is created when someone creates a room.
  */
 class Game {
-    constructor(roomName, onDelete, isSinglePlayerJourney = false) {
+    constructor(roomName, onDelete, isSinglePlayerJourney = true) {
         this.roomName = roomName; // Name of the room
         this.players = []; // List of players who joined
         this.owner = null; // Owner of the room (initially not set)
