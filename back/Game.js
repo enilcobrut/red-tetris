@@ -649,7 +649,7 @@ class Game {
                 this.logs.push(`Player ${player.username} lost with a score of ${player.score}`);
             }
 
-            io.to(player.socketId).emit('game_over', { score: player.score });
+            io.to(player.socketId).emit('game_over', { score: player.score, isWinner });
             this.remindingPlayer = this.remindingPlayer - 1;
 
             clearInterval(player.updateInterval);
