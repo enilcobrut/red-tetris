@@ -4,6 +4,8 @@ const { readJsonFile, writeJsonFile, PERSONAL_BEST_FILE, LEADERBOARD_FILE, STAT_
 
 const DEFAULT_PIECES = 1000;
 const DEFAULT_INTERVAL = 1000;
+const DEFAULT_SCORE = 100;
+SCORE_MULTIPLIER = 1.0;
 
 /**
  * An instance of Game is created when someone creates a room.
@@ -408,18 +410,17 @@ class Game {
         }
         if (linesCleared > 0) {
             player.linesCleared = (player.linesCleared || 0) + linesCleared; // Track lines cleared
-            const scorePerLine = 100;
-            player.score += scorePerLine * linesCleared;
+            player.score += DEFAULT_SCORE * linesCleared * SCORE_MULTIPLIER;
     
             if (linesCleared === 4 && this.isPerfectClear(grid)) {
-                player.score += 5000; // Reward 5000 points for a Perfect Clear
+                player.score += DEFAULT_SCORE * SCORE_MULTIPLIER * 50; // Reward points for a Perfect Clear
                 this.sendPenaltyLines(io, player, 10); // Send 10 penalty lines to opponents
                 console.log(`Player ${player.username} achieved a Perfect Clear!`);
                 this.logs.push(`Player ${player.username} achieved a Perfect Clear!`);
             } else {
                 if (linesCleared === 4) {
                     player.tetrisScored = (player.tetrisScored || 0) + 1; // Track Tetris scored
-                    player.score += 400; // Additional 400 points for clearing 4 lines (Tetris)
+                    player.score += DEFAULT_SCORE * SCORE_MULTIPLIER * 4; // Additional 400 points for clearing 4 lines (Tetris)
                     console.log(`Player ${player.username} cleared a Tetris!`);
                     this.logs.push(`Player ${player.username} cleared a Tetris!`);
                 } else {
