@@ -10,6 +10,8 @@ class Player {
         this.fall = false;
         this.updateInterval = null; // Reference to the interval
         this.dropInterval = 0;
+        this.level = 1;
+        this.finalInterval = 1000;
     }
 }
 module.exports = Player;

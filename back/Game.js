@@ -5,13 +5,17 @@ const { readJsonFile, writeJsonFile, PERSONAL_BEST_FILE, LEADERBOARD_FILE, STAT_
 const DEFAULT_PIECES = 1000;
 const DEFAULT_INTERVAL = 1000;
 const DEFAULT_SCORE = 100;
-SCORE_MULTIPLIER = 1.0;
+const SCORE_MULTIPLIER_INCREMENT = 0.2;
+const INTERVAL_DECREMENT = 50;
+const MINIMUM_INTERVAL = 150;
+const LINES_PER_LEVEL = 1;
+let SCORE_MULTIPLIER = 1.0;
 
 /**
  * An instance of Game is created when someone creates a room.
  */
 class Game {
-    constructor(roomName, onDelete) {
+    constructor(roomName, onDelete, isSinglePlayerJourney = false) {
         this.roomName = roomName; // Name of the room
         this.players = []; // List of players who joined
         this.owner = null; // Owner of the room (initially not set)
@@ -26,6 +30,7 @@ class Game {
         this.started = false; // Track if the game has started
         this.logs = []; // New property to track logs
         this.remindingPlayer = 0;
+        this.isSinglePlayerJourney = isSinglePlayerJourney;
     }
 
     /**
@@ -244,6 +249,13 @@ class Game {
             this.startPlayerInterval(io, player);
         });
         this.started = true;
+        if (this.originalPlayerCount > 1) {
+            console.log(`Multiplayer game started in room ${this.roomName}.`);
+        } else if (this.isSinglePlayerJourney){
+            console.log(`Single player journey started in room ${this.roomName}.`);
+        } else {
+            console.log(`Single player started in room ${this.roomName}.`);
+        }
         this.emitLogUpdate(io);
     }    
 
@@ -410,17 +422,38 @@ class Game {
         }
         if (linesCleared > 0) {
             player.linesCleared = (player.linesCleared || 0) + linesCleared; // Track lines cleared
-            player.score += DEFAULT_SCORE * linesCleared * SCORE_MULTIPLIER;
+            player.score = player.score + (DEFAULT_SCORE * linesCleared * SCORE_MULTIPLIER);
+        
+            if (this.isSinglePlayerJourney) {
+                // Check if player has cleared enough lines to level up
+                const level = 1 + Math.floor(player.linesCleared / LINES_PER_LEVEL);
+                SCORE_MULTIPLIER = 1.0 + ((level - 1) * SCORE_MULTIPLIER_INCREMENT);
+                const newInterval = DEFAULT_INTERVAL - (level * INTERVAL_DECREMENT);
+                player.finalInterval = Math.max(newInterval, MINIMUM_INTERVAL);
     
+                if (level > (player.level || 1)) {
+                    player.level = level;
+                    const bonus_point = Math.floor(level * DEFAULT_SCORE * SCORE_MULTIPLIER);
+                    player.score = player.score + bonus_point;
+                    
+                    this.logs.push(`Player ${player.username} leveled up to level ${level}!`);
+                    this.logs.push(`Bonus points: ${bonus_point}!`);
+                    console.log(`Player ${player.username} leveled up to level ${level}!`);
+                    console.log(`Bonus points: ${bonus_point}!`);
+                    console.log(`Player ${player.username} has a new interval of ${player.finalInterval}!`);
+                    console.log(`Player ${player.username} has a new score multiplier of ${SCORE_MULTIPLIER.toFixed(2)}!`);
+                }
+            }
+        
             if (linesCleared === 4 && this.isPerfectClear(grid)) {
-                player.score += DEFAULT_SCORE * SCORE_MULTIPLIER * 50; // Reward points for a Perfect Clear
+                player.score = player.score + (DEFAULT_SCORE * SCORE_MULTIPLIER * 50); // Reward points for a Perfect Clear
                 this.sendPenaltyLines(io, player, 10); // Send 10 penalty lines to opponents
                 console.log(`Player ${player.username} achieved a Perfect Clear!`);
                 this.logs.push(`Player ${player.username} achieved a Perfect Clear!`);
             } else {
                 if (linesCleared === 4) {
                     player.tetrisScored = (player.tetrisScored || 0) + 1; // Track Tetris scored
-                    player.score += DEFAULT_SCORE * SCORE_MULTIPLIER * 4; // Additional 400 points for clearing 4 lines (Tetris)
+                    player.score = player.score + (DEFAULT_SCORE * SCORE_MULTIPLIER * 4); // Additional 400 points for clearing 4 lines (Tetris)
                     console.log(`Player ${player.username} cleared a Tetris!`);
                     this.logs.push(`Player ${player.username} cleared a Tetris!`);
                 } else {
@@ -432,18 +465,23 @@ class Game {
                     this.logs.push(`Player ${player.username} cleared ${linesCleared} lines.`);
                 }
             }
-
-            // Emit the updated information to the front end
-            io.to(player.socketId).emit('lines_cleared', {
+            
+            let linesClearedData = {
                 score: player.score,
                 linesCleared: player.linesCleared,
                 tetrisScored: player.tetrisScored || 0
-            });
-
+            };
+            
+            if (this.isSinglePlayerJourney) {
+                linesClearedData.level = player.level || 1;
+            }
+            
+            io.to(player.socketId).emit('lines_cleared', linesClearedData);
+        
             this.emitLogUpdate(io); // Emit log update
         }
-    }   
-    
+    }
+        
     /**
      * Check if the grid is completely empty (Perfect Clear).
      * @param {array} grid - The grid to check.
@@ -581,7 +619,7 @@ class Game {
             clearInterval(player.updateInterval);
             player.updateInterval = setInterval(() => {
                 this.movePieceDownForPlayer(io, player);
-            }, DEFAULT_INTERVAL);
+            }, player.finalInterval || DEFAULT_INTERVAL);
         }
     }
 
@@ -596,8 +634,8 @@ class Game {
         clearInterval(player.updateInterval);
         const grid = this.grids.get(socketId);
         const currentPiece = this.currentPieces.get(socketId);
-        if (!currentPiece)
-            return;
+        if (!currentPiece) return;
+
         let newPosition = { ...currentPiece.position };
 
         while (this.isValidPlacement(grid, currentPiece.shape, { ...newPosition, y: newPosition.y + 1 })) {
@@ -608,6 +646,9 @@ class Game {
         this.broadcastGridUpdate(io, socketId);
         this.clearFullLines(io, grid, player);
 
+        if (this.isSinglePlayerJourney == true) {
+            player.dropInterval = 0;
+        }
         setTimeout(() => {
             this.checkSommet(io, grid, player);
 
@@ -622,7 +663,7 @@ class Game {
                 this.broadcastGridUpdate(io, socketId);
                 player.updateInterval = setInterval(() => {
                     this.movePieceDownForPlayer(io, player);
-                }, DEFAULT_INTERVAL);
+                }, player.finalInterval || DEFAULT_INTERVAL);
             }
         }, player.dropInterval);
 
@@ -646,8 +687,13 @@ class Game {
                 console.log(`Player ${player.username} won with a score of ${player.score}`);
                 this.logs.push(`Player ${player.username} won with a score of ${player.score}`);
             } else {
-                console.log(`Player ${player.username} lost with a score of ${player.score}`);
-                this.logs.push(`Player ${player.username} lost with a score of ${player.score}`);
+                if (isMultiplayer) {
+                    console.log(`Player ${player.username} lost with a score of ${player.score}`);
+                    this.logs.push(`Player ${player.username} lost with a score of ${player.score}`);
+                } else {
+                    console.log(`Game over for player ${player.username} with a score of ${player.score}`);
+                    this.logs.push(`Game over for player ${player.username} with a score of ${player.score}`);
+                }
             }
 
             io.to(player.socketId).emit('game_over', { score: player.score, isWinner });
