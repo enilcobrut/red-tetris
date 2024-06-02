@@ -134,7 +134,7 @@ const GameCanva = ({ className }) => {
                         <div className='font-3'>GAME OVER</div>
                         <div className='font-4'>SCORE : {PlayerScore}</div>
                         <div className='font-4'>
-                            {isWinner ? 'Congratulations, you win!' : 'YOU LOSE, GO TRAIN MORE!!!'}
+                            {isWinner ? 'Congratulations, you win!' : 'You lose! Maybe next time!'}
                         </div>
 
                         <Button onClick={handleClick}>LOBBY</Button>
