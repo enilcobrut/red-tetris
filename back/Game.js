@@ -424,10 +424,11 @@ class Game {
                     this.logs.push(`Player ${player.username} cleared a Tetris!`);
                 } else {
                     console.log(`Player ${player.username} cleared ${linesCleared} lines.`);
-                    this.logs.push(`Player ${player.username} cleared ${linesCleared} lines.`);
                 }
                 if (linesCleared > 1) {
                     this.sendPenaltyLines(io, player, linesCleared - 1);
+                    console.log(`Player ${player.username} cleared ${linesCleared} lines.`);
+                    this.logs.push(`Player ${player.username} cleared ${linesCleared} lines.`);
                 }
             }
 
@@ -633,18 +634,26 @@ class Game {
      */
     removePlayer(io, socketId) {
         const player = this.players.find(p => p.socketId === socketId);
-    
+
         if (player) {
             console.log(`Removing player ${player.username} with score ${player.score}`);
-            this.logs.push(`Removing player ${player.username} with score ${player.score}`);
-            io.to(player.socketId).emit('game_over', { score: player.score });
-            this.remindingPlayer  = this.remindingPlayer - 1;
-
-    
-            clearInterval(player.updateInterval);
-    
             const isMultiplayer = this.originalPlayerCount > 1;
-    
+            const isWinner = isMultiplayer && this.players.length === 1;
+
+            // Log the player's result
+            if (isWinner) {
+                console.log(`Player ${player.username} won with a score of ${player.score}`);
+                this.logs.push(`Player ${player.username} won with a score of ${player.score}`);
+            } else {
+                console.log(`Player ${player.username} lost with a score of ${player.score}`);
+                this.logs.push(`Player ${player.username} lost with a score of ${player.score}`);
+            }
+
+            io.to(player.socketId).emit('game_over', { score: player.score });
+            this.remindingPlayer = this.remindingPlayer - 1;
+
+            clearInterval(player.updateInterval);
+
             if (this.originalPlayerCount === 1) {
                 this.updatePersonalBest(player.username, player.score);
                 this.updateLeaderboard(player.username, player.score);
@@ -652,22 +661,22 @@ class Game {
             } else {
                 this.updateStatistics(player.username, false, isMultiplayer, player.linesCleared || 0, player.tetrisScored || 0);
             }
-    
+
             // Remove the player from the game
             this.players = this.players.filter(p => p.socketId !== socketId);
             this.grids.delete(socketId);
             this.currentPieces.delete(socketId);
-    
+
             // Check if there is only one player left in a multiplayer game
             if (isMultiplayer && this.players.length === 1) {
                 const lastPlayer = this.players[0];
                 this.updateStatistics(lastPlayer.username, true, true, lastPlayer.linesCleared || 0, lastPlayer.tetrisScored || 0);
                 console.log(`Game over for player ${lastPlayer.username}! He won the game!`);
-                this.logs.push(`Game over for player ${lastPlayer.username}! He won the game!`);
+                // this.logs.push(`Game over for player ${lastPlayer.username}! He won the game!`);
                 io.to(lastPlayer.socketId).emit('game_over');
                 this.removePlayer(io, lastPlayer.socketId);
             }
-    
+
             // Check if there are no players left
             if (this.players.length === 0 && this.areAllResourcesCleared()) {
                 this.onDelete(this.roomName);
@@ -675,7 +684,7 @@ class Game {
                 this.clearAllResources();
                 this.onDelete(this.roomName);
             }
-    
+
             this.emitLogUpdate(io, this.remindingPlayer);
         }
     }
