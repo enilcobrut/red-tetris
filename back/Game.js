@@ -430,9 +430,17 @@ class Game {
                     this.sendPenaltyLines(io, player, linesCleared - 1);
                 }
             }
+
+            // Emit the updated information to the front end
+            io.to(player.socketId).emit('lines_cleared', {
+                score: player.score,
+                linesCleared: player.linesCleared,
+                tetrisScored: player.tetrisScored || 0
+            });
+
             this.emitLogUpdate(io); // Emit log update
         }
-    }      
+    }   
     
     /**
      * Check if the grid is completely empty (Perfect Clear).
@@ -770,7 +778,7 @@ class Game {
         }
     
         writeJsonFile(STAT_FILE, history);
-    }    
+    }
 
     /**
      * Broadcast the updated grid to a player.
