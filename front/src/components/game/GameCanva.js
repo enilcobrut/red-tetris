@@ -6,6 +6,7 @@ const GameCanva = ({ className }) => {
     const { socket } = useSelector(state => state.socket);
     const [isModalOpen, setModalOpen] = useState(false);
     const [PlayerScore, setPlayerScore] = useState('');
+    const [isWinner, setWinner] = useState(false);
 
     const navigate = useNavigate();
     const rows = 20;
@@ -78,15 +79,13 @@ const GameCanva = ({ className }) => {
             } else {
                 console.error("Incorrect grid structure", receivedGrid);
             }
-            if (score !== undefined) {
-                setPlayerScore(score);
-                console.log(`Score update: ${score}`);
-            }
+
     
         };
         const handleGameOver = (data) => {
             if (data && data.score !== undefined) {
                 setPlayerScore(data.score);
+                setWinner(data.isWinner);
                 setModalOpen(true);
                 console.log(`Game over, your score was: ${data.score}. Redirecting to homepage.`);
             }
@@ -133,7 +132,11 @@ const GameCanva = ({ className }) => {
                 <div className='modal'>
                     <div className='modal-content'>
                         <div className='font-3'>GAME OVER</div>
-                        <div className='font-4'>{PlayerScore}</div>
+                        <div className='font-4'>SCORE : {PlayerScore}</div>
+                        <div className='font-4'>
+                            {isWinner ? 'Congratulations, you win!' : 'YOU LOSE, GO TRAIN MORE!!!'}
+                        </div>
+
                         <Button onClick={handleClick}>LOBBY</Button>
                     </div>
                 </div>

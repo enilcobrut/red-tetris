@@ -27,6 +27,9 @@ body {
   }
 
   .font-3 {
+	display: flex;
+	justify-content: center;
+	align-items: center;
 	font-family: "Press Start 2P";
 	color: white;
 	text-shadow: 0px 0px 10px #F0F;

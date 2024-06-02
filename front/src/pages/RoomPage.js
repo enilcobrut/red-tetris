@@ -14,7 +14,13 @@ const RoomPage = () => {
     const username = useSelector(state => state.user.username);  // Utilisez useSelector pour obtenir l'username
     const navigate = useNavigate();
     const [logs, setLogs] = useState([]); // State to store logs
-    const [remindingPlayer, setRemindingPlayer] = useState(0)
+    const [remindingPlayer, setRemindingPlayer] = useState(0);
+
+    const [gameData, setGameData] = useState({
+      score: 0,
+      linesCleared: 0,
+      tetrisScored: 0
+    });
 
 
     const displayMode = roomInfo.players.length === 1 ? 'SINGLE MODE' : 'MULTI MODE';
@@ -50,11 +56,29 @@ useEffect(() => {
       if (data.remindingPlayer !== undefined) {
           setRemindingPlayer(data.remindingPlayer);
       }
+      else {
+        setRemindingPlayer(roomInfo.players.length);
+      }
   };
 
   socket.on('log_update', handleLogUpdate);
 
+  const handleLinesCleared = (data) => {
+    console.log('Received lines cleared data:', data);
+    // Update local state with the received data
+    setGameData({
+      score: data.score,
+      linesCleared: data.linesCleared,
+      tetrisScored: data.tetrisScored
+    });
+  };
 
+
+
+
+  socket.on('lines_cleared', handleLinesCleared);
+
+  
 
 
     const handleSpectrumUpdate = (data) => {
@@ -95,9 +119,9 @@ return (
 
           <div className='flex flex-row space-between w-full'>
             <div className='flex flex-col gap-2 justify-center w-full'>
-              <div className='font-tetris-blue'>SCORE : 5479</div>
-              <div className='font-tetris-blue'>LINE : 5</div>
-              <div className='font-tetris-blue'>TETRIS : 1</div>
+              <div className='font-tetris-blue'>SCORE : {gameData.score}</div>
+              <div className='font-tetris-blue'>LINE : {gameData.linesCleared}</div>
+              <div className='font-tetris-blue'>TETRIS : {gameData.tetrisScored}</div>
             </div>
 
           </div>
