@@ -433,7 +433,7 @@ class Game {
     
                 if (level > (player.level || 1)) {
                     player.level = level;
-                    const bonus_point = Math.floor(level * DEFAULT_SCORE * SCORE_MULTIPLIER);
+                    const bonus_point = Math.floor(level * DEFAULT_SCORE / 2);
                     player.score = player.score + bonus_point;
                     
                     this.logs.push(`Player ${player.username} leveled up to level ${level}!`);
