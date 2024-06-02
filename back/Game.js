@@ -456,13 +456,13 @@ class Game {
                     player.score = player.score + (DEFAULT_SCORE * SCORE_MULTIPLIER * 4); // Additional 400 points for clearing 4 lines (Tetris)
                     console.log(`Player ${player.username} cleared a Tetris!`);
                     this.logs.push(`Player ${player.username} cleared a Tetris!`);
-                } else {
-                    console.log(`Player ${player.username} cleared ${linesCleared} lines.`);
-                }
-                if (linesCleared > 1) {
+                    this.sendPenaltyLines(io, player, linesCleared - 1);
+                } else if (linesCleared > 1) {
                     this.sendPenaltyLines(io, player, linesCleared - 1);
                     console.log(`Player ${player.username} cleared ${linesCleared} lines.`);
                     this.logs.push(`Player ${player.username} cleared ${linesCleared} lines.`);
+                } else {
+                    console.log(`Player ${player.username} cleared ${linesCleared} lines.`);
                 }
             }
             
