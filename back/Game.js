@@ -251,7 +251,7 @@ class Game {
         this.started = true;
         if (this.originalPlayerCount > 1) {
             console.log(`Multiplayer game started in room ${this.roomName}.`);
-        } else if (this.isSinglePlayerJourney){
+        } else if (this.isJourney){
             console.log(`Single player journey started in room ${this.roomName}.`);
         } else {
             console.log(`Single player started in room ${this.roomName}.`);
@@ -309,7 +309,7 @@ class Game {
         const newPiece = this.getNextPiece(player);
         if (!this.isValidPlacement(grid, newPiece.shape, newPiece.position)) {
             clearInterval(player.updateInterval);
-            console.log(`Game over for player ${player.username}`);
+            console.log(`Handle Piece Landing: Game over for player ${player.username}`);
             this.removePlayer(io, player.socketId);
         } else {
             this.applyPendingPenalties(grid, player.socketId);
@@ -424,7 +424,7 @@ class Game {
             player.linesCleared = (player.linesCleared || 0) + linesCleared; // Track lines cleared
             player.score = player.score + (DEFAULT_SCORE * linesCleared * SCORE_MULTIPLIER);
         
-            if (this.isSinglePlayerJourney) {
+            if (this.isJourney) {
                 // Check if player has cleared enough lines to level up
                 const level = 1 + Math.floor(player.linesCleared / LINES_PER_LEVEL);
                 SCORE_MULTIPLIER = 1.0 + ((level - 1) * SCORE_MULTIPLIER_INCREMENT);
@@ -472,7 +472,7 @@ class Game {
                 tetrisScored: player.tetrisScored || 0
             };
             
-            if (this.isSinglePlayerJourney) {
+            if (this.isJourney) {
                 linesClearedData.level = player.level || 1;
             }
             
@@ -646,7 +646,7 @@ class Game {
         this.broadcastGridUpdate(io, socketId);
         this.clearFullLines(io, grid, player);
 
-        if (this.isSinglePlayerJourney == true) {
+        if (this.isJourney == true) {
             player.dropInterval = 0;
         }
         setTimeout(() => {
@@ -654,7 +654,7 @@ class Game {
 
             const newPiece = this.getNextPiece(player);
             if (!this.isValidPlacement(grid, newPiece.shape, newPiece.position)) {
-                console.log(`Game over for player ${player.username}`);
+                console.log(`Timeout: Game over for player ${player.username}`);
                 this.removePlayer(io, player.socketId);
             } else {
                 this.applyPendingPenalties(grid, player.socketId);
