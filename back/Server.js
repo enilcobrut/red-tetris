@@ -121,6 +121,12 @@ io.on('connection', socket => {
         }
     });
 
+    socket.on('sendAllActiveRooms', () => {
+        const roomNames = Object.keys(activeGames);
+        socket.emit('activeRooms', { rooms: roomNames });
+    });
+
+
 
     socket.on('join_room_journey', ({ username, room }) => {
         if (activeGames[room]) {
@@ -192,7 +198,7 @@ io.on('connection', socket => {
     });
 
     // Game started event
-    socket.on('game_started', ({ username, room }) => {
+    socket.on('game_started', ({ room }) => {
         const game = activeGames[room];
         if (game) {
             game.startGame(io);
