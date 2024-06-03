@@ -400,7 +400,7 @@ describe('Game class', () => {
         expect(game.updateLeaderboard).toHaveBeenCalledWith(player.username, player.score);
         expect(game.updateStatistics).toHaveBeenCalledWith(player.username, false, false, 0, 0, true);
         expect(io.to).toHaveBeenCalledWith(player.socketId); // Ensure 'game_over' event is emitted
-        expect(io.emit).toHaveBeenCalledWith('game_over', { score: player.score });
+        expect(io.emit).toHaveBeenCalledWith('game_over', { isWinner: false, score: player.score });
     });    
     
     test('broadcastGridUpdate emits correct event', () => {
