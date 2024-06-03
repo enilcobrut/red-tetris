@@ -184,6 +184,20 @@ body {
 	cursor: pointer; /* Style du curseur */
 	margin-top: 5px;
   }
+  .button-join {
+	padding: 7px 10px; /* Padding spécifié */
+	border-radius: 16px; /* Rayon de bordure */
+	border: 2px solid #FFFFFF; /* Bordure blanche */
+	background-color: transparent; /* Couleur de fond transparente */
+	box-shadow: 0 0 10px 0 #00FFFF; /* Ombre portée (effet néon) */
+	font-size: 8px; /* Taille de police (ajustable) */
+	color: white; /* Couleur du texte */
+	font-family: 'Press Start 2P', sans-serif; /* Police */
+	display: flex; /* Utilisation de Flexbox */
+	justify-content: center; /* Centrage horizontal du contenu */
+	align-items: center; /* Centrage vertical du contenu */
+	cursor: pointer; /* Style du curseur */
+  }
   
   .button-blue {
 	box-shadow: 0 0 10px 0 #00FFFF; /* Ombre portée pour bleu */
