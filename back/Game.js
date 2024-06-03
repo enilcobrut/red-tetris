@@ -30,7 +30,7 @@ class Game {
         this.started = false; // Track if the game has started
         this.logs = []; // New property to track logs
         this.remindingPlayer = 0;
-        this.isSinglePlayerJourney = isSinglePlayerJourney;
+        this.isJourney = isSinglePlayerJourney;
     }
 
     /**

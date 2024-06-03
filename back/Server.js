@@ -109,14 +109,48 @@ io.on('connection', socket => {
                     delete activeGames[room];
                 });
             }
+
+            console.log("JOURNEY ??? ", activeGames[room].isJourney)
             
-            if (!activeGames[room].started) {
+            if (!activeGames[room].started || !activeGames[room].isJourney) {
                 activeGames[room].addPlayer(username, socket.id, activeGames[room].players.length === 0);
             }
-    
-            io.to(room).emit('room_update', activeGames[room].getRoomData());
+
+            if (!activeGames[room].isJourney)
+                io.to(room).emit('room_update', activeGames[room].getRoomData());
+            else
+                socket.emit('join_error', { message: 'Cannot join. its alrdy reserved in journey.' });
         }
     });
+
+
+    socket.on('join_room_journey', ({ username, room }) => {
+        if (activeGames[room]) {
+            console.log("alrdy exist !!!");
+            // Send an error message back to the client if the game has already started
+            socket.emit('join_error_journey', { message: 'Cannot join. The game has already started.' });
+        } else {
+            socket.join(room);
+            if (!activeGames[room]) {
+                console.log("journey !!!");
+                activeGames[room] = new Game(room, () => {
+                    console.log(`Deleting room ${room}`);
+                    delete activeGames[room];
+                }, true);
+                console.log(activeGames[room].isJourney);
+            }
+    
+            if (!activeGames[room].started) {
+                activeGames[room].addPlayer(username, socket.id, activeGames[room].players.length === 0);
+                socket.emit('room_update_journey', activeGames[room].getRoomData()); // Emit only to the joining socket
+            }
+        }
+    });
+    
+    
+
+
+
 
     socket.on('leave_room', ({ room, username }) => {
         const game = activeGames[room];

@@ -38,6 +38,23 @@ const CreateRoom = ({ className }) => {
         }
     };
 
+    const handleClickJourney = () => {
+        if (socket && username && roomName) {
+            socket.emit('join_room_journey', { username, room: roomName });
+    
+            socket.once('room_update_journey', () => {
+                navigate('/waitingRoom');
+            });
+    
+            socket.once('join_error_journey', (error) => {
+                alert(error.message); // Display the error message using an alert
+            });
+        } else {
+            console.error("Socket not connected, username or roomName is empty.");
+        }
+    };
+    
+
     return (
         <div className={`username-container ${className}`}>
             <div className='font-username'>CREATE / JOIN ROOM</div>
@@ -49,7 +66,10 @@ const CreateRoom = ({ className }) => {
                 value={roomName}
                 onChange={handleInputChange}
             />
-            <Button onClick={handleClick} color='blue'>START</Button>
+            <div className='flex flex-row w-full gap-5 justify-between'>
+                <Button onClick={handleClickJourney} color='blue'>JOURNEY</Button>
+                <Button onClick={handleClick} color='blue'>MULTI</Button>
+            </div>
         </div>
     );
 };
