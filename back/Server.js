@@ -85,7 +85,15 @@ io.on('connection', socket => {
         const cleanUsername = sanitizeHtml(username, {
             allowedTags: [],
             allowedAttributes: {}
-        });
+        }).trim();
+    
+        const usernameRegex = /^[a-zA-Z0-9]{3,10}$/;
+    
+        if (!usernameRegex.test(cleanUsername)) {
+            callback({ success: false, error: 'Username must be 3-10 characters long and contain only alphanumeric characters.' });
+            return;
+        }
+    
         callback({ success: true, username: cleanUsername });
     });
 

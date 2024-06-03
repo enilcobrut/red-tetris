@@ -15,7 +15,7 @@ let SCORE_MULTIPLIER = 1.0;
  * An instance of Game is created when someone creates a room.
  */
 class Game {
-    constructor(roomName, onDelete, isSinglePlayerJourney = true) {
+    constructor(roomName, onDelete, isSinglePlayerJourney = false) {
         this.roomName = roomName; // Name of the room
         this.players = []; // List of players who joined
         this.owner = null; // Owner of the room (initially not set)
@@ -934,7 +934,7 @@ class Game {
      */
     emitLogUpdate(io, includeRemindingPlayer = false) {
         const data = {
-            logs: this.logs
+            logs: this.logs.slice(-10)
         };
         if (includeRemindingPlayer) {
             data.remindingPlayer = this.remindingPlayer;
