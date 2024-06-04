@@ -23,7 +23,7 @@ const RoomPage = () => {
     });
 
 
-    const displayMode = roomInfo.players.length === 1 ? 'SINGLE MODE' : 'MULTI MODE';
+    const displayMode = roomInfo.players.length === 1 ? 'SINGLE PLAYER' : 'MULTIPLAYER';
 
   useEffect(() => {
     console.log("Socket:", socket);
@@ -153,7 +153,7 @@ return (
             ) : (
                 // Otherwise, display the player list and their spectrums.
 <>
-    <Paragraph neon='blue'>REMINDING PLAYER : {remindingPlayer} / {roomInfo.players.length}</Paragraph>
+    <Paragraph neon='blue'>REMAINING PLAYER : {remindingPlayer} / {roomInfo.players.length}</Paragraph>
 
     <div className='spectrum-player h-full'>
         {roomInfo.players.map((player, index) => {
