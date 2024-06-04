@@ -7,7 +7,6 @@ const HallOfFame = ({ className }) => {
     const [data, setData] = useState([]);
     const [showDropdown, setShowDropdown] = useState(false);
     const [leaderBoard, setLeaderBoard] = useState('Score');
-    const [dataBack, setDataBack] = useState('Score');
     const dropdownRef = useRef(null);
 
 
@@ -24,25 +23,26 @@ const HallOfFame = ({ className }) => {
 		};
 	}, [])
 
-
     useEffect(() => {
-        if (socket) {
-
-
-
-            
+        if (socket) {            
             console.log('Socket is connected:', socket.connected);
-
             const handleData = (jsonData) => {
-                //console.log('Data received:', jsonData);
                 if (Array.isArray(jsonData)) {
-                    setData(jsonData.slice(0, 10));
+                    const standardizedData = jsonData.map(item => {
+                        const keys = Object.keys(item);
+                        const valueKey = keys.find(key => key !== 'username');  // Find the dynamic value key
+                        return {
+                            username: item.username,
+                            value: item[valueKey]  // Standardize under 'value'
+                        };
+                    });
+                    setData(standardizedData.slice(0, 10));
                 } else {
                     console.error('Received data is not an array:', jsonData);
                 }
             };
-
-
+            
+            
 
             socket.emit('getData', { sort: leaderBoard });
 
@@ -112,7 +112,6 @@ const HallOfFame = ({ className }) => {
 							</Paragraph>
 						</button>
 					</DropdownMenu>
-
             </div>
             {data.length > 0 ? (
                 <div className="list-container w-full overflow-y-auto pr-2">  {/* Add the list-container class here */}
@@ -137,7 +136,7 @@ const HallOfFame = ({ className }) => {
                                     size="small"
                                     style={{ color: 'white' }}
                                     className="shrink-0">
-                                    {item.score}    
+                                    {item.value}    
                                 </Paragraph> 
                             </div>
                         ))}
@@ -149,5 +148,4 @@ const HallOfFame = ({ className }) => {
     );
 
 }
-
 export default HallOfFame;
