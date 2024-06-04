@@ -19,7 +19,8 @@ const RoomPage = () => {
     const [gameData, setGameData] = useState({
       score: 0,
       linesCleared: 0,
-      tetrisScored: 0
+      tetrisScored: 0,
+      level: 1
     });
 
 
@@ -41,8 +42,6 @@ const RoomPage = () => {
   const handleClick = () => {
     navigate('/lobby');
     socket.emit('leave_game', { username, room: roomInfo.roomName });
-
-
   }
 
 useEffect(() => {
@@ -69,7 +68,8 @@ useEffect(() => {
     setGameData({
       score: data.score,
       linesCleared: data.linesCleared,
-      tetrisScored: data.tetrisScored
+      tetrisScored: data.tetrisScored,
+      level: data.level
     });
   };
 
@@ -109,17 +109,14 @@ return (
         <div className='font-tetris-3'>{username}</div>
 
         <div className='user-data-2'>
-
           <div className='flex flex-row space-between w-full'>
             <div className='flex flex-col gap-2 justify-center w-full'>
               <div className='font-tetris-blue'>SCORE: {gameData.score}</div>
               <div className='font-tetris-blue'>LINE: {gameData.linesCleared}</div>
               <div className='font-tetris-blue'>TETRIS: {gameData.tetrisScored}</div>
+              <div className='font-tetris-blue'>LEVEL: {gameData.level}</div>
             </div>
-
           </div>
-
-
         </div>
 
       </div>

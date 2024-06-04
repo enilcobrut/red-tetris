@@ -469,12 +469,9 @@ class Game {
             let linesClearedData = {
                 score: player.score,
                 linesCleared: player.linesCleared,
-                tetrisScored: player.tetrisScored || 0
+                tetrisScored: player.tetrisScored || 0,
+                level: this.isJourney ? player.level : 1
             };
-            
-            if (this.isJourney) {
-                linesClearedData.level = player.level || 1;
-            }
             
             io.to(player.socketId).emit('lines_cleared', linesClearedData);
         
@@ -791,9 +788,9 @@ class Game {
 
         leaderboard.push({ username, score });
         leaderboard.sort((a, b) => b.score - a.score);
-        const top50 = leaderboard.slice(0, 50);
+        const top25 = leaderboard.slice(0, 25);
 
-        writeJsonFile(LEADERBOARD_FILE, top50);
+        writeJsonFile(LEADERBOARD_FILE, top25);
     }
 
     /**
