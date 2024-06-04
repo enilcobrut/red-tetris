@@ -699,8 +699,10 @@ class Game {
             clearInterval(player.updateInterval);
 
             if (this.originalPlayerCount === 1) {
-                this.updatePersonalBest(player.username, player.score);
-                this.updateLeaderboard(player.username, player.score);
+                if (this.isJourney) {
+                    this.updatePersonalBest(player.username, player.score);
+                    this.updateLeaderboard(player.username, player.score);
+                }
                 this.updateStatistics(player.username, false, false, player.linesCleared || 0, player.tetrisScored || 0, true);
             } else {
                 this.updateStatistics(player.username, false, isMultiplayer, player.linesCleared || 0, player.tetrisScored || 0);

@@ -41,15 +41,8 @@ const HallOfFame = ({ className }) => {
                     console.error('Received data is not an array:', jsonData);
                 }
             };
-            
-            
-
             socket.emit('getData', { sort: leaderBoard });
-
-
             socket.on('data', handleData);
-
-
             return () => {
                 socket.off('data', handleData);
             };
@@ -83,7 +76,12 @@ const HallOfFame = ({ className }) => {
                 <DropdownMenu isTranslate={false} show={showDropdown} onClose={() => setShowDropdown(false)} style={{ transform: 'translateX(-220px)' }}>
 						<button   onClick={() => { setLeaderBoard('Score'); setShowDropdown(false); }} className="relative z-50 px-4 py-2 text-white hover:bg-gray-950 w-full">
 							<Paragraph>
-								Sort by Score
+								Best Scores
+							</Paragraph>
+						</button>
+                        <button   onClick={() => { setLeaderBoard('Scores'); setShowDropdown(false); }} className="relative z-50 px-4 py-2 text-white hover:bg-gray-950 w-full">
+							<Paragraph>
+								Best Player by Score
 							</Paragraph>
 						</button>
                         <button onClick={() => { setLeaderBoard('Played'); setShowDropdown(false);}} className="block z-50 block px-4 py-2 text-white hover:bg-gray-950 w-full">
@@ -91,7 +89,7 @@ const HallOfFame = ({ className }) => {
 								Sort by Game Played
 							</Paragraph>
 						</button>
-                        <button   onClick={() => { setLeaderBoard('Single Player'); setShowDropdown(false); }} className="relative z-50 px-4 py-2 text-white hover:bg-gray-950 w-full">
+                        <button   onClick={() => { setLeaderBoard('Single'); setShowDropdown(false); }} className="relative z-50 px-4 py-2 text-white hover:bg-gray-950 w-full">
 							<Paragraph>
 								Sort by Single Player Game Played
 							</Paragraph>

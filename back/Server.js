@@ -65,6 +65,38 @@ io.on('connection', socket => {
         });
     };
 
+    function sendScores(event, filePath, data, category) {
+        fs.readFile(filePath, 'utf8', (err, fileData) => {
+            if (err) {
+                console.error('Error reading file:', err);
+                socket.emit(event, { error: 'Error reading file' });
+                return;
+            }
+    
+            const jsonData = JSON.parse(fileData);
+            const userScores = [];
+    
+            // Iterate through each user
+            jsonData.forEach(user => {
+                // Check if the user has scores
+                if (user.scores && user.scores.length > 0) {
+                    // Get the highest score for the user
+                    const highestScore = Math.max(...user.scores);
+                    // Push the username and highest score to the array
+                    userScores.push({ username: user.username, score: highestScore });
+                }
+            });
+    
+            // Sort the userScores array based on score in descending order
+            userScores.sort((a, b) => b.score - a.score);
+    
+            // Get the top 10 users based on highest score
+            const topTenUsers = userScores.slice(0, 10);
+    
+            // Emit the top 10 users to the client
+            socket.emit(event, topTenUsers);
+        });
+    }    
  
     const sendDataStatistics = (event, filePath, defaultValue, category) => {
         fs.readFile(filePath, 'utf8', (err, data) => {
@@ -81,7 +113,7 @@ io.on('connection', socket => {
     
             // Sorting the validEntries based on the category descending
             validEntries.sort((a, b) => b[category] - a[category]);
-    
+            
             // Extracting top 10 entries
             const topTen = validEntries.slice(0, 10).map(entry => ({
                 username: entry.username,
@@ -115,24 +147,24 @@ io.on('connection', socket => {
         }
         else if (data.sort == 'Tetris') {
             category ='tetrisScored';
-        }
-        else if (data.sort == 'Score') {
+        } else if (data.sort == 'Score') {
             category = 'Score';
+        } else if (data.sort == 'Scores') {
+            category = 'Scores';
         }
 
         if (category == 'Score') {
             filePath = path.join(__dirname, 'db/Leaderboard.json');
             sendData('data', filePath);
+        } else if (category == 'Scores') {
+            filePath = path.join(__dirname, 'db/PersonalBest.json');
+            sendScores('data', filePath, data, category);
         }
         else {
             filePath = path.join(__dirname, 'db/Statistics.json');
             sendDataStatistics('data', filePath, data, category);
         }
     });
-
-
-
-    
     
     socket.on('getPlayerScores', (username) => {
         const filePath = path.join(__dirname, 'db/PersonalBest.json');
