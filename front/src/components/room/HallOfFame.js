@@ -34,7 +34,7 @@ const HallOfFame = ({ className }) => {
             console.log('Socket is connected:', socket.connected);
 
             const handleData = (jsonData) => {
-                console.log('Data received:', jsonData);
+                //console.log('Data received:', jsonData);
                 if (Array.isArray(jsonData)) {
                     setData(jsonData.slice(0, 10));
                 } else {
@@ -44,7 +44,7 @@ const HallOfFame = ({ className }) => {
 
 
 
-            socket.emit('getData', { sort: dataBack });
+            socket.emit('getData', { sort: leaderBoard });
 
 
             socket.on('data', handleData);
@@ -62,32 +62,15 @@ const HallOfFame = ({ className }) => {
 
     // Log data whenever it changes
     useEffect(() => {
-        console.log('Updated data:', data);
+        //console.log('Updated data:', data);
 
     }, [data]);
 
 
     useEffect(() => {
-        if (leaderBoard == 'Win') {
-            setDataBack('win');
-        }
-        else if (leaderBoard == 'Loss') {
-            setDataBack('Loss');
-        }
-        else if (leaderBoard == 'Played') {
-            setDataBack('played');
-        }
-        else if (leaderBoard == 'Lines') {
-            setDataBack('linesCleared');
-        }
-        else if (leaderBoard == 'Tetris') {
-            setDataBack('tetrisScored');
-        }
-        else if (leaderBoard == 'Score') {
-            setDataBack('Score');
-        }
+        console.log(leaderBoard);
 
-        socket.emit('getData', { sort: dataBack });
+        socket.emit('getData', { sort: leaderBoard });
 
     }, [leaderBoard]);
 

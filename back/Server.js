@@ -43,8 +43,7 @@ io.on('connection', socket => {
     console.log('A user connected', socket.id);
 
     function getTop10Users(jsonData, category) {
-        const data = JSON.parse(jsonData);
-        const filteredData = data.filter(user => user[category] !== undefined);
+        const filteredData = jsonData.filter(user => user[category] !== undefined);
         filteredData.sort((a, b) => b[category] - a[category]);
         return filteredData.slice(0, 10);
     }
@@ -67,7 +66,7 @@ io.on('connection', socket => {
         });
     };
 
-    const sendDataStatistics = (event, filePath, category, defaultValue) => {
+    const sendDataStatistics = (event, filePath,  defaultValue, category) => {
         fs.readFile(filePath, 'utf8', (err, data) => {
             if (err) {
                 console.error('Error reading file:', err);
@@ -75,35 +74,55 @@ io.on('connection', socket => {
                 return;
             }
 
-
             const jsonData = JSON.parse(data);
-            const filteredData = getTop10Users(jsonData, category);
+            const win = jsonData.map(entry => entry.win);
+            win.sort((a, b) => a - b);
+            console.log("category : ", win);
+
+
 
             
-            console.log(filteredData);
 
-            
-
-            if (filteredData.length === 0) {
+            if (win.length === 0) {
                 socket.emit(event, defaultValue);
             } else {
-                socket.emit(event, filteredData);
+                socket.emit(event, win);
             }
         });
     };
     
     // Handle getData event from client
     socket.on('getData', (data) => {
-        console.log("dvsvasdaw")
         let filePath = '';
+        let category = '';
         console.log(data)
-        if (data.sort == 'Score') {
+
+        if (data.sort == 'Win') {
+            category ='win';
+        }
+        else if (data.sort == 'Loss') {
+            category ='Loss';
+        }
+        else if (data.sort == 'Played') {
+            category = 'played';
+        }
+        else if (data.sort == 'Lines') {
+            category = 'linesCleared';
+        }
+        else if (data.sort == 'Tetris') {
+            category ='tetrisScored';
+        }
+        else if (data.sort == 'Score') {
+            category = 'Score';
+        }
+
+        if (category == 'Score') {
             filePath = path.join(__dirname, 'db/Leaderboard.json');
             sendData('data', filePath);
         }
         else {
             filePath = path.join(__dirname, 'db/Statistics.json');
-            sendDataStatistics('data', filePath, data);
+            sendDataStatistics('data', filePath, data, category);
         }
     });
 
