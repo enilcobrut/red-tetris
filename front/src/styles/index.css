@@ -104,6 +104,17 @@ body {
 }
 
 
+
+.font-username-hallOfFame {
+	display: flex;
+	flex-direction: row;
+	gap: 10;
+	font-family: "Press Start 2P";
+	color: white;
+	text-shadow: 0px 0px 10px #0FF;
+	font-size: 12px;
+
+}
 .font-4 {
 	display: flex;
 	justify-content: center;
@@ -128,7 +139,6 @@ body {
 
 
 .username-container {
-	z-index: 20;
 	display: flex;
 	padding: 30px;
 	flex-direction: column;
@@ -184,6 +194,13 @@ body {
 	cursor: pointer; /* Style du curseur */
 	margin-top: 5px;
   }
+
+  .neon-effect {
+    box-shadow: 0 0 10px magenta; /* Ajoute une lueur magenta autour de l'élément */
+	display: inline-block; /* Assure que le shadow suit la forme de l'image si elle est transparente */
+
+}
+
   .button-join {
 	padding: 7px 10px; /* Padding spécifié */
 	border-radius: 16px; /* Rayon de bordure */
@@ -224,7 +241,7 @@ body {
 	grid-template-areas:
 		'User-Scores Create-Room HallOfFame'
 		'User-Scores Room-List HallOfFame';
-	grid-template-columns: 275px minmax(auto, 750px) 275px;
+	grid-template-columns: 400px minmax(auto, 750px) 400px;
 	grid-template-rows: 2fr 3fr;
 }
 

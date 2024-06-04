@@ -38,7 +38,16 @@ function findGameByPlayer(socketId) {
 
 // Handle new socket connections
 io.on('connection', socket => {
+
+
     console.log('A user connected', socket.id);
+
+    function getTop10Users(jsonData, category) {
+        const filteredData = jsonData.filter(user => user[category] !== undefined);
+        filteredData.sort((a, b) => b[category] - a[category]);
+        return filteredData.slice(0, 10);
+    }
+
 
     const sendData = (event, filePath, filterFn, defaultValue) => {
         fs.readFile(filePath, 'utf8', (err, data) => {
@@ -47,7 +56,6 @@ io.on('connection', socket => {
                 socket.emit(event, { error: 'Error reading file' });
                 return;
             }
-
             const jsonData = JSON.parse(data);
             const filteredData = filterFn ? jsonData.filter(filterFn) : jsonData;
             if (filteredData.length === 0) {
@@ -57,13 +65,79 @@ io.on('connection', socket => {
             }
         });
     };
+
+ 
+    const sendDataStatistics = (event, filePath, defaultValue, category) => {
+        fs.readFile(filePath, 'utf8', (err, data) => {
+            if (err) {
+                console.error('Error reading file:', err);
+                socket.emit(event, { error: 'Error reading file' });
+                return;
+            }
     
+            const jsonData = JSON.parse(data);
+    
+            // Filter out entries where the category is undefined
+            const validEntries = jsonData.filter(entry => entry[category] !== undefined);
+    
+            // Sorting the validEntries based on the category descending
+            validEntries.sort((a, b) => b[category] - a[category]);
+    
+            // Extracting top 10 entries
+            const topTen = validEntries.slice(0, 10).map(entry => ({
+                username: entry.username,
+                [category]: entry[category]
+            }));
+    
+            console.log(topTen); // Log the top ten to verify output
+    
+            // Checking if we have entries
+            if (topTen.length === 0) {
+                socket.emit(event, defaultValue);
+            } else {
+                socket.emit(event, topTen);
+            }
+        });
+    };
     // Handle getData event from client
-    socket.on('getData', () => {
-        const filePath = path.join(__dirname, 'db/Leaderboard.json');
-        sendData('data', filePath);
+    socket.on('getData', (data) => {
+        let filePath = '';
+        let category = '';
+        console.log(data)
+
+        if (data.sort == 'Win') {
+            category ='win';
+        }
+        else if (data.sort == 'Loss') {
+            category ='loss';
+        }
+        else if (data.sort == 'Played') {
+            category = 'played';
+        }
+        else if (data.sort == 'Lines') {
+            category = 'linesCleared';
+        }
+        else if (data.sort == 'Tetris') {
+            category ='tetrisScored';
+        }
+        else if (data.sort == 'Score') {
+            category = 'Score';
+        }
+
+        if (category == 'Score') {
+            filePath = path.join(__dirname, 'db/Leaderboard.json');
+            sendData('data', filePath);
+        }
+        else {
+            filePath = path.join(__dirname, 'db/Statistics.json');
+            sendDataStatistics('data', filePath, data, category);
+        }
     });
 
+
+
+    
+    
     socket.on('getPlayerScores', (username) => {
         const filePath = path.join(__dirname, 'db/PersonalBest.json');
         const defaultScores = { username, scores: [] };
