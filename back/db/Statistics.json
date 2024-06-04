@@ -207,12 +207,12 @@
   },
   {
     "username": "pho",
-    "played": 2,
+    "played": 4,
     "win": 0,
     "loss": 2,
     "linesCleared": 7,
     "tetrisScored": 0,
-    "single": 0
+    "single": 2
   },
   {
     "username": "Mormor",
@@ -252,11 +252,29 @@
   },
   {
     "username": "BOT",
-    "played": 8,
+    "played": 12,
     "win": 0,
     "loss": 0,
     "linesCleared": 0,
     "tetrisScored": 0,
-    "single": 8
+    "single": 12
+  },
+  {
+    "username": "ftgh",
+    "played": 3,
+    "win": 0,
+    "loss": 0,
+    "linesCleared": 0,
+    "tetrisScored": 0,
+    "single": 3
+  },
+  {
+    "username": "iyuyu",
+    "played": 3,
+    "win": 0,
+    "loss": 0,
+    "linesCleared": 146,
+    "tetrisScored": 6,
+    "single": 3
   }
 ]
