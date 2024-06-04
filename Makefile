@@ -20,7 +20,7 @@ test_back:
 	@(cd back && npm run test)
 
 test_front:
-	@(cd front && npm run test)
+	@(cd front/src && npm run test)
 
 # Define the .env.local file
 ENV_FILE_FRONT=front/.env

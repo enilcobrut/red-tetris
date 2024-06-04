@@ -19,8 +19,21 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "rm -rf ../back/build && react-scripts build && mv build ../back/",
-    "test": "react-scripts test",
+    "test": "jest --coverage",
     "eject": "react-scripts eject"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "collectCoverage": true,
+    "coverageDirectory": "coverage",
+    "coverageThreshold": {
+      "global": {
+        "statements": 70,
+        "functions": 70,
+        "lines": 70,
+        "branches": 50
+      }
+    }
   },
   "eslintConfig": {
     "extends": [
@@ -44,6 +57,10 @@
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "autoprefixer": "^10.4.19",
     "postcss": "^8.4.38",
-    "tailwindcss": "^3.4.3"
+    "tailwindcss": "^3.4.3",
+    "@babel/core": "^7.24.6",
+    "@babel/preset-env": "^7.24.6",
+    "@babel/preset-react": "^7.24.6",
+    "babel-jest": "^29.7.0"
   }
 }

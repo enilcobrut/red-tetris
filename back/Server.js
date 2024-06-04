@@ -137,7 +137,6 @@ io.on('connection', socket => {
                     console.log(`Deleting room ${room}`);
                     delete activeGames[room];
                 }, true);
-                console.log(activeGames[room].isJourney);
             }
     
             if (!activeGames[room].started) {
