@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Button from '../Button';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-
+import { toast } from '../Toast';
 const CreateRoom = ({ className }) => {
     const navigate = useNavigate();
     const { socket } = useSelector(state => state.socket);
@@ -18,7 +18,12 @@ const CreateRoom = ({ className }) => {
         if (socket && username && roomName) {
             const handleJoinError = (error) => {
                 setCanNavigate(false);
-                alert(error.message);
+                toast({
+                    title: "Error",
+                    message: `${error.message}`,
+                    type: "error",
+                });
+             //   alert(error.message);
                 socket.off('join_error', handleJoinError);
             };
 
@@ -47,7 +52,12 @@ const CreateRoom = ({ className }) => {
             });
     
             socket.once('join_error_journey', (error) => {
-                alert(error.message); // Display the error message using an alert
+                toast({
+                    title: "Error",
+                    message: `${error.message}`,
+                    type: "error",
+                });
+               // alert(error.message); // Display the error message using an alert
             });
         } else {
             console.error("Socket not connected, username or roomName is empty.");
