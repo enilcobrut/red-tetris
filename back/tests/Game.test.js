@@ -384,7 +384,8 @@ describe('Game class', () => {
         const io = { to: jest.fn().mockReturnThis(), emit: jest.fn() };
         const player = new Player('testUser', 'testSocketId');
         game.players.push(player);
-        game.originalPlayerCount = 1; // Ensure this is set for the test
+        game.originalPlayerCount = 1;
+        game.isJourney = true;
     
         // Mock the methods
         game.updatePersonalBest = jest.fn();
