@@ -126,8 +126,6 @@ io.on('connection', socket => {
         socket.emit('activeRooms', { rooms: roomNames });
     });
 
-
-
     socket.on('join_room_journey', ({ username, room }) => {
         if (activeGames[room]) {
             // Send an error message back to the client if the game has already started
@@ -148,11 +146,6 @@ io.on('connection', socket => {
             }
         }
     });
-    
-    
-
-
-
 
     socket.on('leave_room', ({ room, username }) => {
         const game = activeGames[room];
@@ -165,7 +158,7 @@ io.on('connection', socket => {
 
         // Check if the game should be deleted or not
         if (game.players.length === 0) {
-            console.log("no more room must ");
+            console.log("Room is empty. Deleting room.");
         } else {
             io.to(room).emit('room_update', game.getRoomData());
             console.log(`Updated room data sent after ${username} left the room.`);

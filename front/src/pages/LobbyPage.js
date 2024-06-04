@@ -11,7 +11,6 @@ const LobbyPage = () => {
     const navigate = useNavigate();
     const { socket, isConnected, error } = useSelector(state => state.socket);
     const username = useSelector(state => state.user.username);  // Utilisez useSelector pour obtenir l'username
-    // console.log(username);
     useEffect(() => {
 
         if (!isConnected || error) {

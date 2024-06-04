@@ -1,12 +1,12 @@
 [
   {
     "username": "Sasso",
-    "played": 35,
+    "played": 36,
     "win": 14,
     "loss": 21,
-    "linesCleared": 280,
+    "linesCleared": 312,
     "tetrisScored": 4,
-    "single": 1
+    "single": 2
   },
   {
     "username": "Heinz",
@@ -162,12 +162,12 @@
   },
   {
     "username": "prprkitty",
-    "played": 33,
+    "played": 38,
     "win": 4,
     "loss": 10,
-    "linesCleared": 1487,
-    "tetrisScored": 17,
-    "single": 19
+    "linesCleared": 1786,
+    "tetrisScored": 24,
+    "single": 24
   },
   {
     "username": "Pho aigredouce",
@@ -234,12 +234,12 @@
   },
   {
     "username": "AIGREDOUCE",
-    "played": 28,
+    "played": 29,
     "win": 4,
     "loss": 4,
-    "linesCleared": 1432,
+    "linesCleared": 1447,
     "tetrisScored": 21,
-    "single": 20
+    "single": 21
   },
   {
     "username": "pho",
@@ -276,5 +276,23 @@
     "linesCleared": 0,
     "tetrisScored": 0,
     "single": 2
+  },
+  {
+    "username": "rabijacob",
+    "played": 1,
+    "win": 0,
+    "loss": 0,
+    "linesCleared": 1,
+    "tetrisScored": 0,
+    "single": 1
+  },
+  {
+    "username": "BOT",
+    "played": 1,
+    "win": 0,
+    "loss": 0,
+    "linesCleared": 0,
+    "tetrisScored": 0,
+    "single": 1
   }
 ]

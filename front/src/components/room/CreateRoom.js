@@ -53,7 +53,6 @@ const CreateRoom = ({ className }) => {
             console.error("Socket not connected, username or roomName is empty.");
         }
     };
-    
 
     return (
         <div className={`username-container ${className}`}>
@@ -68,7 +67,7 @@ const CreateRoom = ({ className }) => {
             />
             <div className='flex flex-row w-full gap-5 justify-between'>
                 <Button onClick={handleClickJourney} color='blue'>JOURNEY</Button>
-                <Button onClick={handleClick} color='blue'>MULTI</Button>
+                <Button onClick={handleClick} color='blue'>CLASSIC</Button>
             </div>
         </div>
     );

@@ -73,16 +73,9 @@ useEffect(() => {
     });
   };
 
-
-
-
   socket.on('lines_cleared', handleLinesCleared);
 
-  
-
-
     const handleSpectrumUpdate = (data) => {
-     // console.log("Spectrum update received:", data);
       setSpectrums(prev => ({
         ...prev,
         [data.playerSocketId]: data.spectrumGrid
@@ -113,7 +106,7 @@ return (
     <div className='flex justify-center items-center w-full h-full'>
     <div className='game-layout'>
       <div className='user-data User-Data'>
-        <div className='font-tetris-3'>{username} #RANK</div>
+        <div className='font-tetris-3'>{username}</div>
 
         <div className='user-data-2'>
 

@@ -14,10 +14,6 @@ const RoomList = ({ className }) => {
     const [canNavigate, setCanNavigate] = useState(true);
     const [rooms, setRooms] = useState([]);
 
-
-
-
-
     useEffect(() => {
             if (socket) {
             socket.emit('sendAllActiveRooms');
@@ -54,8 +50,6 @@ const RoomList = ({ className }) => {
             console.error("Socket not connected, username or roomName is empty.");
         }
     };
-
-
 
     return (
         <div className={`halloffame ${className}`}>
