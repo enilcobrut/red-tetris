@@ -200,6 +200,11 @@ io.on('connection', socket => {
     });
 
     socket.on('join_room', ({ username, room }) => {
+        if (!isValidRoomName(room)) {
+            console.error("Invalid room name!");
+            socket.emit('join_error', { message: 'Cannot join. Invalid room name.' });
+            return;
+        }
         if (activeGames[room] && activeGames[room].started) {
             console.error("Game already started!");
             socket.emit('join_error', { message: 'Cannot join. The game has already started.' });
@@ -229,6 +234,11 @@ io.on('connection', socket => {
     });
 
     socket.on('join_room_journey', ({ username, room }) => {
+        if (!isValidRoomName(room)) {
+            console.error("Invalid room name!");
+            socket.emit('join_error_journey', { message: 'Cannot join. Invalid room name.' });
+            return;
+        }
         if (activeGames[room]) {
             // Send an error message back to the client if the game has already started
             socket.emit('join_error_journey', { message: 'Cannot join. The game has already started.' });
@@ -369,6 +379,11 @@ io.on('connection', socket => {
     });
     
 });
+
+function isValidRoomName(room) {
+    const roomNameRegex = /^[a-zA-Z0-9]{1,10}$/;
+    return roomNameRegex.test(room);
+}
 
 // Start the server
 const PORT = process.env.PORT || 3000;
