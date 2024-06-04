@@ -7,6 +7,7 @@ const HallOfFame = ({ className }) => {
     const [data, setData] = useState([]);
     const [showDropdown, setShowDropdown] = useState(false);
     const [leaderBoard, setLeaderBoard] = useState('Score');
+    const [dataBack, setDataBack] = useState('Score');
     const dropdownRef = useRef(null);
 
 
@@ -28,6 +29,7 @@ const HallOfFame = ({ className }) => {
         if (socket) {
 
 
+
             
             console.log('Socket is connected:', socket.connected);
 
@@ -40,7 +42,9 @@ const HallOfFame = ({ className }) => {
                 }
             };
 
-            socket.emit('getData', { sort: leaderBoard });
+
+
+            socket.emit('getData', { sort: dataBack });
 
 
             socket.on('data', handleData);
@@ -59,8 +63,33 @@ const HallOfFame = ({ className }) => {
     // Log data whenever it changes
     useEffect(() => {
         console.log('Updated data:', data);
+
     }, [data]);
 
+
+    useEffect(() => {
+        if (leaderBoard == 'Win') {
+            setDataBack('win');
+        }
+        else if (leaderBoard == 'Loss') {
+            setDataBack('Loss');
+        }
+        else if (leaderBoard == 'Played') {
+            setDataBack('played');
+        }
+        else if (leaderBoard == 'Lines') {
+            setDataBack('linesCleared');
+        }
+        else if (leaderBoard == 'Tetris') {
+            setDataBack('tetrisScored');
+        }
+        else if (leaderBoard == 'Score') {
+            setDataBack('Score');
+        }
+
+        socket.emit('getData', { sort: dataBack });
+
+    }, [leaderBoard]);
 
 
     return (
@@ -74,16 +103,6 @@ const HallOfFame = ({ className }) => {
 								Sort by Score
 							</Paragraph>
 						</button>
-						<button onClick={() => { setLeaderBoard('Tetris'); setShowDropdown(false); }} className="block z-50 block px-4 py-2 text-white hover:bg-gray-950 w-full">
-							<Paragraph>
-								Sort by Tetris
-							</Paragraph>
-						</button>
-                        <button onClick={() => { setLeaderBoard('Lines'); setShowDropdown(false);}} className="block z-50 block px-4 py-2 text-white hover:bg-gray-950 w-full">
-							<Paragraph>
-								Sort Lines cleared
-							</Paragraph>
-						</button>
                         <button onClick={() => { setLeaderBoard('Win'); setShowDropdown(false);}} className="block z-50 block px-4 py-2 text-white hover:bg-gray-950 w-full">
 							<Paragraph>
 								Sort by Game's Wins
@@ -94,9 +113,19 @@ const HallOfFame = ({ className }) => {
 								Sort by Game's Played
 							</Paragraph>
 						</button>
-                        <button onClick={() => { setLeaderBoard('Loose'); setShowDropdown(false);}} className="block z-50 block px-4 py-2 text-white hover:bg-gray-950 w-full">
+                        <button onClick={() => { setLeaderBoard('Loss'); setShowDropdown(false);}} className="block z-50 block px-4 py-2 text-white hover:bg-gray-950 w-full">
 							<Paragraph>
 								Sort by Game's Looses
+							</Paragraph>
+						</button>
+						<button onClick={() => { setLeaderBoard('Tetris'); setShowDropdown(false); }} className="block z-50 block px-4 py-2 text-white hover:bg-gray-950 w-full">
+							<Paragraph>
+								Sort by Tetris
+							</Paragraph>
+						</button>
+                        <button onClick={() => { setLeaderBoard('Lines'); setShowDropdown(false);}} className="block z-50 block px-4 py-2 text-white hover:bg-gray-950 w-full">
+							<Paragraph>
+								Sort Lines cleared
 							</Paragraph>
 						</button>
 					</DropdownMenu>
