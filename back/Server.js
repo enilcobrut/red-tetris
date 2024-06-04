@@ -40,30 +40,50 @@ function findGameByPlayer(socketId) {
 io.on('connection', socket => {
     console.log('A user connected', socket.id);
 
-    const sendData = (event, filePath, filterFn, defaultValue) => {
+    const sendData = (event, filePath, sortField, defaultValue) => {
         fs.readFile(filePath, 'utf8', (err, data) => {
             if (err) {
                 console.error('Error reading file:', err);
                 socket.emit(event, { error: 'Error reading file' });
                 return;
             }
-
-            const jsonData = JSON.parse(data);
-            const filteredData = filterFn ? jsonData.filter(filterFn) : jsonData;
-            if (filteredData.length === 0) {
-                socket.emit(event, defaultValue);
-            } else {
-                socket.emit(event, filteredData);
+    
+            try {
+                const jsonData = JSON.parse(data);
+                let sendData = jsonData;
+            if (filePath.includes('Statistics.json') && sortField && sortField !== 'score') {
+                    sendData = jsonData.sort((a, b) => {
+                        return (b[sortField] || 0) - (a[sortField] || 0);
+                    });
+                }
+    
+                if (sendData.length === 0) {
+                    socket.emit(event, defaultValue);
+                } else {
+                    socket.emit(event, sendData);
+                }
+            } catch (parseError) {
+                console.error('Error parsing JSON:', parseError);
+                socket.emit(event, { error: 'Error parsing JSON' });
             }
         });
     };
     
-    // Handle getData event from client
-    socket.on('getData', () => {
-        const filePath = path.join(__dirname, 'db/Leaderboard.json');
-        sendData('data', filePath);
+    
+    socket.on('getData', (data) => {
+        const sortField = data.sort;
+    
+        let filePath;
+        if (sortField === 'score') {
+            filePath = path.join(__dirname, 'db/Score.json');
+        } else {
+            filePath = path.join(__dirname, 'db/Statistics.json');
+        }
+    
+        // Appel de sendData avec le fichier et le champ de tri appropriés
+        sendData('data', filePath, sortField);
     });
-
+    
     socket.on('getPlayerScores', (username) => {
         const filePath = path.join(__dirname, 'db/PersonalBest.json');
         const defaultScores = { username, scores: [] };
