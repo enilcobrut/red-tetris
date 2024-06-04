@@ -112,9 +112,9 @@ return (
 
           <div className='flex flex-row space-between w-full'>
             <div className='flex flex-col gap-2 justify-center w-full'>
-              <div className='font-tetris-blue'>SCORE : {gameData.score}</div>
-              <div className='font-tetris-blue'>LINE : {gameData.linesCleared}</div>
-              <div className='font-tetris-blue'>TETRIS : {gameData.tetrisScored}</div>
+              <div className='font-tetris-blue'>SCORE: {gameData.score}</div>
+              <div className='font-tetris-blue'>LINE: {gameData.linesCleared}</div>
+              <div className='font-tetris-blue'>TETRIS: {gameData.tetrisScored}</div>
             </div>
 
           </div>

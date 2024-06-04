@@ -57,7 +57,7 @@ const UserScore = ({ className }) => {
     return (
         <div className={`halloffame ${className}`}>
             <div className='flex flex-col gap-5 w-full justify-center items-center'>
-            <div className='font-username-2'>{username} SCORE</div>
+            <div className='font-username-2'>{username} best scores</div>
             {scores.length > 0 ? (
                 <div className="list-container w-full overflow-y-auto pr-2">  {/* Add the list-container class here */}
                     {scores.map((score, index) => (
@@ -91,7 +91,7 @@ const UserScore = ({ className }) => {
             </div>
             )}
 
-            <div className='font-username-2'>MULTIPLAYERS-STAT</div>
+            <div className='font-username-2'>USER STATISTICS</div>
             {history ? (
                 <div className="list-container w-full overflow-y-auto pr-2">  {/* Add the list-container class here */}
                     <div className="list-item w-full px-2 py-4">
@@ -108,6 +108,23 @@ const UserScore = ({ className }) => {
                             style={{ color: 'white' }}
                             className="shrink-0">
                             {history.played}
+                        </Paragraph>
+
+                    </div>
+                <div className="list-item w-full px-2 py-4">
+                        <Paragraph 
+                            displayFlex={false} 
+                            size="small"
+                            style={{ color: 'white' }}
+                            className="shrink-0">
+                            SINGLE
+                        </Paragraph>
+                        <Paragraph 
+                            displayFlex={false} 
+                            size="small"
+                            style={{ color: 'white' }}
+                            className="shrink-0">
+                            {history.single}
                         </Paragraph>
 
                     </div>
@@ -143,7 +160,38 @@ const UserScore = ({ className }) => {
                             className="shrink-0">
                             {history.loss}
                         </Paragraph>
-
+                    </div>
+                    <div className="list-item w-full px-2 py-4">
+                        <Paragraph 
+                            displayFlex={false} 
+                            size="small"
+                            style={{ color: 'white' }}
+                            className="shrink-0">
+                            LINES CLEARED
+                        </Paragraph>
+                        <Paragraph 
+                            displayFlex={false} 
+                            size="small"
+                            style={{ color: 'white' }}
+                            className="shrink-0">
+                            {history.linesCleared}
+                        </Paragraph>
+                    </div>
+                    <div className="list-item w-full px-2 py-4">
+                        <Paragraph 
+                            displayFlex={false} 
+                            size="small"
+                            style={{ color: 'white' }}
+                            className="shrink-0">
+                            TETRIS SCORED
+                        </Paragraph>
+                        <Paragraph 
+                            displayFlex={false} 
+                            size="small"
+                            style={{ color: 'white' }}
+                            className="shrink-0">
+                            {history.tetrisScored}
+                        </Paragraph>
                     </div>
                 </div>
             ) : (
@@ -151,8 +199,8 @@ const UserScore = ({ className }) => {
                 <Paragraph 
                 displayFlex={false} 
                 size="small">
-                    NO MULTI HISTORY YET
-                    GO PLAY GAME IN MULTI !            
+                    NO STATISTICS YET!
+                    GO PLAY SOME GAMES!            
                 </Paragraph>
 
                 </div>
