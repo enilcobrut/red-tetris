@@ -14,7 +14,7 @@ import RoomPage from './pages/RoomPage';
 
 
 import { RoomProvider } from './context/RoomContext';
-
+import { Toaster } from 'react-hot-toast';
 
 function App() {
   const dispatch = useDispatch();
@@ -30,6 +30,9 @@ function App() {
   return (
     <Router>
         <RoomProvider>
+        <div style={{ zIndex: 9999 }}>
+					<Toaster position='bottom-right' />
+				</div>
           <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/lobby" element={<LobbyPage />} />

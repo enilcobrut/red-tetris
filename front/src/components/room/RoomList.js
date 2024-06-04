@@ -4,7 +4,7 @@ import Button from '../Button';
 import Paragraph from '../Paragraph';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import { toast } from '../Toast';
 
 const RoomList = ({ className }) => {
     const navigate = useNavigate();
@@ -31,7 +31,13 @@ const RoomList = ({ className }) => {
         if (socket && username && roomName) {
             const handleJoinError = (error) => {
                 setCanNavigate(false);
-                alert(error.message);
+              //  alert(error.message);
+              toast({
+                title: "Error",
+                message: `${error.message}`,
+                type: "error",
+            });
+
                 socket.off('join_error', handleJoinError);
             };
 

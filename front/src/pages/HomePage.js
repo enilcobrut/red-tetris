@@ -1,7 +1,6 @@
 // src/pages/HomePage.js
 import React from 'react';
 import BackgroundAnimation from '../components/BackgroundAnimation';
-
 import Username from '../components/Username';
 
 function HomePage() {
