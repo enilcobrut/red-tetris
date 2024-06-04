@@ -39,7 +39,6 @@ function findGameByPlayer(socketId) {
 // Handle new socket connections
 io.on('connection', socket => {
 
-
     console.log('A user connected', socket.id);
 
     function getTop10Users(jsonData, category) {
@@ -89,8 +88,6 @@ io.on('connection', socket => {
                 [category]: entry[category]
             }));
     
-            console.log(topTen); // Log the top ten to verify output
-    
             // Checking if we have entries
             if (topTen.length === 0) {
                 socket.emit(event, defaultValue);
@@ -103,7 +100,6 @@ io.on('connection', socket => {
     socket.on('getData', (data) => {
         let filePath = '';
         let category = '';
-        console.log(data)
 
         if (data.sort == 'Win') {
             category ='win';
@@ -247,7 +243,6 @@ io.on('connection', socket => {
         // Find the player using the username
         const player = game.findPlayer(username);
         if (player) {
-            console.log("player found");
             game.removePlayer(io, player.socketId);
         } else {
             console.error("Player not found in room");

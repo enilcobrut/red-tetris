@@ -86,24 +86,29 @@ const HallOfFame = ({ className }) => {
 								Sort by Score
 							</Paragraph>
 						</button>
-                        <button onClick={() => { setLeaderBoard('Win'); setShowDropdown(false);}} className="block z-50 block px-4 py-2 text-white hover:bg-gray-950 w-full">
-							<Paragraph>
-								Sort by Game's Wins
-							</Paragraph>
-						</button>
                         <button onClick={() => { setLeaderBoard('Played'); setShowDropdown(false);}} className="block z-50 block px-4 py-2 text-white hover:bg-gray-950 w-full">
 							<Paragraph>
-								Sort by Game's Played
+								Sort by Game Played
+							</Paragraph>
+						</button>
+                        <button   onClick={() => { setLeaderBoard('Single Player'); setShowDropdown(false); }} className="relative z-50 px-4 py-2 text-white hover:bg-gray-950 w-full">
+							<Paragraph>
+								Sort by Single Player Game Played
+							</Paragraph>
+						</button>
+                        <button onClick={() => { setLeaderBoard('Win'); setShowDropdown(false);}} className="block z-50 block px-4 py-2 text-white hover:bg-gray-950 w-full">
+							<Paragraph>
+								Sort by Multyplayer Game Won
 							</Paragraph>
 						</button>
                         <button onClick={() => { setLeaderBoard('Loss'); setShowDropdown(false);}} className="block z-50 block px-4 py-2 text-white hover:bg-gray-950 w-full">
 							<Paragraph>
-								Sort by Game's Looses
+								Sort by Multyplayer Game Lost
 							</Paragraph>
 						</button>
 						<button onClick={() => { setLeaderBoard('Tetris'); setShowDropdown(false); }} className="block z-50 block px-4 py-2 text-white hover:bg-gray-950 w-full">
 							<Paragraph>
-								Sort by Tetris
+								Sort by Tetris Scored
 							</Paragraph>
 						</button>
                         <button onClick={() => { setLeaderBoard('Lines'); setShowDropdown(false);}} className="block z-50 block px-4 py-2 text-white hover:bg-gray-950 w-full">
