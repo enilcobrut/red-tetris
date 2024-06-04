@@ -1,39 +1,23 @@
 [
   {
-    "username": "testUser",
-    "scores": [
-      0,
-      0,
-      0,
-      0,
-      0
-    ]
-  },
-  {
     "username": "Sasso",
     "scores": [
       26600,
       24700,
       23480,
+      22210,
       11200,
       8500,
+      7490,
       7380,
       6700,
-      4260,
-      3800,
-      3000
+      6210
     ]
   },
   {
     "username": "Oce-anh",
     "scores": [
       3100
-    ]
-  },
-  {
-    "username": "SassoL",
-    "scores": [
-      400
     ]
   },
   {
@@ -58,28 +42,9 @@
     ]
   },
   {
-    "username": "Sas",
-    "scores": [
-      1500
-    ]
-  },
-  {
-    "username": "43",
-    "scores": [
-      100
-    ]
-  },
-  {
     "username": "THIBAULT",
     "scores": [
       1800
-    ]
-  },
-  {
-    "username": "wfwf",
-    "scores": [
-      0,
-      0
     ]
   },
   {
@@ -89,40 +54,9 @@
     ]
   },
   {
-    "username": "41",
-    "scores": [
-      100
-    ]
-  },
-  {
-    "username": "notNapoli",
-    "scores": [
-      1000
-    ]
-  },
-  {
     "username": "lulu",
     "scores": [
       1500
-    ]
-  },
-  {
-    "username": "hey",
-    "scores": [
-      1600
-    ]
-  },
-  {
-    "username": "ip",
-    "scores": [
-      900,
-      0
-    ]
-  },
-  {
-    "username": "oui",
-    "scores": [
-      0
     ]
   },
   {
@@ -131,12 +65,6 @@
       22510,
       5300,
       0
-    ]
-  },
-  {
-    "username": "Zets",
-    "scores": [
-      2500
     ]
   },
   {
@@ -231,20 +159,7 @@
       0,
       0,
       0,
-      0
-    ]
-  },
-  {
-    "username": "Sasso42",
-    "scores": [
-      500,
-      200
-    ]
-  },
-  {
-    "username": "SSa",
-    "scores": [
-      500,
+      0,
       0
     ]
   }

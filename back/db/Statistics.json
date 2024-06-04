@@ -1,12 +1,12 @@
 [
   {
     "username": "Sasso",
-    "played": 46,
+    "played": 49,
     "win": 14,
     "loss": 20,
-    "linesCleared": 571,
-    "tetrisScored": 6,
-    "single": 12
+    "linesCleared": 685,
+    "tetrisScored": 10,
+    "single": 15
   },
   {
     "username": "Heinz",
@@ -197,42 +197,6 @@
     "single": 0
   },
   {
-    "username": "C'est auoi la limite pour un nom en faite je sais pas comment máppeler",
-    "played": 1,
-    "win": 0,
-    "loss": 1,
-    "linesCleared": 0,
-    "tetrisScored": 0,
-    "single": 0
-  },
-  {
-    "username": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz",
-    "played": 1,
-    "win": 0,
-    "loss": 1,
-    "linesCleared": 3,
-    "tetrisScored": 0,
-    "single": 0
-  },
-  {
-    "username": "kimmmmmmmmmmmmm",
-    "played": 2,
-    "win": 1,
-    "loss": 1,
-    "linesCleared": 20,
-    "tetrisScored": 0,
-    "single": 0
-  },
-  {
-    "username": "kinnnnnnnn",
-    "played": 1,
-    "win": 0,
-    "loss": 1,
-    "linesCleared": 2,
-    "tetrisScored": 0,
-    "single": 0
-  },
-  {
     "username": "AIGREDOUCE",
     "played": 29,
     "win": 4,
@@ -288,29 +252,11 @@
   },
   {
     "username": "BOT",
-    "played": 7,
+    "played": 8,
     "win": 0,
     "loss": 0,
     "linesCleared": 0,
     "tetrisScored": 0,
-    "single": 7
-  },
-  {
-    "username": "Sasso42",
-    "played": 2,
-    "win": 0,
-    "loss": 0,
-    "linesCleared": 6,
-    "tetrisScored": 0,
-    "single": 2
-  },
-  {
-    "username": "SSa",
-    "played": 2,
-    "win": 0,
-    "loss": 0,
-    "linesCleared": 4,
-    "tetrisScored": 0,
-    "single": 2
+    "single": 8
   }
 ]
