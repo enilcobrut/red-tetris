@@ -643,10 +643,11 @@ class Game {
         this.broadcastGridUpdate(io, socketId);
         this.clearFullLines(io, grid, player);
 
-        if (this.isJourney == true) {
-            player.dropInterval = 0;
-        }
-        setTimeout(() => {
+        // if (this.isJourney == true) {
+        //     player.dropInterval = 0;
+        // }
+        // Commented out for now, it causes crash 0.005% of the time
+        //setTimeout(() => {
             this.checkSommet(io, grid, player);
 
             const newPiece = this.getNextPiece(player);
@@ -662,7 +663,7 @@ class Game {
                     this.movePieceDownForPlayer(io, player);
                 }, player.finalInterval || DEFAULT_INTERVAL);
             }
-        }, player.dropInterval);
+        //}, player.dropInterval);
 
     }
 
