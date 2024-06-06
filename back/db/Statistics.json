@@ -347,26 +347,17 @@
     "played": 21,
     "win": 0,
     "loss": 0,
-    "linesCleared": 328,
-    "tetrisScored": 22,
-    "single": 21
+    "linesCleared": 227,
+    "tetrisScored": 1,
+    "single": 12
   },
   {
-    "username": "ben",
-    "played": 7,
+    "username": "celi",
+    "played": 1,
     "win": 0,
     "loss": 0,
-    "linesCleared": 132,
-    "tetrisScored": 15,
-    "single": 7
-  },
-  {
-    "username": "xDD",
-    "played": 2,
-    "win": 0,
-    "loss": 0,
-    "linesCleared": 1,
-    "tetrisScored": 0,
-    "single": 2
+    "linesCleared": 55,
+    "tetrisScored": 2,
+    "single": 1
   }
 ]

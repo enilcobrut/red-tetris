@@ -39,13 +39,13 @@ class Game {
      */
     generatePieces(count = DEFAULT_PIECES) {
         const templates = [
-            { shape: [[1], [1], [1], [1]], color: 'cyan', position: { x: 5, y: 0 } },
+            { shape: [[0,1,0,0], [0,1,0,0], [0,1,0,0], [0,1,0,0]], color: 'cyan', position: { x: 5, y: 0 } },
             { shape: [[1, 1], [1, 1]], color: 'yellow', position: { x: 5, y: 0 } },
-            { shape: [[0, 1, 0], [1, 1, 1]], color: 'purple', position: { x: 5, y: 0 } },
-            { shape: [[1, 0, 0], [1, 1, 1]], color: 'orange', position: { x: 5, y: 0 } },
-            { shape: [[0, 0, 1], [1, 1, 1]], color: 'blue', position: { x: 5, y: 0 } },
-            { shape: [[0, 1, 1], [1, 1, 0]], color: 'red', position: { x: 5, y: 0 } },
-            { shape: [[1, 1, 0], [0, 1, 1]], color: 'green', position: { x: 5, y: 0 } }
+            { shape: [[0, 1, 0], [1, 1, 1],[0,0,0]], color: 'purple', position: { x: 5, y: 0 } },
+            { shape: [[0,0,0],[1, 0, 0], [1, 1, 1]], color: 'orange', position: { x: 5, y: 0 } },
+            { shape: [[0, 0, 1], [1, 1, 1], [0,0,0]], color: 'blue', position: { x: 5, y: 0 } },
+            { shape: [[0, 1, 1], [1, 1, 0],[0,0,0]], color: 'red', position: { x: 5, y: 0 } },
+            { shape: [[1, 1, 0], [0, 1, 1],[0,0,0]], color: 'green', position: { x: 5, y: 0 } }
         ];
 
         while (this.pieceQueue.length < count) {
@@ -68,6 +68,9 @@ class Game {
     rotate(io, socketId, clockwise = true) {
         const grid = this.grids.get(socketId);
         const currentPiece = this.currentPieces.get(socketId);
+        const player = this.players.find(player => player.socketId === socketId);
+
+        clearInterval(player.updateInterval);
         if (!currentPiece) return;
 
         this.clearPieceFromGrid(grid, currentPiece);
@@ -82,6 +85,15 @@ class Game {
         this.placePieceOnGrid(grid, currentPiece);
 
         this.broadcastGridUpdate(io, socketId);
+
+        player.updateInterval = setInterval(() => {
+            this.movePieceDownForPlayer(io, player);
+        }, player.finalInterval || DEFAULT_INTERVAL);
+
+
+
+
+
     }
 
     /**
