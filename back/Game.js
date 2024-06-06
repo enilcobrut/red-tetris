@@ -422,7 +422,7 @@ class Game {
         }
         if (linesCleared > 0) {
             player.linesCleared = (player.linesCleared || 0) + linesCleared; // Track lines cleared
-            player.score = player.score + (DEFAULT_SCORE * linesCleared * SCORE_MULTIPLIER);
+            player.score = Math.floor(player.score + (DEFAULT_SCORE * linesCleared * SCORE_MULTIPLIER));
         
             if (this.isJourney) {
                 // Check if player has cleared enough lines to level up
@@ -434,7 +434,7 @@ class Game {
                 if (level > (player.level || 1)) {
                     player.level = level;
                     const bonus_point = Math.floor(level * DEFAULT_SCORE / 2);
-                    player.score = player.score + bonus_point;
+                    player.score = Math.floor(player.score + bonus_point);
                     
                     this.logs.push(`Player ${player.username} leveled up to level ${level}!`);
                     this.logs.push(`Bonus points: ${bonus_point}!`);
@@ -446,14 +446,14 @@ class Game {
             }
         
             if (linesCleared === 4 && this.isPerfectClear(grid)) {
-                player.score = player.score + (DEFAULT_SCORE * SCORE_MULTIPLIER * 50); // Reward points for a Perfect Clear
+                player.score = Math.floor(player.score + (DEFAULT_SCORE * SCORE_MULTIPLIER * 50)); // Reward points for a Perfect Clear
                 this.sendPenaltyLines(io, player, 10); // Send 10 penalty lines to opponents
                 console.log(`Player ${player.username} achieved a Perfect Clear!`);
                 this.logs.push(`Player ${player.username} achieved a Perfect Clear!`);
             } else {
                 if (linesCleared === 4) {
                     player.tetrisScored = (player.tetrisScored || 0) + 1; // Track Tetris scored
-                    player.score = player.score + (DEFAULT_SCORE * SCORE_MULTIPLIER * 4); // Additional 400 points for clearing 4 lines (Tetris)
+                    player.score = Math.floor(player.score + (DEFAULT_SCORE * SCORE_MULTIPLIER * 4)); // Additional 400 points for clearing 4 lines (Tetris)
                     console.log(`Player ${player.username} cleared a Tetris!`);
                     this.logs.push(`Player ${player.username} cleared a Tetris!`);
                     this.sendPenaltyLines(io, player, linesCleared - 1);
