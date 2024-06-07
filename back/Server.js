@@ -181,7 +181,9 @@ io.on('connection', socket => {
     // Validate username event
     socket.on('validate_username', ({ username }, callback) => {
         if (!username || typeof username !== 'string' || username.trim().length === 0) {
-            callback({ success: false, error: 'Invalid username' });
+            if (typeof callback === 'function') {
+                callback({ success: false, error: 'Invalid username' });
+            }
             return;
         }
         const cleanUsername = sanitizeHtml(username, {
@@ -192,11 +194,15 @@ io.on('connection', socket => {
         const usernameRegex = /^[a-zA-Z0-9]{3,10}$/;
     
         if (!usernameRegex.test(cleanUsername)) {
-            callback({ success: false, error: 'Username must be 3-10 characters long and contain only alphanumeric characters.' });
+            if (typeof callback === 'function') {
+                callback({ success: false, error: 'Username must be 3-10 characters long and contain only alphanumeric characters.' });
+            }
             return;
         }
     
-        callback({ success: true, username: cleanUsername });
+        if (typeof callback === 'function') {
+            callback({ success: true, username: cleanUsername });
+        }
     });
 
     socket.on('join_room', ({ username, room }) => {
