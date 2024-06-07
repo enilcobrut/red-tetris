@@ -1,12 +1,12 @@
 [
   {
     "username": "Sasso",
-    "played": 92,
+    "played": 97,
     "win": 23,
     "loss": 32,
-    "linesCleared": 1994,
-    "tetrisScored": 61,
-    "single": 37
+    "linesCleared": 2184,
+    "tetrisScored": 68,
+    "single": 42
   },
   {
     "username": "Heinz",
@@ -137,12 +137,12 @@
   },
   {
     "username": "riri",
-    "played": 61,
+    "played": 68,
     "win": 2,
-    "loss": 41,
-    "linesCleared": 855,
-    "tetrisScored": 5,
-    "single": 19
+    "loss": 44,
+    "linesCleared": 966,
+    "tetrisScored": 8,
+    "single": 23
   },
   {
     "username": "Jolan",
@@ -200,10 +200,10 @@
   },
   {
     "username": "AIGREDOUCE",
-    "played": 55,
-    "win": 8,
+    "played": 58,
+    "win": 11,
     "loss": 11,
-    "linesCleared": 2440,
+    "linesCleared": 2528,
     "tetrisScored": 64,
     "single": 36
   },
@@ -254,12 +254,12 @@
   },
   {
     "username": "BOT",
-    "played": 50,
+    "played": 53,
     "win": 0,
     "loss": 0,
     "linesCleared": 0,
     "tetrisScored": 0,
-    "single": 50
+    "single": 53
   },
   {
     "username": "ftgh",
@@ -281,12 +281,12 @@
   },
   {
     "username": "MEXICO",
-    "played": 22,
+    "played": 23,
     "win": 2,
     "loss": 3,
-    "linesCleared": 548,
-    "tetrisScored": 7,
-    "single": 17
+    "linesCleared": 604,
+    "tetrisScored": 8,
+    "single": 18
   },
   {
     "username": "ttss",
@@ -326,12 +326,12 @@
   },
   {
     "username": "erg",
-    "played": 7,
+    "played": 9,
     "win": 0,
     "loss": 0,
     "linesCleared": 0,
     "tetrisScored": 0,
-    "single": 7
+    "single": 9
   },
   {
     "username": "Sasso42",
@@ -353,12 +353,12 @@
   },
   {
     "username": "ben",
-    "played": 61,
+    "played": 65,
     "win": 2,
-    "loss": 5,
-    "linesCleared": 1728,
-    "tetrisScored": 146,
-    "single": 54
+    "loss": 8,
+    "linesCleared": 1738,
+    "tetrisScored": 147,
+    "single": 55
   },
   {
     "username": "xDD",
@@ -398,12 +398,12 @@
   },
   {
     "username": "test",
-    "played": 2,
+    "played": 7,
     "win": 0,
     "loss": 0,
     "linesCleared": 0,
     "tetrisScored": 0,
-    "single": 2
+    "single": 7
   },
   {
     "username": "gayougay",
@@ -506,12 +506,12 @@
   },
   {
     "username": "lukaka",
-    "played": 1,
+    "played": 2,
     "win": 0,
     "loss": 0,
-    "linesCleared": 91,
-    "tetrisScored": 2,
-    "single": 1
+    "linesCleared": 110,
+    "tetrisScored": 3,
+    "single": 2
   },
   {
     "username": "FWEFW",
@@ -539,5 +539,32 @@
     "linesCleared": 38,
     "tetrisScored": 2,
     "single": 2
+  },
+  {
+    "username": "rgy",
+    "played": 7,
+    "win": 0,
+    "loss": 0,
+    "linesCleared": 0,
+    "tetrisScored": 0,
+    "single": 7
+  },
+  {
+    "username": "ttt",
+    "played": 3,
+    "win": 0,
+    "loss": 0,
+    "linesCleared": 0,
+    "tetrisScored": 0,
+    "single": 3
+  },
+  {
+    "username": "55845",
+    "played": 5,
+    "win": 0,
+    "loss": 0,
+    "linesCleared": 0,
+    "tetrisScored": 0,
+    "single": 5
   }
 ]

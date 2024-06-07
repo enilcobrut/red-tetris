@@ -42,7 +42,7 @@ class Game {
             { shape: [[0,1,0,0], [0,1,0,0], [0,1,0,0], [0,1,0,0]], color: 'cyan', position: { x: 5, y: 0 } },
             { shape: [[1, 1], [1, 1]], color: 'yellow', position: { x: 5, y: 0 } },
             { shape: [[0, 1, 0], [1, 1, 1],[0,0,0]], color: 'purple', position: { x: 5, y: 0 } },
-            { shape: [[0,0,0],[1, 0, 0], [1, 1, 1]], color: 'orange', position: { x: 5, y: 0 } },
+            { shape: [[1, 0, 0], [1, 1, 1], [0,0,0]], color: 'orange', position: { x: 5, y: 0 } },
             { shape: [[0, 0, 1], [1, 1, 1], [0,0,0]], color: 'blue', position: { x: 5, y: 0 } },
             { shape: [[0, 1, 1], [1, 1, 0],[0,0,0]], color: 'red', position: { x: 5, y: 0 } },
             { shape: [[1, 1, 0], [0, 1, 1],[0,0,0]], color: 'green', position: { x: 5, y: 0 } }
