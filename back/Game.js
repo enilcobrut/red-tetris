@@ -80,6 +80,7 @@ class Game {
 
         if (this.isValidPlacement(grid, newPiece.shape, newPiece.position)) {
             currentPiece.shape = newShape;
+            player.rotationCounter++; // Increment rotation counter
         }
 
         this.placePieceOnGrid(grid, currentPiece);
@@ -90,10 +91,11 @@ class Game {
             this.movePieceDownForPlayer(io, player);
         }, player.finalInterval || DEFAULT_INTERVAL);
 
-
-
-
-
+        if (player.rotationCounter > 50) {
+            console.log(`Cheater! Player ${player.username} rotated the piece excessively.`);
+            io.to(player.socketId).emit('game_over', { message: "Cheater!" });
+            this.removePlayer(io, player.socketId);
+        }
     }
 
     /**
@@ -420,6 +422,7 @@ class Game {
      * @param {object} player - The player object.
      */
     clearFullLines(io, grid, player) {
+        player.rotationCounter = 0;
         player.dropInterval = 0;
         let linesCleared = 0;
         for (let row = 0; row < this.rows; row++) {

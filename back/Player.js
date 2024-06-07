@@ -12,6 +12,7 @@ class Player {
         this.dropInterval = 0;
         this.level = 1;
         this.finalInterval = 1000;
+        this.rotationCounter = 0; // New property to track rotations
     }
 }
 module.exports = Player;
