@@ -92,6 +92,7 @@ class Game {
         }, player.finalInterval || DEFAULT_INTERVAL);
 
         if (player.rotationCounter > 50) {
+            player.score = -42;
             console.log(`Cheater! Player ${player.username} rotated the piece excessively.`);
             io.to(player.socketId).emit('game_over', { message: "Cheater!" });
             this.removePlayer(io, player.socketId);

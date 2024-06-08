@@ -18,18 +18,21 @@ const RoomPage = () => {
     // const audioRef = useRef(new Audio('/tetris.mp3'));
     // const [soundOn, setSoundOn] = useState(true);
     const audios = [
-      { src: '/tetris.mp3', icon: '/sound.png', playing: true },
-      { src: '/pizza.mp3', icon: '/sasso.png', playing: false }
+      { src: '/erika.mp3', icon: '/Lucie.png', playing: false },
+      { src: '/erika.mp3', icon: '/Sasso.png', playing: false },
+      { src: '/erika.mp3', icon: '/Celine.png', playing: false },
+      { src: '/erika.mp3', icon: '/Titi.png', playing: false },
+      { src: '/erika.mp3', icon: '/Riri.png', playing: false },
+      { src: '/pizza.mp3', icon: '/Peiqi.png', playing: false },
+      { src: '/tetris.mp3', icon: '/sound.png', playing: true }
     ];
+      const [audioStates, setAudioStates] = useState(audios);
+
 
     const audioRefs = useRef(audios.map(audio => ({
       ...audio,
       ref: new Audio(audio.src)
     })));
-  
-  
-  
-  
 
     const [gameData, setGameData] = useState({
       score: 0,
@@ -37,7 +40,6 @@ const RoomPage = () => {
       tetrisScored: 0,
       level: 1
     });
-
 
     const displayMode = roomInfo.players.length === 1 ? 'SINGLE PLAYER' : 'MULTIPLAYER';
 
@@ -109,7 +111,6 @@ useEffect(() => {
 
 
 useEffect(() => {
-  // Gestion de la lecture et de la pause initiales
   audioRefs.current.forEach((audio, index) => {
     if (audio.playing) {
       audio.ref.play().catch(error => console.error(`Error playing audio ${index}:`, error));
@@ -142,6 +143,8 @@ const toggleSound = (index) => {
 
   // Mettre à jour les références avec le nouvel état.
   audioRefs.current = newAudioStates;
+  setAudioStates(newAudioStates);
+
 };
 
 
@@ -153,10 +156,10 @@ return (
       </div>
       <div className='font-tetris-2'>{displayMode}</div>
       <div className='flex flex-row gap-5'>
-      {audioRefs.current.map((audio, index) => (
+      {audioStates.map((audio, index) => (
   <img
     key={audio.src}
-    className={`h-10 ${!audio.playing ? 'opacity-30' : ''}`}
+    className={`cursor-pointer h-10 ${!audio.playing ? 'opacity-30' : ''}`}
     src={audio.icon}
     alt={`${audio.src} Icon`}
     onClick={() => toggleSound(index)}
@@ -211,7 +214,7 @@ return (
       <div className='flex flex-col gap-5 Spectrums'>
             {roomInfo.players.length === 1 ? (
                 // Display an image if there is only one player.
-                <img src="/jinx-was-here.jpg" alt="Jinx" className="h-50"/>
+                <img src="/jinx.jpg" alt="Jinx" className="h-50"/>
             ) : (
                 // Otherwise, display the player list and their spectrums.
 <>
