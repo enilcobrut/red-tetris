@@ -33,7 +33,7 @@ const LobbyPage = () => {
       }, [socket, isConnected, error, navigate]);
     
   return (
-    <main className="flex min-h-screen items-center justify-center p-10 flex-col gap-20">
+    <main className="flex min-h-screen items-center justify-center flex-col gap-20">
       <BackgroundAnimation/>
       <div onClick={() => navigate('/')} className="font-tetris">RED TETRIS</div>
       <div className="font-2">Welcome {username || "No Username"}!</div>

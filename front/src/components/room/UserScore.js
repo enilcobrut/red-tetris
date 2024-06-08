@@ -59,7 +59,7 @@ const UserScore = ({ className }) => {
             <div className='flex flex-col gap-5 w-full justify-center items-center'>
             <div className='font-username-2'>{username} best scores</div>
             {scores.length > 0 ? (
-                <div className="list-container w-full overflow-y-auto pr-2">  {/* Add the list-container class here */}
+                <div className="list-container w-full">  {/* Add the list-container class here */}
                     {scores.map((score, index) => (
                         <div key={index} className="list-item w-full px-2 py-4">  {/* Add the list-item class here */}
                                 <Paragraph 
@@ -93,7 +93,7 @@ const UserScore = ({ className }) => {
 
             <div className='font-username-2'>USER STATISTICS</div>
             {history ? (
-                <div className="list-container w-full overflow-y-auto pr-2">  {/* Add the list-container class here */}
+                <div className="list-container w-full">  {/* Add the list-container class here */}
                     <div className="list-item w-full px-2 py-4">
                         <Paragraph 
                             displayFlex={false} 
