@@ -4,6 +4,7 @@ class Player {
         this.socketId = socketId;
         this.isOwner = false;
         this.currentPieceIndex = 0;
+        this.nextPieceIndex = 0;
         this.currentPiece = null;
         this.score = 0;
         this.dropped = false;

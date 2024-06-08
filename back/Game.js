@@ -258,8 +258,9 @@ class Game {
         this.generatePieces();
     
         this.players.forEach(player => {
+            //this.broadcastNextPiece(io, player.socketId)
             this.grids.set(player.socketId, this.createEmptyGrid());
-            let initialPiece = this.getNextPiece(player);
+            let initialPiece = this.getNextPiece(player, io);
             this.currentPieces.set(player.socketId, initialPiece);
             this.startPlayerInterval(io, player);
         });
@@ -271,6 +272,7 @@ class Game {
         } else {
             console.log(`Single player started in room ${this.roomName}.`);
         }
+        
         this.emitLogUpdate(io);
     }    
 
@@ -321,7 +323,7 @@ class Game {
         this.clearFullLines(io, grid, player);
         this.checkSommet(io, grid, player);
 
-        const newPiece = this.getNextPiece(player);
+        const newPiece = this.getNextPiece(player, io);
         if (!this.isValidPlacement(grid, newPiece.shape, newPiece.position)) {
             clearInterval(player.updateInterval);
             console.log(`Handle Piece Landing: Game over for player ${player.username}`);
@@ -666,7 +668,7 @@ class Game {
         //setTimeout(() => {
             this.checkSommet(io, grid, player);
 
-            const newPiece = this.getNextPiece(player);
+            const newPiece = this.getNextPiece(player, io);
             if (!this.isValidPlacement(grid, newPiece.shape, newPiece.position)) {
                 console.log(`Timeout: Game over for player ${player.username}`);
                 this.removePlayer(io, player.socketId);
@@ -864,12 +866,28 @@ class Game {
         io.to(socketId).emit('grid_update', { grid, score });
     }
 
+
+    broadcastNextPiece(io, socketId) {
+        const player = this.players.find(p => p.socketId === socketId);
+        player.nextPieceIndex++;
+        const nextPieceIndex = player.nextPieceIndex % this.pieceQueue.length;
+        const pieceTemplate = this.pieceQueue[nextPieceIndex];    
+        const nextPiece = Piece.createFromTemplate(pieceTemplate);
+        io.to(socketId).emit('next_piece', {
+            shape: nextPiece.shape,
+            color: nextPiece.color,
+        });
+    }
+
+
     /**
      * Get the next piece for a player.
      * @param {object} player - The player object.
      * @returns {object} The next piece.
      */
-    getNextPiece(player) {
+    getNextPiece(player, io) {
+
+        this.broadcastNextPiece(io, player.socketId)
         const nextPieceIndex = player.currentPieceIndex % DEFAULT_PIECES;
         const pieceTemplate = this.pieceQueue[nextPieceIndex];
         player.currentPieceIndex++;

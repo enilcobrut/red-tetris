@@ -15,6 +15,16 @@ const RoomPage = () => {
     const navigate = useNavigate();
     const [logs, setLogs] = useState([]); // State to store logs
     const [remindingPlayer, setRemindingPlayer] = useState(0);
+    const [currentPiece, setCurrentPiece] = useState(null);
+
+    useEffect(() => {
+      socket.on('next_piece', (piece) => {
+        setCurrentPiece(piece);
+      });
+      return () => socket.off('next_piece');
+    }, []);
+
+    
     // const audioRef = useRef(new Audio('/tetris.mp3'));
     // const [soundOn, setSoundOn] = useState(true);
     const audios = [
@@ -27,6 +37,48 @@ const RoomPage = () => {
       { src: '/tetris.mp3', icon: '/sound.png', playing: true }
     ];
       const [audioStates, setAudioStates] = useState(audios);
+      const renderPiece = (piece) => {
+        if (!piece) return null;
+      
+        const containerStyle = {
+          display: 'inline-block',
+          border: '1px solid #333' // Bordure optionnelle pour visualiser le contour de la pièce entière
+        };
+      
+        const rowStyle = {
+          display: 'flex'
+        };
+      
+        const cellStyle = {
+          width: '30px',
+          height: '30px',
+          display: 'inline-block',
+          backgroundColor: 'transparent', // Fond par défaut transparent
+          border: '1px solid transparent' // Bordure transparente par défaut
+        };
+        const filledCellStyle = {
+          ...cellStyle,
+          border: '1px solid #FFFFFF',
+          borderRadius: '4px',
+          boxShadow: `inset 0 0 10px rgba(255, 255, 255, 0.8),
+                      inset 0 0 20px rgba(255, 255, 255, 0.1),
+                      0 0 5px #000000`
+        };
+      
+        return (
+          <div>
+            {piece.shape.map((row, rowIndex) => (
+              <div key={rowIndex} style={rowStyle}>
+          {row.map((cell, cellIndex) => (
+            <div key={cellIndex} style={cell ? { ...filledCellStyle, backgroundColor: piece.color } : cellStyle}></div>
+          ))}
+              </div>
+            ))}
+          </div>
+        );
+      };
+      
+    
 
 
     const audioRefs = useRef(audios.map(audio => ({
@@ -177,13 +229,17 @@ return (
         <div className='font-tetris-3'>{username}</div>
 
         <div className='user-data-2'>
-          <div className='flex flex-row space-between w-full'>
-            <div className='flex flex-col gap-2 justify-center w-full'>
+          <div className='flex flex-row items-center gap-10 w-full'>
+            <div className='flex flex-col gap-2 justify-center'>
               <div className='font-tetris-blue'>SCORE: {gameData.score}</div>
               <div className='font-tetris-blue'>LINE: {gameData.linesCleared}</div>
               <div className='font-tetris-blue'>TETRIS: {gameData.tetrisScored}</div>
               <div className='font-tetris-blue'>LEVEL: {gameData.level}</div>
             </div>
+            <div className='flex items-center justify-center'>
+              {renderPiece(currentPiece)}
+            </div>
+
           </div>
         </div>
 
