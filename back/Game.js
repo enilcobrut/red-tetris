@@ -870,10 +870,9 @@ class Game {
      * @returns {object} The next piece.
      */
     getNextPiece(player) {
-        if (player.currentPieceIndex >= this.pieceQueue.length) {
-            this.generatePieces(DEFAULT_PIECES);
-        }
-        const pieceTemplate = this.pieceQueue[player.currentPieceIndex++];
+        const nextPieceIndex = player.currentPieceIndex % DEFAULT_PIECES;
+        const pieceTemplate = this.pieceQueue[nextPieceIndex];
+        player.currentPieceIndex++;
         return Piece.createFromTemplate(pieceTemplate);
     }
 
