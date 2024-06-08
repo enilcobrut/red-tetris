@@ -242,7 +242,7 @@ body {
 		'User-Scores Create-Room HallOfFame'
 		'User-Scores Room-List HallOfFame';
 	grid-template-columns: 400px minmax(auto, 750px) 400px;
-	grid-template-rows: 2fr 3fr;
+	grid-template-rows: 2fr 2fr;
 }
 
 .game-layout {
@@ -253,11 +253,11 @@ body {
 	padding: 0 20px;
 	align-items: center;
 	justify-content: center;
-	gap: 3rem;
+	gap: 2rem;
 	grid-template-areas:
 		'User-Data Game-Canva Spectrums'
 		'Logs Game-Canva Spectrums';
-		grid-template-columns: minmax(275px, 500px) 1fr minmax(auto, 570px);
+		grid-template-columns: 1fr minmax(auto, 400px) 1fr;
 		grid-template-rows: 2fr 3fr;
 	}
 
@@ -395,9 +395,6 @@ body {
 	background: var(--surfaces-surface-secondary, #1D1A40);
 	box-sizing: border-box; /* Inclut le padding dans la largeur */
 	max-width: 400px; /* Largeur maximale de la grille pour contrôler la taille des cellules */
-
-
-
   }
   .game-grid {
     display: grid;
