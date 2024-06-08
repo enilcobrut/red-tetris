@@ -15,6 +15,21 @@ const RoomPage = () => {
     const navigate = useNavigate();
     const [logs, setLogs] = useState([]); // State to store logs
     const [remindingPlayer, setRemindingPlayer] = useState(0);
+    // const audioRef = useRef(new Audio('/tetris.mp3'));
+    // const [soundOn, setSoundOn] = useState(true);
+    const audios = [
+      { src: '/tetris.mp3', icon: '/sound.png', playing: true },
+      { src: '/pizza.mp3', icon: '/sasso.png', playing: false }
+    ];
+
+    const audioRefs = useRef(audios.map(audio => ({
+      ...audio,
+      ref: new Audio(audio.src)
+    })));
+  
+  
+  
+  
 
     const [gameData, setGameData] = useState({
       score: 0,
@@ -64,7 +79,6 @@ useEffect(() => {
 
   const handleLinesCleared = (data) => {
     console.log('Received lines cleared data:', data);
-    // Update local state with the received data
     setGameData({
       score: data.score,
       linesCleared: data.linesCleared,
@@ -93,6 +107,44 @@ useEffect(() => {
 
 
 
+
+useEffect(() => {
+  // Gestion de la lecture et de la pause initiales
+  audioRefs.current.forEach((audio, index) => {
+    if (audio.playing) {
+      audio.ref.play().catch(error => console.error(`Error playing audio ${index}:`, error));
+    }
+  });
+
+  return () => {
+    audioRefs.current.forEach(audio => audio.ref.pause());
+  };
+}, []);
+
+const toggleSound = (index) => {
+  const newAudioStates = audioRefs.current.map((audio, idx) => {
+    if (idx === index) {
+      if (audio.playing) {
+        // Si l'audio est déjà en train de jouer, on le met en pause.
+        audio.ref.pause();
+        return { ...audio, playing: false };
+      } else {
+        // Si l'audio est en pause, on arrête tous les autres et on joue celui-ci.
+        audio.ref.play().catch(error => console.error(`Error playing audio ${idx}:`, error));
+        return { ...audio, playing: true };
+      }
+    } else {
+      // On met en pause tous les autres audios.
+      audio.ref.pause();
+      return { ...audio, playing: false };
+    }
+  });
+
+  // Mettre à jour les références avec le nouvel état.
+  audioRefs.current = newAudioStates;
+};
+
+
 return (
   <div className="flex flex-col h-full w-full gap-10">
     <div className="flex items-center justify-between p-10 h-20"> {/* Nav Bar with minimal height */}
@@ -100,7 +152,20 @@ return (
         <Paragraph neon='blue'>LEAVE</Paragraph>
       </div>
       <div className='font-tetris-2'>{displayMode}</div>
-      <img className='h-10' src='/sound.png' alt='Sound Icon' /> {/* Assuming you have sound.png in your public/assets folder */}
+      <div className='flex flex-row gap-5'>
+      {audioRefs.current.map((audio, index) => (
+  <img
+    key={audio.src}
+    className={`h-10 ${!audio.playing ? 'opacity-30' : ''}`}
+    src={audio.icon}
+    alt={`${audio.src} Icon`}
+    onClick={() => toggleSound(index)}
+    style={{ cursor: 'd-pointer' }}
+  />
+))}
+
+
+    </div>
     </div>
     <BackgroundAnimation />
     <div className='flex justify-center items-center w-full h-full'>
