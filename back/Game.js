@@ -9,7 +9,6 @@ const SCORE_MULTIPLIER_INCREMENT = 0.2;
 const INTERVAL_DECREMENT = 50;
 const MINIMUM_INTERVAL = 150;
 const LINES_PER_LEVEL = 4;
-let SCORE_MULTIPLIER = 1.0;
 
 /**
  * An instance of Game is created when someone creates a room.
@@ -440,12 +439,12 @@ class Game {
         }
         if (linesCleared > 0) {
             player.linesCleared = (player.linesCleared || 0) + linesCleared; // Track lines cleared
-            player.score = Math.floor(player.score + (DEFAULT_SCORE * linesCleared * SCORE_MULTIPLIER));
+            player.score = Math.floor(player.score + (DEFAULT_SCORE * linesCleared * player.scoreMultiplier));
         
             if (this.isJourney) {
                 // Check if player has cleared enough lines to level up
                 const level = 1 + Math.floor(player.linesCleared / LINES_PER_LEVEL);
-                SCORE_MULTIPLIER = 1.0 + ((level - 1) * SCORE_MULTIPLIER_INCREMENT);
+                player.scoreMultiplier = 1.0 + ((level - 1) * SCORE_MULTIPLIER_INCREMENT);
                 const newInterval = DEFAULT_INTERVAL - (level * INTERVAL_DECREMENT);
                 player.finalInterval = Math.max(newInterval, MINIMUM_INTERVAL);
     
@@ -459,19 +458,19 @@ class Game {
                     console.log(`Player ${player.username} leveled up to level ${level}!`);
                     console.log(`Bonus points: ${bonus_point}!`);
                     console.log(`Player ${player.username} has a new interval of ${player.finalInterval}!`);
-                    console.log(`Player ${player.username} has a new score multiplier of ${SCORE_MULTIPLIER.toFixed(2)}!`);
+                    console.log(`Player ${player.username} has a new score multiplier of ${player.scoreMultiplier.toFixed(2)}!`);
                 }
             }
         
             if (linesCleared === 4 && this.isPerfectClear(grid)) {
-                player.score = Math.floor(player.score + (DEFAULT_SCORE * SCORE_MULTIPLIER * 50)); // Reward points for a Perfect Clear
+                player.score = Math.floor(player.score + (DEFAULT_SCORE * player.scoreMultiplier * 50)); // Reward points for a Perfect Clear
                 this.sendPenaltyLines(io, player, 10); // Send 10 penalty lines to opponents
                 console.log(`Player ${player.username} achieved a Perfect Clear!`);
                 this.logs.push(`Player ${player.username} achieved a Perfect Clear!`);
             } else {
                 if (linesCleared === 4) {
                     player.tetrisScored = (player.tetrisScored || 0) + 1; // Track Tetris scored
-                    player.score = Math.floor(player.score + (DEFAULT_SCORE * SCORE_MULTIPLIER * 4)); // Additional 400 points for clearing 4 lines (Tetris)
+                    player.score = Math.floor(player.score + (DEFAULT_SCORE * player.scoreMultiplier * 4)); // Additional 400 points for clearing 4 lines (Tetris)
                     console.log(`Player ${player.username} cleared a Tetris!`);
                     this.logs.push(`Player ${player.username} cleared a Tetris!`);
                     this.sendPenaltyLines(io, player, linesCleared - 1);

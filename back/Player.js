@@ -14,6 +14,7 @@ class Player {
         this.level = 1;
         this.finalInterval = 1000;
         this.rotationCounter = 0; // New property to track rotations
+        this.scoreMultiplier = 1; // New property to track score multiplier
     }
 }
 module.exports = Player;
