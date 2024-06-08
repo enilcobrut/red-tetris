@@ -18,12 +18,12 @@ const RoomPage = () => {
     // const audioRef = useRef(new Audio('/tetris.mp3'));
     // const [soundOn, setSoundOn] = useState(true);
     const audios = [
-      { src: '/erika.mp3', icon: '/Lucie.png', playing: false },
-      { src: '/erika.mp3', icon: '/Sasso.png', playing: false },
+      { src: '/lucie.mp3', icon: '/Lucie.png', playing: false },
+      { src: '/sasso.mp3', icon: '/Sasso.png', playing: false },
       { src: '/erika.mp3', icon: '/Celine.png', playing: false },
-      { src: '/erika.mp3', icon: '/Titi.png', playing: false },
-      { src: '/erika.mp3', icon: '/Riri.png', playing: false },
-      { src: '/pizza.mp3', icon: '/Peiqi.png', playing: false },
+      { src: '/titi.mp3', icon: '/Titi.png', playing: false },
+      { src: '/riri.mp3', icon: '/Riri.png', playing: false },
+      { src: '/peiqi.mp3', icon: '/Peiqi.png', playing: false },
       { src: '/tetris.mp3', icon: '/sound.png', playing: true }
     ];
       const [audioStates, setAudioStates] = useState(audios);
