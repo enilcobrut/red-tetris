@@ -805,6 +805,7 @@ class Game {
      * @param {number} score - The player's score.
      */
     updateLeaderboard(username, score) {
+        if (username == 'BOT') return;
         const leaderboard = readJsonFile(LEADERBOARD_FILE);
 
         leaderboard.push({ username, score });
