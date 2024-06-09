@@ -191,23 +191,20 @@ useEffect(() => {
 const toggleSound = (index) => {
   const newAudioStates = audioRefs.current.map((audio, idx) => {
     if (idx === index) {
-      if (audio.playing) {
-        // Si l'audio est déjà en train de jouer, on le met en pause.
-        audio.ref.pause();
-        return { ...audio, playing: false };
-      } else {
-        // Si l'audio est en pause, on arrête tous les autres et on joue celui-ci.
+      // If the selected audio file is currently not playing, start playing it in a loop
+      if (!audio.playing) {
+        audio.ref.loop = true;
         audio.ref.play().catch(error => console.error(`Error playing audio ${idx}:`, error));
-        return { ...audio, playing: true };
       }
+      return { ...audio, playing: true };
     } else {
-      // On met en pause tous les autres audios.
+      // Pause all other audio files
       audio.ref.pause();
       return { ...audio, playing: false };
     }
   });
 
-  // Mettre à jour les références avec le nouvel état.
+  // Update the references with the new state
   audioRefs.current = newAudioStates;
   setAudioStates(newAudioStates);
 
