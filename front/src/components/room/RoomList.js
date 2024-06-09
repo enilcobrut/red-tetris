@@ -23,9 +23,12 @@ const RoomList = ({ className }) => {
             });
         }
         return () => {
-            socket.off('activeRooms');
+            if (socket) {
+                socket.off('activeRooms');
+            }
         };
-    }, [rooms]);
+        return () => {};
+    }, [socket]); // Ensure effect runs when socket changes
 
     const handleClick = (roomName) => {
         if (socket && username && roomName) {

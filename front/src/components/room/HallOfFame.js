@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import Paragraph from '../Paragraph';
 import DropdownMenu from '../DropDownMenu';
+
 const HallOfFame = ({ className }) => {
     const { socket } = useSelector(state => state.socket);
     const [data, setData] = useState([]);
@@ -44,28 +45,26 @@ const HallOfFame = ({ className }) => {
             socket.emit('getData', { sort: leaderBoard });
             socket.on('data', handleData);
             return () => {
-                socket.off('data', handleData);
+                if (socket) {
+                    socket.off('data', handleData);
+                }
             };
         }
-    }, [socket]);
+    }, [socket, leaderBoard]);
     const handleClick = () => {
 		setShowDropdown(!showDropdown);
 
 	};
 
-    // Log data whenever it changes
-    useEffect(() => {
-        //console.log('Updated data:', data);
-
-    }, [data]);
 
 
-    useEffect(() => {
-        console.log(leaderBoard);
 
-        socket.emit('getData', { sort: leaderBoard });
+    // useEffect(() => {
+    //     console.log(leaderBoard);
 
-    }, [leaderBoard]);
+    //     socket.emit('getData', { sort: leaderBoard });
+
+    // }, [leaderBoard]);
 
 
     return (

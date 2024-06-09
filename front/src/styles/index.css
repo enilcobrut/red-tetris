@@ -248,7 +248,6 @@ body {
 
 .game-layout {
 	display: grid;
-	justify-content: center;
 	width: 100%;
 	height: 100%;
 	padding: 0 20px;
@@ -259,7 +258,7 @@ body {
 		'User-Data Game-Canva Spectrums'
 		'Logs Game-Canva Spectrums';
 		grid-template-columns: minmax(auto, 440px) minmax(auto, 400px) minmax(auto, 440px);
-		grid-template-rows: 2fr 3fr;
+		grid-template-rows: 1fr 1fr;
 	}
 
 .User-Data {
@@ -338,7 +337,9 @@ body {
 	background: var(--surfaces-surface-secondary, #1D1A40);
 }
 
-
+.min-he {
+	min-height: 400px;
+}
 
 .user-data {
 	display: flex;
@@ -350,6 +351,21 @@ body {
 	border-radius: 16px;
 	border: 1px solid var(--borders-border-primary, #FFF);
 	background: var(--surfaces-surface-secondary, #1D1A40);
+}
+
+
+.user-data-stat {
+	display: flex;
+	justify-content: center;
+	width: 100%;
+	padding: 15px;
+	min-height: 200px;
+	flex-direction: column;
+	gap: 10px;
+	flex: 1 0 0;
+	align-self: stretch;
+	border-radius: 16px;
+	background: var(--surfaces-surface-secondary, #110023);
 }
 
 

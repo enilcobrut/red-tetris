@@ -30,11 +30,14 @@ const RoomPage = () => {
 
 
     useEffect(() => {
+      if (socket) {
+
       socket.on('next_piece', (piece) => {
         setCurrentPiece(piece);
       });
       return () => socket.off('next_piece');
-    }, []);
+    }
+    }, [socket]);
 
     
     // const audioRef = useRef(new Audio('/tetris.mp3'));
@@ -239,7 +242,7 @@ return (
       <div className='user-data User-Data'>
         <div className='font-tetris-3'>{username}</div>
 
-        <div className='user-data-2'>
+        <div className='user-data-stat min-he'>
           <div className='flex flex-row items-center gap-10 w-full'>
             <div className='flex flex-col gap-2 justify-center'>
               <div className='font-tetris-blue'>SCORE: {gameData.score}</div>

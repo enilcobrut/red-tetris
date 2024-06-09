@@ -7,6 +7,7 @@ import CreateRoom from '../components/room/CreateRoom';
 import RoomList from '../components/room/RoomList';
 import HallOfFame from '../components/room/HallOfFame';
 import { setRoomStatus } from '../features/user/userSlice';
+import { toast } from '../components/Toast';
 
 const LobbyPage = () => {
     const navigate = useNavigate();
@@ -19,7 +20,12 @@ const LobbyPage = () => {
     useEffect(() => {
 
         if (!isConnected || error) {
-          console.error("Socket is not connected or an error occurred", error);
+          toast({
+            title: "Connection Error",
+            message: "No socket connection. Please check your network and try again.",
+            type: "error",
+        });
+
           navigate('/');
         }
         if (isInRoom) {
@@ -43,7 +49,7 @@ const LobbyPage = () => {
       }, [socket, isConnected, error, navigate]);
     
   return (
-    <main className="flex min-h-screen items-center justify-center flex-col gap-20">
+    <main className="flex min-h-screen items-center justify-center flex-col gap-10">
       <BackgroundAnimation/>
       <div onClick={() => navigate('/')} className="font-tetris">RED TETRIS</div>
       <div className="font-2">Welcome {username || "No Username"}!</div>
