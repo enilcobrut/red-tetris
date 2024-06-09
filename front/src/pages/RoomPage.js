@@ -17,6 +17,7 @@ const RoomPage = () => {
     const [logs, setLogs] = useState([]); // State to store logs
     const [remindingPlayer, setRemindingPlayer] = useState(0);
     const [currentPiece, setCurrentPiece] = useState(null);
+    const [hasInteracted, setHasInteracted] = useState(false); // Track user interaction
 
     const dispatch = useDispatch();
 
@@ -180,26 +181,33 @@ useEffect(() => {
 
 
 useEffect(() => {
-  audioRefs.current.forEach((audio, index) => {
-    if (audio.playing) {
-      audio.ref.play().catch(error => console.error(`Error playing audio ${index}:`, error));
-    }
-  });
+  if (hasInteracted) { // Ensure playback only starts after user interaction
+    audioRefs.current.forEach((audio, index) => {
+      if (audio.playing) {
+        audio.ref.loop = true;
+        audio.ref.play().catch(error => console.error(`Error playing audio ${index}:`, error));
+      }
+    });
 
-  return () => {
-    audioRefs.current.forEach(audio => audio.ref.pause());
-  };
-}, []);
+    return () => {
+      audioRefs.current.forEach(audio => audio.ref.pause());
+    };
+  }
+}, [hasInteracted]);
 
 const toggleSound = (index) => {
   const newAudioStates = audioRefs.current.map((audio, idx) => {
     if (idx === index) {
-      // If the selected audio file is currently not playing, start playing it in a loop
-      if (!audio.playing) {
+      // If the selected audio file is currently playing, pause it and set playing to false
+      if (audio.playing) {
+        audio.ref.pause();
+        return { ...audio, playing: false };
+      } else {
+        // If the selected audio file is currently not playing, start playing it in a loop
         audio.ref.loop = true;
         audio.ref.play().catch(error => console.error(`Error playing audio ${idx}:`, error));
+        return { ...audio, playing: true };
       }
-      return { ...audio, playing: true };
     } else {
       // Pause all other audio files
       audio.ref.pause();
@@ -215,7 +223,7 @@ const toggleSound = (index) => {
 
 
 return (
-  <div className="flex flex-col h-full w-full gap-10">
+  <div className="flex flex-col h-full w-full gap-10" onClick={() => setHasInteracted(true)}> {/* Add onClick to capture user interaction */}
     <div className="flex items-center justify-between p-10 h-20"> {/* Nav Bar with minimal height */}
       <div role='button' className='button-leave' onClick={handleClick}>
         <Paragraph neon='blue'>LEAVE</Paragraph>
