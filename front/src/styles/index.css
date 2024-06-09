@@ -243,7 +243,7 @@ body {
 		'User-Scores Create-Room HallOfFame'
 		'User-Scores Room-List HallOfFame';
 	grid-template-columns: 400px minmax(auto, 750px) 400px;
-	grid-template-rows: 2fr 2fr;
+	grid-template-rows: 5fr 7fr;
 }
 
 .game-layout {
@@ -257,8 +257,8 @@ body {
 	grid-template-areas:
 		'User-Data Game-Canva Spectrums'
 		'Logs Game-Canva Spectrums';
-		grid-template-columns: minmax(auto, 440px) minmax(auto, 400px) minmax(auto, 440px);
-		grid-template-rows: 1fr 1fr;
+		grid-template-columns: minmax(auto, 600px) minmax(auto, 400px) minmax(auto, 440px);
+		grid-template-rows: 5fr 7fr;
 	}
 
 .User-Data {

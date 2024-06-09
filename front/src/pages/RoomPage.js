@@ -243,7 +243,7 @@ return (
         <div className='font-tetris-3'>{username}</div>
 
         <div className='user-data-stat min-he'>
-          <div className='flex flex-row items-center gap-10 w-full'>
+          <div className='flex flex-row items-center justify-around gap-10 w-full'>
             <div className='flex flex-col gap-2 justify-center'>
               <div className='font-tetris-blue'>SCORE: {gameData.score}</div>
               <div className='font-tetris-blue'>LINE: {gameData.linesCleared}</div>
