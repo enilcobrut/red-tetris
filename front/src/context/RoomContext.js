@@ -18,14 +18,8 @@ export const RoomProvider = ({ children }) => {
                 setRoomInfo(roomData);
                 setIsOwner(roomData.ownerSocketId === socket.id);
             };
-    
-            // Listen to 'room_update_journey' event
             socket.on('room_update_journey', handleRoomUpdate);
-    
-            // Listen to 'room_update' event
             socket.on('room_update', handleRoomUpdate);
-    
-            // Cleanup function to remove both listeners when the component unmounts or the socket changes
             return () => {
                 socket.off('room_update_journey', handleRoomUpdate);
                 socket.off('room_update', handleRoomUpdate);

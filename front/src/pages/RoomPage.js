@@ -3,9 +3,10 @@ import BackgroundAnimation from '../components/BackgroundAnimation';
 import Paragraph from '../components/Paragraph';
 import GameCanva from '../components/game/GameCanva';
 import { useRoom } from '../context/RoomContext';
-import {  useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-
+import { setRoomStatus } from '../features/user/userSlice';
+import { setInGame } from '../features/user/userSlice';
 const RoomPage = () => {
     const { socket } = useSelector(state => state.socket);
     const { roomInfo } = useRoom();
@@ -16,6 +17,17 @@ const RoomPage = () => {
     const [logs, setLogs] = useState([]); // State to store logs
     const [remindingPlayer, setRemindingPlayer] = useState(0);
     const [currentPiece, setCurrentPiece] = useState(null);
+
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+      dispatch(setInGame(true));
+
+      return () => {
+          dispatch(setInGame(false));
+      };
+  }, [dispatch]);
+
 
     useEffect(() => {
       socket.on('next_piece', (piece) => {
@@ -111,6 +123,8 @@ const RoomPage = () => {
   const handleClick = () => {
     navigate('/lobby');
     socket.emit('leave_game', { username, room: roomInfo.roomName });
+    dispatch(setRoomStatus({ isInRoom: false, roomName: '' }));
+    dispatch(setInGame(false));  
   }
 
 useEffect(() => {

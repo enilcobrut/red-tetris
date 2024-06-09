@@ -1,16 +1,19 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {  useSelector } from 'react-redux';
 import BackgroundAnimation from "../components/BackgroundAnimation";
 import Button from '../components/Button';
 import { useRoom } from '../context/RoomContext';
+import { useDispatch, useSelector } from 'react-redux';
+import { setRoomStatus, setInGame } from '../features/user/userSlice';  // Ensure both actions are imported
 
 const WaitingRoomPage = () => {
-    
+    const dispatch = useDispatch();
+
     const navigate = useNavigate();
     const { roomInfo } = useRoom();
     const username = useSelector(state => state.user.username);  // Utilisez useSelector pour obtenir l'username
     const { socket, isConnected, error } = useSelector(state => state.socket);
+    const isInGame = useSelector(state => state.user.isInGame);  // Access the isInGame state
 
 
     useEffect(() => {
@@ -18,6 +21,20 @@ const WaitingRoomPage = () => {
             console.error("Socket is not connected or an error occurred", error);
             navigate('/');
           }
+        if (roomInfo.roomName) {
+            dispatch(setRoomStatus({ isInRoom: true, roomName: roomInfo.roomName }));
+        }
+
+        if (isInGame) {
+            socket.emit('leave_room', { room: roomInfo.roomName, username: username });
+            dispatch(setRoomStatus({ isInRoom: false, roomName: '' }));  
+            dispatch(setInGame(false));          
+            console.log("The user is currently in a room.");
+        }
+
+
+
+
       
           const handleDisconnect = () => {
             console.log("Disconnected from server, redirecting to homepage");
@@ -32,6 +49,9 @@ const WaitingRoomPage = () => {
             socket?.off('disconnect', handleDisconnect);
           };
         }, [socket, isConnected, error, navigate, roomInfo]);
+
+
+
     const startGame = () => {
         if (roomInfo.roomName && username && username === roomInfo.owner) {
             socket.emit('redirect_game', { room: roomInfo.roomName, username });
@@ -42,7 +62,8 @@ const WaitingRoomPage = () => {
 
     const leaveGame = () => {
         socket.emit('leave_room', { room: roomInfo.roomName, username: username });
-    
+        dispatch(setRoomStatus({ isInRoom: false, roomName: '' }));
+
         // Optionally navigate away immediately or wait for server confirmation
         navigate('/lobby');
     };
