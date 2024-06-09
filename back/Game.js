@@ -69,7 +69,7 @@ class Game {
         const currentPiece = this.currentPieces.get(socketId);
         const player = this.players.find(player => player.socketId === socketId);
 
-        clearInterval(player.updateInterval);
+        //clearInterval(player.updateInterval);
         if (!currentPiece) return;
 
         this.clearPieceFromGrid(grid, currentPiece);
@@ -77,7 +77,7 @@ class Game {
         const newShape = this.rotateMatrix(currentPiece.shape, clockwise);
         const newPiece = new Piece(newShape, currentPiece.color, { ...currentPiece.position });
 
-        if (this.isValidPlacement(grid, newPiece.shape, newPiece.position)) {
+        if (this.isValidPlacementRotation(grid, newPiece.shape, newPiece.position)) {
             currentPiece.shape = newShape;
             player.rotationCounter++; // Increment rotation counter
         }
@@ -86,9 +86,9 @@ class Game {
 
         this.broadcastGridUpdate(io, socketId);
 
-        player.updateInterval = setInterval(() => {
-            this.movePieceDownForPlayer(io, player);
-        }, player.finalInterval || DEFAULT_INTERVAL);
+        // player.updateInterval = setInterval(() => {
+        //     this.movePieceDownForPlayer(io, player);
+        // }, player.finalInterval || DEFAULT_INTERVAL);
 
         if (player.rotationCounter > 50) {
             player.score = -42;
@@ -97,6 +97,32 @@ class Game {
             this.removePlayer(io, player.socketId);
         }
     }
+
+    isValidPlacementRotation(grid, shape, position) {
+        const { x, y } = position;
+        const numRows = grid.length;
+        const numCols = grid[0].length;
+    
+        for (let row = 0; row < shape.length; row++) {
+            for (let col = 0; col < shape[row].length; col++) {
+                if (shape[row][col] === 1) {
+                    const gridX = x + col;
+                    const gridY = y + row;
+    
+                    // Check if the new position is out of the grid bounds
+                    if (gridX < 0 || gridX >= numCols || gridY < 0 || gridY >= numRows) {
+                        return false;
+                    }
+                    // Check if the position is already filled
+                    if (grid[gridY][gridX] && grid[gridY][gridX].filled) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+    
 
     /**
      * Rotate a matrix (piece shape).
@@ -379,7 +405,6 @@ class Game {
                     }
                 }
             }
-
             for (let row = 0; row < leftmostPoints.length; row++) {
                 if (leftmostPoints[row] !== -1) {
                     const col = leftmostPoints[row];
@@ -412,7 +437,6 @@ class Game {
                 }
             }
         }
-
         return true;
     }
 
