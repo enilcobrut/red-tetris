@@ -45,12 +45,12 @@
   },
   {
     "username": "Robin",
-    "played": 20,
+    "played": 21,
     "win": 1,
     "loss": 8,
-    "linesCleared": 141,
+    "linesCleared": 166,
     "tetrisScored": 8,
-    "single": 11
+    "single": 12
   },
   {
     "username": "tom",
@@ -209,12 +209,12 @@
   },
   {
     "username": "pho",
-    "played": 8,
+    "played": 20,
     "win": 1,
     "loss": 2,
-    "linesCleared": 111,
-    "tetrisScored": 2,
-    "single": 5
+    "linesCleared": 484,
+    "tetrisScored": 27,
+    "single": 17
   },
   {
     "username": "Mormor",
