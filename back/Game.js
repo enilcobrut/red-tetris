@@ -491,6 +491,11 @@ class Game {
                 this.sendPenaltyLines(io, player, 10); // Send 10 penalty lines to opponents
                 console.log(`Player ${player.username} achieved a Perfect Clear!`);
                 this.logs.push(`Player ${player.username} achieved a Perfect Clear!`);
+            } else if (this.isPerfectClear(grid) && player.linesCleared > 4) {
+                player.score = Math.floor(player.score + (DEFAULT_SCORE * player.scoreMultiplier * 10)); // Reward points for an (almost) Perfect Clear
+                this.sendPenaltyLines(io, player, 5); // Send 5 penalty lines to opponents
+                console.log(`Player ${player.username} achieved an (almost) Perfect Clear!`);
+                this.logs.push(`Player ${player.username} achieved an (almost) Perfect Clear!`);
             } else {
                 if (linesCleared === 4) {
                     player.tetrisScored = (player.tetrisScored || 0) + 1; // Track Tetris scored
