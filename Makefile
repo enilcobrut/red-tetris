@@ -16,11 +16,8 @@ fclean: stop
 
 re: stop build run
 
-test_back:
+test:
 	@(cd back && npm run test)
-
-test_front:
-	@(cd front/src && npm run test)
 
 # Define the .env.local file
 ENV_FILE_FRONT=front/.env

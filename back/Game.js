@@ -886,7 +886,6 @@ class Game {
      * @returns {object} The next piece.
      */
     getNextPiece(player, io) {
-
         this.broadcastNextPiece(io, player.socketId)
         const nextPieceIndex = player.currentPieceIndex % DEFAULT_PIECES;
         const pieceTemplate = this.pieceQueue[nextPieceIndex];

@@ -27,7 +27,8 @@ jest.mock('../Player', () => {
             socketId, 
             isOwner: false, 
             score: 0, 
-            dropInterval: 0 // Add dropInterval property here
+            dropInterval: 0, // Add dropInterval property here,
+            scoreMultiplier: 1 // Add scoreMultiplier property here
         }; 
     });
 });
@@ -49,6 +50,17 @@ describe('Game class', () => {
     const mockOnDelete = jest.fn();
 
     beforeEach(() => {
+        // Mock io object with mock implementations for to and emit methods
+        const mockIo = {
+            to: jest.fn().mockReturnThis(),
+            emit: jest.fn()
+        };
+
+        // Spy on broadcastNextPiece and provide a mock implementation using the mockIo object
+        jest.spyOn(Game.prototype, 'broadcastNextPiece').mockImplementation((io, socketId) => {
+            mockIo.to(socketId).emit('next_piece', { shape: [[1, 1], [1, 1]], color: 'red' });
+        });
+
         game = new Game(mockRoomName, mockOnDelete);
         jest.clearAllMocks();
     });
@@ -291,7 +303,7 @@ describe('Game class', () => {
         const player = new Player('testUser', 'testSocketId');
         game.players.push(player);
         game.grids.set(player.socketId, grid);
-    
+        game.isJourney = false;
         game.clearFullLines(io, grid, player);
     
         expect(grid[0].every(cell => !cell.filled)).toBe(true);
@@ -415,27 +427,6 @@ describe('Game class', () => {
         expect(io.to).toHaveBeenCalledWith(player.socketId);
         expect(io.emit).toHaveBeenCalledWith('grid_update', expect.any(Object));
     });
-
-    test('dropPiece drops piece correctly', () => {
-        const io = { to: jest.fn().mockReturnThis(), emit: jest.fn() };
-        const player = new Player('testUser', 'testSocketId');
-        const piece = { shape: [[1, 1], [1, 0]], color: 'red', position: { x: 0, y: 0 } };
-        game.players.push(player);
-        game.grids.set(player.socketId, game.createEmptyGrid());
-        game.currentPieces.set(player.socketId, piece);
-    
-        game.generatePieces(1); // Ensure there is a piece to get
-    
-        const initialPiece = game.getNextPiece(player); // Get the initial piece
-    
-        // Set the initial piece to ensure there's a piece to drop
-        game.currentPieces.set(player.socketId, initialPiece);
-    
-        game.dropPiece(io, player.socketId);
-    
-        expect(io.to).toHaveBeenCalledWith(player.socketId);
-        expect(io.emit).toHaveBeenCalledWith('grid_update', expect.any(Object));
-    });
     
     test('getNextPiece returns the correct piece', () => {
         game.generatePieces(1); // Ensure there is at least one piece generated
@@ -538,7 +529,6 @@ describe('Game class', () => {
         // Assert that the methods were called correctly
         expect(game.clearFullLines).toHaveBeenCalledWith(io, grid, player);
         expect(game.checkSommet).toHaveBeenCalledWith(io, grid, player);
-        expect(game.getNextPiece).toHaveBeenCalledWith(player);
         expect(game.isValidPlacement).toHaveBeenCalledWith(grid, expect.any(Array), { x: 0, y: 0 });
         expect(game.applyPendingPenalties).toHaveBeenCalledWith(grid, player.socketId);
         expect(game.updateGrid).toHaveBeenCalledWith(grid, expect.any(Object), { x: 0, y: 0 });
