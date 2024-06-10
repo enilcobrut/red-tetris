@@ -311,6 +311,7 @@ io.on('connection', socket => {
         const game = activeGames[room];
         if (game) {
             game.startGame(io);
+            console.log(game.players);
         } else {
             console.error('Attempt to start game in a non-existent room');
         }
@@ -383,7 +384,7 @@ io.on('connection', socket => {
             });
         }
     });
-    
+
 });
 
 function isValidRoomName(room) {

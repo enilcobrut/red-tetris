@@ -13,25 +13,48 @@ export const RoomProvider = ({ children }) => {
     const [isOwner, setIsOwner] = useState(false);
 
     useEffect(() => {
-        if (socket) {
-            const handleRoomUpdate = (roomData) => {
-                setRoomInfo(roomData);
-                setIsOwner(roomData.ownerSocketId === socket.id);
-            };
-            socket.on('room_update_journey', handleRoomUpdate);
-            socket.on('room_update', handleRoomUpdate);
-            return () => {
-                socket.off('room_update_journey', handleRoomUpdate);
-                socket.off('room_update', handleRoomUpdate);
-            };
-        }
+        if (!socket) return;
+    
+        const handleRoomUpdate = (roomData) => {
+            console.log("Received room update:", roomData);
+            setRoomInfo(prev => {
+                if (prev.roomName === roomData.roomName && JSON.stringify(prev.players) === JSON.stringify(roomData.players)) {
+                    return prev; // No need to update if nothing has changed
+                }
+                return roomData;
+            });
+            setIsOwner(roomData.ownerSocketId === socket.id);
+        };
+    
+        // Listen for room updates
+        socket.on('room_update', handleRoomUpdate);
+        socket.on('room_update_journey', handleRoomUpdate);
+    
+        // Clean up when the component unmounts or socket changes
+        return () => {
+            socket.off('room_update', handleRoomUpdate);
+            socket.off('room_update_journey', handleRoomUpdate);
+        };
     }, [socket]);
+    
     
 
     useEffect(() => {
         const handleGameStart = ({ room, url }) => {
+            console.log('Current room info:', roomInfo);
+            console.log("Players in room:", roomInfo.players.map(player => player.name));
+
+            // Check if current user is included in the list of players
+            if (!roomInfo.players.some(player => player.name === username)) {
+                console.log(username);
+                console.log("Current user not in room players list.");
+                return;
+            }
+            // Check if all expected players are present
             if (room === roomInfo.roomName) {
                 navigate(url);
+            } else {
+                console.log("Not all players are present yet.");
             }
         };
 
@@ -42,12 +65,16 @@ export const RoomProvider = ({ children }) => {
                 socket.off('redirect_game', handleGameStart);
             };
         }
-    }, [socket, roomInfo.roomName, navigate, username]); 
+    }, [socket, roomInfo, navigate, username]);
 
-    
 
+    const resetRoomContext = () => {
+        setRoomInfo({ roomName: '', players: [], owner: '', ownerSocketId: '' });
+        setIsOwner(false);
+        console.log("Room context has been reset.");
+    };
     return (
-        <RoomContext.Provider value={{ roomInfo, setRoomInfo, isOwner }}>
+        <RoomContext.Provider value={{ roomInfo, setRoomInfo, isOwner, resetRoomContext }}>
             {children}
         </RoomContext.Provider>
     );

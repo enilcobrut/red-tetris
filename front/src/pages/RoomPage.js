@@ -136,7 +136,8 @@ useEffect(() => {
   if (socket) {
 
     const handleLogUpdate = (data) => {
-      if (data.logs) {
+      console.log("event from back LOGS");
+      if (data.logs && data.roomName === roomInfo.roomName) {
           setLogs(data.logs);
       }
       if (data.remindingPlayer !== undefined) {

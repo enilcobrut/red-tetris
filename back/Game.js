@@ -995,11 +995,13 @@ class Game {
      */
     emitLogUpdate(io, includeRemindingPlayer = false) {
         const data = {
-            logs: this.logs.slice(-10)
+            logs: this.logs.slice(-10),
+            roomName: this.roomName
         };
         if (includeRemindingPlayer) {
             data.remindingPlayer = this.remindingPlayer;
         }
+        console.log(io);
         io.to(this.roomName).emit('log_update', data);
     }
 }

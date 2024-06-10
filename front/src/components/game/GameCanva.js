@@ -1,12 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {  useSelector } from 'react-redux';
 import Button from '../Button'
+import { useRoom } from '../../context/RoomContext';
+
 const GameCanva = ({ className }) => {
     const { socket } = useSelector(state => state.socket);
     const [isModalOpen, setModalOpen] = useState(false);
     const [PlayerScore, setPlayerScore] = useState('');
     const [isWinner, setWinner] = useState(false);
+
+    const { resetRoomContext } = useRoom();
+
 
     const navigate = useNavigate();
     const rows = 20;
@@ -88,9 +93,11 @@ const GameCanva = ({ className }) => {
                 setWinner(data.isWinner);
                 setModalOpen(true);
                 console.log(`Game over, your score was: ${data.score}. Redirecting to homepage.`);
+                // Reset the room context
+                resetRoomContext();
+                // Navigate to the lobby or main menu
+          //      navigate('/lobby');
             }
-        
-            //navigate('/');
         };
         
     
