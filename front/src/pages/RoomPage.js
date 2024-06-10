@@ -19,6 +19,8 @@ const RoomPage = () => {
     const [currentPiece, setCurrentPiece] = useState(null);
     const [hasInteracted, setHasInteracted] = useState(false); // Track user interaction
 
+    const [initialPlayersCount, setInitialPlayersCount] = useState(0); // Ajout d'une nouvelle variable d'état
+
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -28,6 +30,13 @@ const RoomPage = () => {
           dispatch(setInGame(false));
       };
   }, [dispatch]);
+
+    useEffect(() => {
+      if (roomInfo && roomInfo.players) {
+          setInitialPlayersCount(roomInfo.players.length);
+      }
+  }, []); 
+
 
 
     useEffect(() => {
@@ -297,7 +306,7 @@ return (
             ) : (
                 // Otherwise, display the player list and their spectrums.
 <>
-    <Paragraph neon='blue'>REMAINING PLAYER : {remindingPlayer} / {roomInfo.players.length}</Paragraph>
+    <Paragraph neon='blue'>REMAINING PLAYER : {remindingPlayer} / {initialPlayersCount}</Paragraph>
 
     <div className='spectrum-player h-full'>
         {roomInfo.players.map((player, index) => {
