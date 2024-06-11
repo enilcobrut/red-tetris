@@ -10,6 +10,10 @@ const INTERVAL_DECREMENT = 50;
 const MINIMUM_INTERVAL = 150;
 const LINES_PER_LEVEL = 4;
 
+// Mute the console logs and errors
+//console.log = function() {};
+console.error = function() {};
+
 /**
  * An instance of Game is created when someone creates a room.
  */
@@ -1001,7 +1005,7 @@ class Game {
         if (includeRemindingPlayer) {
             data.remindingPlayer = this.remindingPlayer;
         }
-        console.log(io);
+        //console.log(io);
         io.to(this.roomName).emit('log_update', data);
     }
 }

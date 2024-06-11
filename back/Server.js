@@ -6,6 +6,10 @@ const Game = require('./Game');
 const path = require('path');
 const fs = require('fs');
 
+// Mute the console logs and errors
+//console.log = function() {};
+console.error = function() {};
+
 // Initialize Express app and HTTP server
 const app = express();
 const server = http.createServer(app);
@@ -311,7 +315,7 @@ io.on('connection', socket => {
         const game = activeGames[room];
         if (game) {
             game.startGame(io);
-            console.log(game.players);
+            //console.log(game.players);
         } else {
             console.error('Attempt to start game in a non-existent room');
         }
