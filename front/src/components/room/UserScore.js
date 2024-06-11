@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import Paragraph from '../Paragraph';
+import { toast } from '../Toast';
 const UserScore = ({ className }) => {
     const { socket } = useSelector(state => state.socket);
     const [scores, setScores] = useState([]);
@@ -16,12 +17,20 @@ const UserScore = ({ className }) => {
                     if (playerData && Array.isArray(playerData.scores)) {
                         setScores(playerData.scores.sort((a, b) => b - a).slice(0, 5));
                     } else {
-                        console.error('Received data is not valid:', jsonData);
+                        toast({
+                            title: "Error",
+                            message: "Player scores not found.",
+                            type: "error",
+                        });
                     }
                 } else if (jsonData && jsonData.username === username && Array.isArray(jsonData.scores)) {
                     setScores(jsonData.scores.sort((a, b) => b - a).slice(0, 5));
                 } else {
-                    console.error('Received data is not valid:', jsonData);
+                    toast({
+                        title: "Error",
+                        message: "Player scores not found.",
+                        type: "error",
+                    });
                 }
             };
 
@@ -32,12 +41,20 @@ const UserScore = ({ className }) => {
                     if (playerHistory) {
                         setHistory(playerHistory);
                     } else {
-                        console.error('Received history data is not valid:', jsonData);
+                        toast({
+                            title: "Error",
+                            message: "Player history not found.",
+                            type: "error",
+                        });
                     }
                 } else if (jsonData && jsonData.username === username) {
                     setHistory(jsonData);
                 } else {
-                    console.error('Received history data is not valid:', jsonData);
+                    toast({
+                        title: "Error",
+                        message: "Player history not found.",
+                        type: "error",
+                    });
                 }
             };
 

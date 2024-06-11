@@ -39,7 +39,11 @@ const CreateRoom = ({ className }) => {
                 }
             });
         } else {
-            console.error("Socket not connected, username or roomName is empty.");
+            toast({
+                title: "Error",
+                message: "Socket not connected, username or roomName is empty.",
+                type: "error",
+            });
         }
     };
 

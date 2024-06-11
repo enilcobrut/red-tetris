@@ -5,6 +5,7 @@ import Button from '../components/Button';
 import { useRoom } from '../context/RoomContext';
 import { useDispatch, useSelector } from 'react-redux';
 import { setRoomStatus, setInGame } from '../features/user/userSlice';  // Ensure both actions are imported
+import { toast } from '../components/Toast';
 
 const WaitingRoomPage = () => {
     const dispatch = useDispatch();
@@ -18,7 +19,11 @@ const WaitingRoomPage = () => {
 
     useEffect(() => {
           if (!isConnected || error) {
-            console.error("Socket is not connected or an error occurred", error);
+            toast({
+                title: "Connection Error",
+                message: "Socket is not connected or an error occurred. Redirecting to homepage.",
+                type: "error",
+                });
             navigate('/');
           }
         if (roomInfo.roomName) {
@@ -31,10 +36,6 @@ const WaitingRoomPage = () => {
             dispatch(setInGame(false));          
             console.log("The user is currently in a room.");
         }
-
-
-
-
       
           const handleDisconnect = () => {
             console.log("Disconnected from server, redirecting to homepage");
@@ -56,7 +57,11 @@ const WaitingRoomPage = () => {
         if (roomInfo.roomName && username && username === roomInfo.owner) {
             socket.emit('redirect_game', { room: roomInfo.roomName, username });
         } else {
-            console.error('Les informations nécessaires pour démarrer le jeu ne sont pas disponibles.');
+            toast({
+                title: "Game Start Error",
+                message: "The necessary information to start the game is not available.",
+                type: "error",
+            });
         }
     };
 

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {  useSelector } from 'react-redux';
 import Button from '../Button'
 import { useRoom } from '../../context/RoomContext';
+import { toast } from '../Toast';
 
 const GameCanva = ({ className }) => {
     const { socket } = useSelector(state => state.socket);
@@ -68,13 +69,16 @@ const GameCanva = ({ className }) => {
     useEffect(() => {
         if (!socket) {
             navigate('/');
-            console.error("Socket is not defined");
+            toast({
+                title: "Connection Error",
+                message: "Socket is not connected. Redirecting to homepage.",
+                type: "error",
+            });
             return;
         }
     
         const handleGridUpdate = ({ grid: receivedGrid, score }) => {
             if (receivedGrid.length === cols && receivedGrid[0].length === rows) {
-                console.error("Grid dimensions are transposed. Correcting...");
                 const correctedGrid = receivedGrid[0].map((_, colIndex) =>
                     receivedGrid.map(row => row[colIndex])
                 );
@@ -82,10 +86,12 @@ const GameCanva = ({ className }) => {
             } else if (receivedGrid.length === rows && receivedGrid[0].length === cols) {
                 setGrid(receivedGrid);
             } else {
-                console.error("Incorrect grid structure", receivedGrid);
+                toast({
+                    title: "Grid Update Error",
+                    message: "Incorrect grid structure",
+                    type: "error",
+                });
             }
-
-    
         };
         const handleGameOver = (data) => {
             if (data && data.score !== undefined) {

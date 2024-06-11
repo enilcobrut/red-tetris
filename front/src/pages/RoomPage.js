@@ -195,7 +195,13 @@ useEffect(() => {
     audioRefs.current.forEach((audio, index) => {
       if (audio.playing) {
         audio.ref.loop = true;
-        audio.ref.play().catch(error => console.error(`Error playing audio ${index}:`, error));
+        audio.ref.play().catch(error => {
+          toast({
+            title: "Error",
+            message: `Error playing audio ${index}: ${error.message}`,
+            type: "error",
+          });
+        });
       }
     });
 
@@ -215,7 +221,13 @@ const toggleSound = (index) => {
       } else {
         // If the selected audio file is currently not playing, start playing it in a loop
         audio.ref.loop = true;
-        audio.ref.play().catch(error => console.error(`Error playing audio ${idx}:`, error));
+        audio.ref.play().catch(error => {
+          toast({
+            title: "Error",
+            message: `Error playing audio ${idx}: ${error.message}`,
+            type: "error",
+          });
+        });
         return { ...audio, playing: true };
       }
     } else {

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import Paragraph from '../Paragraph';
 import DropdownMenu from '../DropDownMenu';
+import { toast } from '../Toast';
 
 const HallOfFame = ({ className }) => {
     const { socket } = useSelector(state => state.socket);
@@ -39,7 +40,11 @@ const HallOfFame = ({ className }) => {
                     });
                     setData(standardizedData.slice(0, 10));
                 } else {
-                    console.error('Received data is not an array:', jsonData);
+                    toast({
+                        title: "Error",
+                        message: "Received data is not an array.",
+                        type: "error",
+                    });
                 }
             };
             socket.emit('getData', { sort: leaderBoard });
