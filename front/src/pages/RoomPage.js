@@ -7,6 +7,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { setRoomStatus } from '../features/user/userSlice';
 import { setInGame } from '../features/user/userSlice';
+import { toast } from '../components/Toast';
+
 const RoomPage = () => {
     const { socket } = useSelector(state => state.socket);
     const { roomInfo } = useRoom();
