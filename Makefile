@@ -36,7 +36,7 @@ create-env:
 # Should be the IP address of the server
 update-env:
 	@echo "Updating REACT_APP_SOCKET_URL to $(NEW_URL) in env files..."
-	@sed -i'' 's|^REACT_APP_SOCKET_URL=.*$$|REACT_APP_SOCKET_URL=$(NEW_URL)|' $(ENV_FILE_BACK)
+	@sed -i'' 's|^REACT_APP_SOCKET_URL=.*$$|REACT_APP_SOCKET_URL=$(NEW_URL)|' $(ENV_FILE_FRONT)
 	@sed -i'' 's|^REACT_APP_SOCKET_URL=.*$$|REACT_APP_SOCKET_URL=$(NEW_URL)|' $(ENV_FILE_BACK)
 	@echo "Update complete."
 
